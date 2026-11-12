@@ -3,6 +3,7 @@
 // El nombre solo viaja si el estudiante lo autoriza en ese momento.
 import { onMounted, ref } from 'vue'
 import { llamar, mensajeDeError } from '@/lib/api'
+import { supabase } from '@/lib/supabase'
 import { fechaCorta } from '@/lib/fechas'
 import AppIcon from '@/components/comun/AppIcon.vue'
 import AvisoError from '@/components/comun/AvisoError.vue'
@@ -23,12 +24,24 @@ async function cargar() {
 
 onMounted(cargar)
 
+// Pide al servidor que avise ya por correo a la dirección. Si falla, el aviso
+// se envía igualmente en la tarea diaria y siempre aparece en su panel.
+async function avisarPorCorreo() {
+  try {
+    const { data } = await supabase.auth.getSession()
+    await fetch('/api/notificar-apoyo', { method: 'POST', headers: { Authorization: `Bearer ${data.session?.access_token ?? ''}` } })
+  } catch {
+    // Sin consecuencias: queda pendiente para la tarea diaria.
+  }
+}
+
 async function enviar() {
   enviando.value = true
   error.value = ''
   try {
     await llamar('pedir_apoyo', { p_compartir_nombre: compartirNombre.value })
     enviado.value = true
+    avisarPorCorreo()
     await cargar()
   } catch (e) {
     error.value = mensajeDeError(e)

@@ -86,6 +86,13 @@ for (const [i, pareja] of parejas8.entries()) {
   await c.query(`insert into public.bienestar (estudiante_id, semana, valor_cifrado) values ($1, 2, private.cifrar_bienestar(4))`, [est])
   await c.query(`insert into public.respuestas_tutor (pareja_id, semana, avance, siguiente_paso) values ($1, 2, $2, $3)`, [pareja, 2 + ((i + 1) % 4), i % 2 ? null : 3])
 }
+
+// SOLO EN LOCAL: una convocatoria ficticia con plazo cercano, Ana con Puente
+// activado y el pretest abierto hasta la semana 3, para poder probarlo todo.
+await c.query(`insert into public.convocatorias (nombre, organismo, fecha_apertura, fecha_cierre, enlace, estado)
+  values ('Convocatoria de ejemplo (ficticia)', 'Organismo ficticio', (now() + interval '7 days')::date, (now() + interval '40 days')::date, '[PENDIENTE: enlace oficial]', 'Ficticia')`)
+await c.query(`update public.perfiles set puente_doctorado = true where user_id = $1`, [ana])
+await c.query(`update public.cuestionarios set hasta_semana = 3 where clave = 'pretest'`)
 await c.end()
 
 // Cierre de las semanas 1 y 2 con el mismo proceso que en producción (sin

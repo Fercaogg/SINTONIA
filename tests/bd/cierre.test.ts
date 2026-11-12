@@ -82,7 +82,7 @@ describe('Cierre de la semana con la base de datos', () => {
   it('se muestra la agenda de la última semana procesada (la 2, sin datos: mensaje neutro)', async () => {
     for (const est of [e.estudianteA, e.estudianteB]) {
       await bd.rpc(est, 'aceptar_consentimiento', { p_version: 1 })
-      expect(await bd.rpc(est, 'mi_agenda')).toEqual({ estado: 'sin_agenda', semana: 2 })
+      expect(await bd.rpc(est, 'mi_agenda')).toEqual({ estado: 'sin_agenda', semana: 2, linea_puente: null })
     }
   })
 
@@ -101,7 +101,7 @@ describe('Cierre de la semana con la base de datos', () => {
         expect(mia.preguntas).toHaveLength(3)
         expect(suya.preguntas).toEqual(mia.preguntas)
       } else {
-        expect(mia).toEqual({ estado: 'sin_agenda', semana: 1 })
+        expect(mia).toEqual({ estado: 'sin_agenda', semana: 1, linea_puente: null })
         expect(suya).toEqual(mia)
       }
     }

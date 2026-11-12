@@ -22,3 +22,6 @@ Todo lo que el sistema necesita y que no puedo inventar. En la aplicación, cada
 | Revisar y aprobar el banco de 14 preguntas provisionales de la agenda (tabla banco_preguntas) | Agenda sin modelo | Fernando y sus directores |
 | Confirmar que el sorteo incluye a todas las parejas con los dos check-ins, aunque no haya desajuste relevante | Microensayo aleatorizado | Fernando |
 | Decidir si se usa el modelo de lenguaje en el piloto (AGENDA_MODO) y quién paga la clave de la API | Agenda | Fernando |
+| Instrucciones del cuestionario inicial y del final | Pretest y postest | Fernando |
+| Enlace, organismo, fechas y estado de cada convocatoria (FPU, FPI, contratos de la USAL y de la Junta, admisión al doctorado) | Puente al doctorado (pantalla Investigación > Convocatorias) | Fernando |
+| Cuenta de Resend (u otro proveedor) y dominio desde el que se envían los correos | Recordatorios | Fernando |

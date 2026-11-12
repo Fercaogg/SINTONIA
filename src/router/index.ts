@@ -33,6 +33,8 @@ const routes: RouteRecordRaw[] = [
       { path: 'checkin', component: () => import('@/views/estudiante/CheckinEstudianteView.vue'), meta: { titulo: 'Check-in semanal' } },
       { path: 'historial', component: () => import('@/views/estudiante/HistorialView.vue'), meta: { titulo: 'Mi histórico' } },
       { path: 'apoyo', component: () => import('@/views/estudiante/ApoyoView.vue'), meta: { titulo: 'Necesito apoyo' } },
+      { path: 'puente', component: () => import('@/views/estudiante/PuenteView.vue'), meta: { titulo: 'Puente al doctorado' } },
+      { path: 'cuestionario/:clave', component: () => import('@/views/estudiante/CuestionarioView.vue'), meta: { titulo: 'Cuestionario' } },
     ],
   },
   {
@@ -61,6 +63,8 @@ const routes: RouteRecordRaw[] = [
     children: [
       { path: '', component: () => import('@/views/investigacion/MastersView.vue'), meta: { titulo: 'Másteres y códigos' } },
       { path: 'calendario', component: () => import('@/views/investigacion/CalendarioView.vue'), meta: { titulo: 'Calendario del estudio' } },
+      { path: 'convocatorias', component: () => import('@/views/investigacion/ConvocatoriasView.vue'), meta: { titulo: 'Convocatorias' } },
+      { path: 'cuestionarios', component: () => import('@/views/investigacion/CuestionariosView.vue'), meta: { titulo: 'Cuestionarios' } },
     ],
   },
   {

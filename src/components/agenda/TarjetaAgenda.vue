@@ -19,9 +19,12 @@ withDefaults(defineProps<{ agenda: AgendaSemana | null; otraPersona: string; tit
 
     <p v-if="!agenda" class="text-sm texto-suave mt-1">Cuando haya preguntas para la próxima tutoría, las verás aquí.</p>
 
-    <p v-else-if="agenda.estado === 'sin_agenda'" class="text-sm text-surface-800 mt-2" data-agenda="sin_agenda">
-      Esta semana no hay agenda. Sigue como siempre.
-    </p>
+    <template v-else-if="agenda.estado === 'sin_agenda'">
+      <p class="text-sm text-surface-800 mt-2" data-agenda="sin_agenda">Esta semana no hay agenda. Sigue como siempre.</p>
+      <p v-if="agenda.linea_puente" class="mt-4 p-3 rounded-xl bg-surface-100 text-sm text-surface-900 flex gap-2" data-agenda="puente">
+        <AppIcon name="graduation" :size="18" class="shrink-0" /> {{ agenda.linea_puente }}
+      </p>
+    </template>
 
     <template v-else>
       <p class="text-sm texto-suave mt-1">Tres preguntas para hablar juntos. {{ otraPersona }} ve las mismas.</p>
@@ -31,7 +34,7 @@ withDefaults(defineProps<{ agenda: AgendaSemana | null; otraPersona: string; tit
           <span class="text-surface-900 leading-relaxed pt-0.5">{{ p }}</span>
         </li>
       </ol>
-      <p v-if="agenda.linea_puente" class="mt-4 p-3 rounded-xl bg-surface-100 text-sm text-surface-900 flex gap-2">
+      <p v-if="agenda.linea_puente" class="mt-4 p-3 rounded-xl bg-surface-100 text-sm text-surface-900 flex gap-2" data-agenda="puente">
         <AppIcon name="graduation" :size="18" class="shrink-0" /> {{ agenda.linea_puente }}
       </p>
       <p class="mt-4 text-xs texto-suave">

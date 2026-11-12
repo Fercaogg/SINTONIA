@@ -41,6 +41,10 @@ function almacenFalso(parejas: DatosPareja[], opciones: { guardados?: Record<str
       sorteos.push(...filas)
       return filas.map((f) => ({ pareja_id: f.pareja_id, resultado: opciones.guardados?.[f.pareja_id] ?? f.resultado }))
     },
+    datosPuente: async () => ({ referencia: '2027-02-15', convocatorias: [], parejas: parejas.map((p) => ({ pareja_id: p.pareja_id, activado: false })) }),
+    registrarPuente: async () => {
+      registro.push('puente')
+    },
     guardarAgenda: async (id, _s, agenda) => {
       if (opciones.fallaAgenda) throw new Error('fallo de red')
       registro.push(`agenda:${id}`)
@@ -99,7 +103,7 @@ describe('Cierre de semana', () => {
   it('si falla al guardar una agenda, los sorteos ya están guardados y la semana no se da por cerrada', async () => {
     const f = almacenFalso([pareja('p1', 3, 3)], { guardados: { p1: true }, fallaAgenda: true })
     await expect(cerrarSemanas({ almacen: f.almacen, redactor: null, semilla: SEMILLA })).rejects.toThrow()
-    expect(f.registro).toEqual(['sorteos'])
+    expect(f.registro).toEqual(['sorteos', 'puente'])
   })
 })
 

@@ -20,6 +20,7 @@ const MENUS: Record<Rol, Enlace[]> = {
     { to: '/estudiante', label: 'Inicio', icon: 'home', exact: true },
     { to: '/estudiante/checkin', label: 'Check-in semanal', icon: 'checkin' },
     { to: '/estudiante/historial', label: 'Mi histórico', icon: 'history' },
+    { to: '/estudiante/puente', label: 'Puente al doctorado', icon: 'graduation' },
     { to: '/estudiante/apoyo', label: 'Necesito apoyo', icon: 'heart' },
     CUENTA,
     COMO,
@@ -40,6 +41,8 @@ const MENUS: Record<Rol, Enlace[]> = {
   investigador: [
     { to: '/investigacion', label: 'Másteres y códigos', icon: 'building', exact: true },
     { to: '/investigacion/calendario', label: 'Calendario del estudio', icon: 'calendar' },
+    { to: '/investigacion/convocatorias', label: 'Convocatorias', icon: 'graduation' },
+    { to: '/investigacion/cuestionarios', label: 'Cuestionarios', icon: 'document' },
     CUENTA,
     COMO,
   ],

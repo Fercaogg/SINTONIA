@@ -15,6 +15,8 @@ import TarjetaAgenda from '@/components/agenda/TarjetaAgenda.vue'
 const sesion = useSesion()
 const datos = ref<CheckinEstudiante | null>(null)
 const agenda = ref<AgendaSemana | null>(null)
+const cuestionarios = ref<{ clave: string; titulo: string; abierto: boolean; completado: boolean }[]>([])
+const cuestionarioPendiente = computed(() => cuestionarios.value.find((c) => c.abierto && !c.completado))
 const cargando = ref(true)
 const error = ref('')
 
@@ -22,9 +24,14 @@ const nombre = computed(() => sesion.perfil?.nombre?.split(' ')[0] ?? '')
 
 onMounted(async () => {
   try {
-    const [d, a] = await Promise.all([llamar<CheckinEstudiante>('mi_checkin'), llamar<AgendaSemana | null>('mi_agenda')])
+    const [d, a, c] = await Promise.all([
+      llamar<CheckinEstudiante>('mi_checkin'),
+      llamar<AgendaSemana | null>('mi_agenda'),
+      llamar<typeof cuestionarios.value>('mis_cuestionarios'),
+    ])
     datos.value = d
     agenda.value = a
+    cuestionarios.value = c
   } catch (e) {
     error.value = mensajeDeError(e)
   } finally {
@@ -41,6 +48,17 @@ onMounted(async () => {
     <EstadoCarga v-if="cargando" />
     <AvisoError v-else-if="error" :mensaje="error" />
     <template v-else-if="datos">
+      <section v-if="cuestionarioPendiente" class="card p-5 sm:p-6 mb-4 flex flex-col sm:flex-row sm:items-center gap-4 bg-brand-50 border-brand-200" aria-labelledby="t-cuest">
+        <div class="w-12 h-12 rounded-2xl bg-white flex items-center justify-center shrink-0">
+          <AppIcon name="document" :size="24" class="text-surface-900" />
+        </div>
+        <div class="flex-1">
+          <h2 id="t-cuest" class="font-semibold text-surface-900">{{ cuestionarioPendiente.titulo }}</h2>
+          <p class="text-sm texto-suave mt-0.5">Unas pocas preguntas para el estudio. Solo hay que responderlo una vez.</p>
+        </div>
+        <RouterLink :to="`/estudiante/cuestionario/${cuestionarioPendiente.clave}`" class="btn-primary">Responder</RouterLink>
+      </section>
+
       <EstadoCalendario v-if="datos.calendario.estado !== 'abierta'" :calendario="datos.calendario" />
 
       <section v-else class="card p-5 sm:p-6 flex flex-col sm:flex-row sm:items-center gap-4" aria-labelledby="t-semana">

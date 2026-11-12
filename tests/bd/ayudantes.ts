@@ -5,6 +5,8 @@ import pg from 'pg'
 // @ts-expect-error: módulo JavaScript sin tipos
 import { crearBaseDeDatos, borrarBaseDeDatos } from '../../scripts/local/bd.mjs'
 
+const SERVIDOR = '__servidor__'
+
 export interface Bd {
   nombre: string
   /** Si se fija, la base de datos "cree" que es esta hora (ISO 8601). */
@@ -14,6 +16,8 @@ export interface Bd {
   admin: <T = any>(sql: string, params?: unknown[]) => Promise<T[]>
   /** Ejecuta SQL como una persona identificada, igual que la API de Supabase. */
   como: <T = any>(userId: string | null, sql: string, params?: unknown[]) => Promise<T[]>
+  /** Llama a una función como el servidor (clave service_role). */
+  servidor: <T = any>(funcion: string, args?: Record<string, unknown>) => Promise<T>
   /** Llama a una función de la API como una persona identificada. */
   rpc: <T = any>(userId: string | null, funcion: string, args?: Record<string, unknown>) => Promise<T>
   cerrar: () => Promise<void>
@@ -30,9 +34,9 @@ export async function nuevaBd(prefijo: string): Promise<Bd> {
     const cliente = await pool.connect()
     try {
       await cliente.query('begin')
-      const rol = userId ? 'authenticated' : 'anon'
+      const rol = userId === SERVIDOR ? 'service_role' : userId ? 'authenticated' : 'anon'
       await cliente.query(`set local role ${rol}`)
-      const claims = userId ? { sub: userId, role: rol } : { role: rol }
+      const claims = userId && userId !== SERVIDOR ? { sub: userId, role: rol } : { role: rol }
       await cliente.query(`select set_config('request.jwt.claims', $1, true)`, [JSON.stringify(claims)])
       if (bd.ahora) await cliente.query(`select set_config('sintonia.ahora', $1, true)`, [bd.ahora])
       const res = await cliente.query(sql, params)
@@ -60,6 +64,7 @@ export async function nuevaBd(prefijo: string): Promise<Bd> {
     admin,
     como,
     rpc,
+    servidor: (funcion, args = {}) => rpc(SERVIDOR, funcion, args),
     cerrar: async () => {
       await pool.end()
       await borrarBaseDeDatos(nombre)

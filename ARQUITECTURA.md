@@ -1,6 +1,6 @@
 # Arquitectura de SINTONÍA: quién ve qué
 
-Versión de la Fase 4. Se completará en las fases siguientes (sorteo, agenda, panel de dirección y exportación).
+Versión de la Fase 5. Se completará en las fases siguientes (sorteo, agenda, panel de dirección y exportación).
 
 Este documento está pensado para el apartado CTS del TFM: cada decisión sobre quién ve qué dato es una decisión de diseño que inclina la herramienta hacia el acompañamiento o hacia la vigilancia.
 
@@ -60,6 +60,9 @@ Las respuestas solo llevan el código de la pareja. El nombre está en otra tabl
 | Desajustes calculados | **No** | **No** | **No** | Sí (seudónimos) |
 | Sorteos | **No** | **No** | **No** | Sí (seudónimos) |
 | Agenda de la pareja | La suya | La de cada pareja suya | **No** | Sí (seudónimos) |
+| Puente al doctorado activado | Sí | Solo la línea de la agenda | No | Sí (seudónimos) |
+| Respuestas a los cuestionarios | Las suyas | **No** | **No** | Sí (seudónimos) |
+| Correos electrónicos de las personas | El suyo | **No** | **No** | **No** (solo el servidor, para enviar recordatorios) |
 | Auditoría | No | No | No | Sí |
 | Resúmenes del máster (Fase 6) | No | No | Sí, con un mínimo de 5 personas | Sí |
 
@@ -126,3 +129,9 @@ sequenceDiagram
 - La base de datos **no permite** guardar una agenda sin un sorteo favorable guardado antes (clave foránea y comprobación en la función).
 - Ni el estudiante ni el tutor ven la diferencia, el desajuste ni el resultado del sorteo: solo ven las tres preguntas o el mensaje "Esta semana no hay agenda. Sigue como siempre."
 - Lo que se envía al modelo queda guardado con la agenda (`entrada_modelo`), para poder comprobar que nunca contiene datos personales.
+
+## 9. Correos
+
+- Los correos son el único momento en que se juntan nombre, correo y actividad, y solo los ve el servidor.
+- Recordatorios: uno al abrirse el check-in y otro 48 horas antes del cierre, solo a quien no ha respondido y los tiene activados.
+- Aviso de apoyo a la dirección: solo el máster y, si el estudiante lo autorizó, su nombre. Nunca respuestas ni bienestar.

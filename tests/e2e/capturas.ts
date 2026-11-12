@@ -135,3 +135,25 @@ test('pantallas de los check-ins y de la cuenta', async ({ page }, info) => {
   await page.getByRole('heading', { name: 'Sorteos por semana' }).waitFor()
   await foto(page, '22-investigacion-calendario', p)
 })
+
+test('pantallas de Puente al doctorado y cuestionarios', async ({ page }, info) => {
+  const p = info.project.name
+  await entrarConContrasena(page, 'ana@usal.es')
+  await page.locator('[data-agenda="puente"]').waitFor()
+  await foto(page, '24-estudiante-inicio-con-puente-y-cuestionario', p)
+  await page.goto('/estudiante/puente')
+  await page.getByRole('switch').waitFor()
+  await foto(page, '25-estudiante-puente', p)
+  await page.goto('/estudiante/cuestionario/pretest')
+  await page.getByRole('heading', { name: 'Cuestionario inicial' }).waitFor()
+  await foto(page, '26-estudiante-cuestionario', p)
+
+  await page.evaluate(() => localStorage.clear())
+  await entrarConContrasena(page, 'investigador@usal.es')
+  await page.goto('/investigacion/convocatorias')
+  await page.getByRole('heading', { name: 'Convocatorias' }).waitFor()
+  await foto(page, '27-investigacion-convocatorias', p)
+  await page.goto('/investigacion/cuestionarios')
+  await page.getByRole('heading', { name: 'Cuestionario inicial' }).waitFor()
+  await foto(page, '28-investigacion-cuestionarios', p)
+})

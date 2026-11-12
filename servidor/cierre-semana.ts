@@ -8,8 +8,10 @@
  *   2. Calcula los desajustes (logica/desajuste.ts).
  *   3. Hace el sorteo de cada pareja elegible y GUARDA desajustes y sorteos.
  *      Si la semana ya tenía sorteos, se respetan: un sorteo nunca se repite.
- *   4. Solo después, genera y guarda la agenda de las parejas que la reciben.
- *   5. Marca la semana como procesada.
+ *   4. Decide la línea de Puente al doctorado de cada pareja y la guarda
+ *      (también si esa semana no hay agenda).
+ *   5. Solo después, genera y guarda la agenda de las parejas que la reciben.
+ *   6. Marca la semana como procesada.
  *
  * Si algo falla en el paso 4, los sorteos ya están guardados y la siguiente
  * ejecución completará las agendas que falten sin volver a sortear.
@@ -19,6 +21,7 @@ import { calcularDesajustes, type Desajuste, type Regla, type SemanaPareja } fro
 import { ALGORITMO_SORTEO, motivoNoElegible, nuevaSemilla, sortear, type MotivoNoElegible } from './logica/sorteo'
 import { entradaParaModelo, seleccionarDelBanco, validarSalidaModelo, type PreguntaBanco } from './logica/agenda'
 import { VERSION_PROMPT, type Redactor } from './logica/modelo'
+import { decidirPuente, type Convocatoria, type DecisionPuente } from './logica/puente'
 
 export interface SemanaPendiente {
   estudio_id: string
@@ -69,6 +72,8 @@ export interface Almacen {
   semanasPorCerrar(): Promise<SemanaPendiente[]>
   datosSemana(estudioId: string, semana: number): Promise<DatosSemana>
   registrarSorteos(estudioId: string, semana: number, desajustes: unknown[], sorteos: FilaSorteo[]): Promise<{ pareja_id: string; resultado: boolean | null }[]>
+  datosPuente(estudioId: string, semana: number): Promise<{ referencia: string; convocatorias: Convocatoria[]; parejas: { pareja_id: string; activado: boolean }[] }>
+  registrarPuente(semana: number, filas: DecisionPuente[]): Promise<void>
   guardarAgenda(parejaId: string, semana: number, agenda: Agenda): Promise<void>
   completarCierre(estudioId: string, semana: number): Promise<void>
 }
@@ -168,7 +173,13 @@ export async function cerrarSemanas(opciones: {
     // Lo que manda es lo guardado (si la semana ya se había sorteado, se respeta).
     const guardados = await almacen.registrarSorteos(estudio_id, semana, filasDesajuste, sorteos)
 
-    // 4. Agendas, solo para las parejas con sorteo favorable guardado.
+    // 4. Puente al doctorado (se registra para todas las parejas).
+    const puente = await almacen.datosPuente(estudio_id, semana)
+    const decisiones = decidirPuente(puente.parejas, puente.convocatorias, puente.referencia)
+    await almacen.registrarPuente(semana, decisiones)
+    const lineaDe = new Map(decisiones.map((d) => [d.pareja_id, d.linea]))
+
+    // 5. Agendas, solo para las parejas con sorteo favorable guardado.
     let generadas = 0
     for (const g of guardados.filter((x) => x.resultado)) {
       const p = datos.parejas.find((x) => x.pareja_id === g.pareja_id)
@@ -177,11 +188,12 @@ export async function cerrarSemanas(opciones: {
         desajustes: desajustesPorPareja.get(p.pareja_id) ?? calcularDesajustes(p.semanas, semana, datos.regla),
         semana, semanas, banco: datos.banco, previas: p.preguntas_previas, semilla: `${semilla}:${p.pareja_id}`, redactor,
       })
+      agenda.linea_puente = lineaDe.get(p.pareja_id) ?? null
       await almacen.guardarAgenda(p.pareja_id, semana, agenda)
       generadas++
     }
 
-    // 5. Semana procesada.
+    // 6. Semana procesada.
     await almacen.completarCierre(estudio_id, semana)
     resumen.push({
       estudio_id, semana,

@@ -45,9 +45,17 @@ Necesitas Node.js 20 o posterior y PostgreSQL 16 en marcha en tu ordenador (usua
    npm run dev
    ```
 
-Cuentas de prueba (contraseña `sintonia-local`, botón "Entrar con contraseña"): `investigador@usal.es`, `tutora@usal.es`, `direccion@usal.es` y `ana@usal.es`.
+Cuentas de prueba (contraseña `sintonia-local`, botón "Entrar con contraseña"): `investigador@usal.es`, `tutora@usal.es`, `tutor8@usal.es` (con 8 estudiantes), `direccion@usal.es` y `ana@usal.es`. La base de datos local incluye una convocatoria **ficticia** para poder ver la línea de Puente al doctorado.
 
 En local no se envían correos: el enlace de acceso aparece en la terminal del paso 3.
+
+Para ejecutar a mano las tareas diarias del servidor (cierre de semanas, recordatorios y avisos), con el servidor local en marcha:
+
+```bash
+npm run local:tareas
+```
+
+Los correos se muestran en la terminal.
 
 ## Tests
 
