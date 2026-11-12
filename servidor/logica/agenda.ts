@@ -62,7 +62,7 @@ export function erroresDePregunta(texto: unknown): string[] {
   if (t.length > 160) errores.push('demasiado larga')
   if (!t.startsWith('¿') || !t.endsWith('?')) errores.push('no es una pregunta (¿...?)')
   if (/\d/.test(t)) errores.push('contiene números')
-  if (/[—–]/.test(t)) errores.push('contiene rayas')
+  if (/[\u2014\u2013]/.test(t)) errores.push('contiene rayas')
   if (/[\n\r]/.test(t)) errores.push('contiene saltos de línea')
   const minus = ` ${t.toLowerCase()} `
   for (const raiz of RAICES_PROHIBIDAS) {
