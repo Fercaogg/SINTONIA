@@ -7,6 +7,8 @@ import { crearBaseDeDatos, borrarBaseDeDatos } from '../../scripts/local/bd.mjs'
 
 export interface Bd {
   nombre: string
+  /** Si se fija, la base de datos "cree" que es esta hora (ISO 8601). */
+  ahora: string | null
   pool: pg.Pool
   /** Ejecuta SQL con permisos de administrador (como el panel de Supabase). */
   admin: <T = any>(sql: string, params?: unknown[]) => Promise<T[]>
@@ -32,6 +34,7 @@ export async function nuevaBd(prefijo: string): Promise<Bd> {
       await cliente.query(`set local role ${rol}`)
       const claims = userId ? { sub: userId, role: rol } : { role: rol }
       await cliente.query(`select set_config('request.jwt.claims', $1, true)`, [JSON.stringify(claims)])
+      if (bd.ahora) await cliente.query(`select set_config('sintonia.ahora', $1, true)`, [bd.ahora])
       const res = await cliente.query(sql, params)
       await cliente.query('commit')
       return res.rows
@@ -50,8 +53,9 @@ export async function nuevaBd(prefijo: string): Promise<Bd> {
     return filas[0].r
   }
 
-  return {
+  const bd: Bd = {
     nombre,
+    ahora: null,
     pool,
     admin,
     como,
@@ -61,6 +65,7 @@ export async function nuevaBd(prefijo: string): Promise<Bd> {
       await borrarBaseDeDatos(nombre)
     },
   }
+  return bd
 }
 
 /** Crea una cuenta igual que lo haría Supabase al registrarse. */

@@ -2,7 +2,7 @@
 // y redirecciones por perfil.
 
 import { expect, test } from '@playwright/test'
-import { abrirMenuSiMovil, codigosLibres, entrarConContrasena, porProyecto, sinRayasLargas, ultimoEnlace } from './ayudantes'
+import { abrirMenuSiMovil, sinErroresDeAccesibilidad, codigosLibres, entrarConContrasena, porProyecto, sinRayasLargas, ultimoEnlace } from './ayudantes'
 
 test('un estudiante se registra con su código, acepta el consentimiento y llega a su panel', async ({ page }, info) => {
   const codigo = porProyecto(info, codigosLibres())
@@ -98,11 +98,12 @@ test('el investigador crea un máster y códigos', async ({ page }, info) => {
   await sinRayasLargas(page)
 })
 
-test('ninguna pantalla pública se sale por los lados', async ({ page }) => {
+test('las pantallas públicas no se salen por los lados y pasan la revisión de accesibilidad', async ({ page }) => {
   for (const ruta of ['/', '/como-funciona', '/acceso', '/registro', '/no-existe']) {
     await page.goto(ruta)
     await page.waitForLoadState('networkidle')
     const desborde = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)
     expect(desborde, `La página ${ruta} es más ancha que la pantalla`).toBeLessThanOrEqual(0)
+    await sinErroresDeAccesibilidad(page)
   }
 })

@@ -12,23 +12,36 @@ import BandaEntorno from '@/components/comun/BandaEntorno.vue'
 
 interface Enlace { to: string; label: string; icon: string; exact?: boolean }
 
+const CUENTA: Enlace = { to: '/cuenta', label: 'Mi cuenta', icon: 'profile' }
+const COMO: Enlace = { to: '/como-funciona', label: 'Cómo funciona y tus datos', icon: 'shield' }
+
 const MENUS: Record<Rol, Enlace[]> = {
   estudiante: [
     { to: '/estudiante', label: 'Inicio', icon: 'home', exact: true },
-    { to: '/como-funciona', label: 'Cómo funciona y tus datos', icon: 'shield' },
+    { to: '/estudiante/checkin', label: 'Check-in semanal', icon: 'checkin' },
+    { to: '/estudiante/historial', label: 'Mi histórico', icon: 'history' },
+    { to: '/estudiante/apoyo', label: 'Necesito apoyo', icon: 'heart' },
+    CUENTA,
+    COMO,
   ],
   tutor: [
     { to: '/tutor', label: 'Inicio', icon: 'home', exact: true },
+    { to: '/tutor/checkin', label: 'Check-in semanal', icon: 'checkin' },
     { to: '/tutor/codigos', label: 'Códigos para tus estudiantes', icon: 'key' },
-    { to: '/como-funciona', label: 'Cómo funciona y tus datos', icon: 'shield' },
+    CUENTA,
+    COMO,
   ],
   direccion: [
     { to: '/direccion', label: 'Resumen del máster', icon: 'chart', exact: true },
-    { to: '/como-funciona', label: 'Cómo funciona y tus datos', icon: 'shield' },
+    { to: '/direccion/avisos', label: 'Avisos de apoyo', icon: 'inbox' },
+    CUENTA,
+    COMO,
   ],
   investigador: [
     { to: '/investigacion', label: 'Másteres y códigos', icon: 'building', exact: true },
-    { to: '/como-funciona', label: 'Cómo funciona y tus datos', icon: 'shield' },
+    { to: '/investigacion/calendario', label: 'Calendario del estudio', icon: 'calendar' },
+    CUENTA,
+    COMO,
   ],
 }
 
@@ -39,7 +52,7 @@ const menuAbierto = ref(false)
 
 const rol = computed(() => sesion.perfil?.rol ?? 'estudiante')
 const oscuro = computed(() => rol.value === 'direccion' || rol.value === 'investigador')
-const enlaces = computed(() => MENUS[rol.value])
+const enlaces = computed(() => (sesion.perfil?.retirado ? [CUENTA, COMO] : MENUS[rol.value]))
 
 const iniciales = computed(() => {
   const n = sesion.perfil?.nombre || 'S'

@@ -18,3 +18,4 @@ Todo lo que el sistema necesita y que no puedo inventar. En la aplicación, cada
 | Remitente de los correos (dirección y nombre) | Recordatorios | Fernando |
 | Logotipo definitivo | Toda la interfaz (ahora es provisional) | Fernando |
 | Correo de la persona investigadora que administrará SINTONÍA | Alta inicial en Supabase | Fernando |
+| Comprobar en el proyecto real de Supabase que la base de datos puede borrar la cuenta de acceso. Si no, el servidor terminará el borrado (está previsto). | Borrado de datos | Claude, en la Fase 7 |

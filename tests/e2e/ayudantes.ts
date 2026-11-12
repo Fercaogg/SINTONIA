@@ -1,4 +1,5 @@
 import { readFileSync } from 'node:fs'
+import AxeBuilder from '@axe-core/playwright'
 import { expect, type Page, type TestInfo } from '@playwright/test'
 
 export const API = 'http://localhost:54322'
@@ -26,6 +27,7 @@ export async function entrarConContrasena(page: Page, email: string) {
   await page.getByLabel('Correo institucional').fill(email)
   await page.getByLabel('Contraseña').fill(CONTRASENA)
   await page.getByRole('button', { name: 'Entrar', exact: true }).click()
+  await page.waitForURL((url) => !url.pathname.startsWith('/acceso'))
 }
 
 export async function abrirMenuSiMovil(page: Page) {
@@ -36,4 +38,32 @@ export async function abrirMenuSiMovil(page: Page) {
 export async function sinRayasLargas(page: Page) {
   const texto = await page.locator('body').innerText()
   expect(texto).not.toContain('—')
+}
+
+/** Registra un estudiante con un código y acepta el consentimiento. */
+export async function registrarEstudiante(page: Page, codigo: string, email: string, nombre: string) {
+  await page.goto('/registro')
+  await page.getByLabel('Código de acceso').fill(codigo)
+  await page.getByLabel('Tu nombre').fill(nombre)
+  await page.getByLabel('Correo institucional').fill(email)
+  await page.getByRole('button', { name: 'Continuar' }).click()
+  await expect(page.getByRole('heading', { name: 'Revisa tu correo' })).toBeVisible()
+  await page.goto(await ultimoEnlace(email))
+  await page.getByLabel(/He leído el texto y acepto participar/).check()
+  await page.getByRole('button', { name: 'Aceptar y continuar' }).click()
+  await expect(page).toHaveURL(/\/estudiante$/)
+}
+
+export async function salir(page: Page) {
+  await page.evaluate(() => localStorage.clear())
+}
+
+/** Revisión automática de accesibilidad (WCAG 2.1 A y AA) con axe. */
+export async function sinErroresDeAccesibilidad(page: Page) {
+  // El logotipo queda fuera: las WCAG (1.4.3) no exigen contraste a los logotipos.
+  const r = await new AxeBuilder({ page })
+    .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'])
+    .exclude('[data-logotipo]')
+    .analyze()
+  expect(r.violations.map((v) => `${v.id}: ${v.help} -> ${v.nodes.map((n) => n.target.join(' ')).join(' | ')}`)).toEqual([])
 }

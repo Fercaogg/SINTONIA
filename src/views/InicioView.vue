@@ -1,6 +1,6 @@
 <script setup lang="ts">
 // Página de entrada. Sin tono comercial: explica qué es y deja entrar.
-import { RouterLink } from 'vue-router'
+import { RouterLink, useRoute } from 'vue-router'
 import { useSesion } from '@/stores/sesion'
 import { INICIO_ROL } from '@/lib/tipos'
 import AppLogo from '@/components/comun/AppLogo.vue'
@@ -8,6 +8,7 @@ import AppIcon from '@/components/comun/AppIcon.vue'
 import BandaEntorno from '@/components/comun/BandaEntorno.vue'
 
 const sesion = useSesion()
+const route = useRoute()
 
 const pasos = [
   { icono: 'checkin', titulo: 'Un minuto a la semana', texto: 'Estudiante y tutor/a responden por separado unas pocas preguntas sobre cómo avanza el trabajo.' },
@@ -33,6 +34,9 @@ const pasos = [
     </header>
 
     <main id="contenido" class="flex-1">
+      <p v-if="route.query.borrado" class="aviso-exito max-w-[900px] mx-4 sm:mx-auto mt-6" role="status">
+        Hemos borrado tu cuenta y todos tus datos. Gracias por haber participado.
+      </p>
       <section class="relative overflow-hidden py-16 sm:py-24">
         <div class="absolute inset-0 pointer-events-none" aria-hidden="true">
           <div class="absolute top-16 left-10 w-72 h-72 bg-brand-400/20 rounded-full blur-3xl" />

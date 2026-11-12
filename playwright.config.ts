@@ -16,6 +16,8 @@ export default defineConfig({
     trace: 'off',
     locale: 'es-ES',
     timezoneId: 'Europe/Madrid',
+    // Sin animaciones: así la revisión de accesibilidad mide los colores finales.
+    reducedMotion: 'reduce',
   },
   projects: process.env.CAPTURAS
     ? [

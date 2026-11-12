@@ -1,6 +1,6 @@
 # Arquitectura de SINTONÍA: quién ve qué
 
-Versión de la Fase 2. Se completará en las fases siguientes (sorteo, agenda, panel de dirección y exportación).
+Versión de la Fase 3. Se completará en las fases siguientes (sorteo, agenda, panel de dirección y exportación).
 
 Este documento está pensado para el apartado CTS del TFM: cada decisión sobre quién ve qué dato es una decisión de diseño que inclina la herramienta hacia el acompañamiento o hacia la vigilancia.
 
@@ -56,6 +56,7 @@ Las respuestas solo llevan el código de la pareja. El nombre está en otra tabl
 | Bienestar | Solo el suyo | **No** | **No** | **No** en la tabla. Solo dentro de la exportación seudonimizada, que queda registrada (Fase 6) |
 | Códigos de acceso | No | Los suyos sin usar, para repartirlos | No | Todos |
 | Consentimientos | Los suyos | Los suyos | Los suyos | Todos |
+| Avisos de "Necesito apoyo" | Los suyos | **No** | Los de su máster, mediante una función que solo da la fecha y el nombre **si el estudiante lo ha autorizado** | No |
 | Auditoría | No | No | No | Sí |
 | Resúmenes del máster (Fase 6) | No | No | Sí, con un mínimo de 5 personas | Sí |
 
@@ -79,3 +80,19 @@ Cada fila de esta tabla está comprobada por un test automático (`tests/bd/perm
 5. El investigador se autoriza una sola vez desde el panel de Supabase (ver el README).
 
 El investigador nunca necesita conocer nombres: reconoce a los tutores por la etiqueta que puso a su código (por ejemplo, "Tutor 3").
+
+## 6. Check-ins y bienestar bajo
+
+- Cada estudiante responde 4 ítems por semana; el tutor, 1 obligatorio y 1 opcional por estudiante.
+- El check-in solo se acepta mientras la semana está abierta. Se puede cambiar hasta el cierre, pero hay una sola respuesta por semana.
+- Si el estudiante responde 1 o 2 en bienestar, solo su propia pantalla muestra un mensaje amable y el enlace al servicio de atención psicológica. **No se avisa a nadie y no se guarda ninguna marca.**
+- "Necesito apoyo" es lo único que avisa a otra persona, y solo cuando el estudiante lo pulsa.
+
+## 7. Derechos sobre los datos
+
+| Derecho | Cómo se ejerce | Qué ocurre |
+|---|---|---|
+| Acceso | Mi cuenta > Descargar | Archivo con todo lo que se guarda sobre la persona. Queda en la auditoría. |
+| Rectificación | Mi cuenta > Nombre | Cambia el nombre. |
+| Retirada | Mi cuenta > Retirarme y conservar | Deja de participar; las respuestas anteriores se conservan sin nombre. |
+| Supresión | Mi cuenta > Retirarme y borrar | Se borran la cuenta, la identidad, las respuestas, el bienestar, los avisos y lo que el tutor respondió sobre el estudiante. |

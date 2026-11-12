@@ -28,7 +28,12 @@ const routes: RouteRecordRaw[] = [
     path: '/estudiante',
     component: LayoutPanel,
     meta: { rol: 'estudiante' },
-    children: [{ path: '', component: () => import('@/views/estudiante/PanelEstudianteView.vue'), meta: { titulo: 'Inicio' } }],
+    children: [
+      { path: '', component: () => import('@/views/estudiante/PanelEstudianteView.vue'), meta: { titulo: 'Inicio' } },
+      { path: 'checkin', component: () => import('@/views/estudiante/CheckinEstudianteView.vue'), meta: { titulo: 'Check-in semanal' } },
+      { path: 'historial', component: () => import('@/views/estudiante/HistorialView.vue'), meta: { titulo: 'Mi histórico' } },
+      { path: 'apoyo', component: () => import('@/views/estudiante/ApoyoView.vue'), meta: { titulo: 'Necesito apoyo' } },
+    ],
   },
   {
     path: '/tutor',
@@ -36,6 +41,7 @@ const routes: RouteRecordRaw[] = [
     meta: { rol: 'tutor' },
     children: [
       { path: '', component: () => import('@/views/tutor/PanelTutorView.vue'), meta: { titulo: 'Inicio' } },
+      { path: 'checkin', component: () => import('@/views/tutor/CheckinTutorView.vue'), meta: { titulo: 'Check-in semanal' } },
       { path: 'codigos', component: () => import('@/views/tutor/CodigosTutorView.vue'), meta: { titulo: 'Códigos para tus estudiantes' } },
     ],
   },
@@ -43,13 +49,24 @@ const routes: RouteRecordRaw[] = [
     path: '/direccion',
     component: LayoutPanel,
     meta: { rol: 'direccion' },
-    children: [{ path: '', component: () => import('@/views/direccion/PanelDireccionView.vue'), meta: { titulo: 'Resumen del máster' } }],
+    children: [
+      { path: '', component: () => import('@/views/direccion/PanelDireccionView.vue'), meta: { titulo: 'Resumen del máster' } },
+      { path: 'avisos', component: () => import('@/views/direccion/AvisosApoyoView.vue'), meta: { titulo: 'Avisos de apoyo' } },
+    ],
   },
   {
     path: '/investigacion',
     component: LayoutPanel,
     meta: { rol: 'investigador' },
-    children: [{ path: '', component: () => import('@/views/investigacion/MastersView.vue'), meta: { titulo: 'Másteres y códigos' } }],
+    children: [
+      { path: '', component: () => import('@/views/investigacion/MastersView.vue'), meta: { titulo: 'Másteres y códigos' } },
+      { path: 'calendario', component: () => import('@/views/investigacion/CalendarioView.vue'), meta: { titulo: 'Calendario del estudio' } },
+    ],
+  },
+  {
+    path: '/cuenta',
+    component: LayoutPanel,
+    children: [{ path: '', component: () => import('@/views/CuentaView.vue'), meta: { titulo: 'Mi cuenta' } }],
   },
   { path: '/:pathMatch(.*)*', component: () => import('@/views/NoEncontradaView.vue'), meta: { publica: true, titulo: 'Página no encontrada' } },
 ]
@@ -69,6 +86,9 @@ router.beforeEach(async (to) => {
   if (to.meta.publica) return true
 
   if (!sesion.conectado || !perfil) return { path: '/acceso', query: { volver: to.fullPath } }
+
+  // Quien se ha retirado solo puede ver su cuenta (para descargar o borrar sus datos).
+  if (perfil.retirado) return to.path === '/cuenta' ? true : '/cuenta'
 
   if (necesitaConsentimiento(perfil.rol) && !perfil.consentimiento.aceptado && to.path !== '/consentimiento') {
     return '/consentimiento'

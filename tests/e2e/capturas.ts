@@ -9,6 +9,9 @@ const carpeta = 'docs/capturas'
 async function foto(page: Page, nombre: string, proyecto: string) {
   await page.waitForLoadState('networkidle')
   await page.evaluate(() => document.fonts.ready)
+  // En una captura de página completa, los elementos fijos (cabecera del móvil,
+  // botón de envío) aparecerían a mitad de imagen: se dejan en su sitio normal.
+  await page.addStyleTag({ content: '.sticky { position: static !important; }' })
   await page.screenshot({ path: `${carpeta}/${proyecto}/${nombre}.png`, fullPage: true })
 }
 
@@ -75,4 +78,56 @@ test('pantallas de tutora, dirección e investigación', async ({ page }, info) 
   await page.getByRole('heading', { name: 'Másteres y códigos' }).waitFor()
   await page.getByRole('heading', { name: 'Códigos de este máster' }).waitFor()
   await foto(page, '12-investigacion-masters', p)
+})
+
+test('pantallas de los check-ins y de la cuenta', async ({ page }, info) => {
+  const p = info.project.name
+  await entrarConContrasena(page, 'ana@usal.es')
+  await page.getByRole('heading', { name: 'Hola, Ana' }).waitFor()
+  await foto(page, '13-estudiante-inicio-semana-abierta', p)
+
+  await page.goto('/estudiante/checkin')
+  await page.getByRole('heading', { name: /Check-in de la semana/ }).waitFor()
+  await foto(page, '14-estudiante-checkin-vacio', p)
+  const grupos = page.getByRole('radiogroup')
+  await grupos.nth(0).getByRole('radio', { name: '3' }).click()
+  await grupos.nth(1).getByRole('radio', { name: '4' }).click()
+  await grupos.nth(2).getByRole('radio', { name: /^5/ }).click()
+  await grupos.nth(3).getByRole('radio', { name: '2' }).click()
+  await foto(page, '15-estudiante-checkin-bienestar-bajo', p)
+  await page.getByRole('button', { name: /^(Enviar|Guardar cambios)$/ }).click()
+  await page.getByRole('heading', { name: 'Check-in guardado' }).waitFor()
+  await foto(page, '16-estudiante-checkin-guardado', p)
+
+  await page.goto('/estudiante/historial')
+  await page.getByRole('heading', { name: 'Semana 1' }).waitFor()
+  await foto(page, '17-estudiante-historico', p)
+  await page.goto('/estudiante/apoyo')
+  await page.getByRole('heading', { name: 'Necesito apoyo' }).waitFor()
+  await foto(page, '18-estudiante-apoyo', p)
+  await page.getByRole('button', { name: 'Enviar aviso a la dirección' }).click()
+  await page.getByText('Aviso enviado').waitFor()
+  await page.goto('/cuenta')
+  await page.getByRole('heading', { name: 'Mi cuenta' }).waitFor()
+  await foto(page, '19-cuenta', p)
+
+  await page.evaluate(() => localStorage.clear())
+  await entrarConContrasena(page, 'tutor8@usal.es')
+  await page.goto('/tutor/checkin')
+  await page.getByRole('heading', { name: /Check-in de la semana/ }).waitFor()
+  const tarjetas = page.locator('form li')
+  for (let i = 0; i < 3; i++) await tarjetas.nth(i).getByRole('radiogroup').first().getByRole('radio', { name: String(i + 2) }).click()
+  await foto(page, '20-tutor-checkin', p)
+
+  await page.evaluate(() => localStorage.clear())
+  await entrarConContrasena(page, 'direccion@usal.es')
+  await page.goto('/direccion/avisos')
+  await page.getByRole('heading', { name: 'Avisos de apoyo' }).waitFor()
+  await foto(page, '21-direccion-avisos', p)
+
+  await page.evaluate(() => localStorage.clear())
+  await entrarConContrasena(page, 'investigador@usal.es')
+  await page.goto('/investigacion/calendario')
+  await page.getByRole('heading', { name: 'Semanas' }).waitFor()
+  await foto(page, '22-investigacion-calendario', p)
 })
