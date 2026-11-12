@@ -36,7 +36,7 @@ describe('Validación de una pregunta', () => {
     ['¿Qué nota le pondríais al trabajo de esta semana?', 'nota'],
     ['¿Hay estrés con los plazos de entrega del trabajo?', 'estrés'],
     ['Revisad el plan de trabajo de la semana.', 'pregunta'],
-    ['¿Qué falta? — revisad el plan de trabajo', 'rayas'],
+    ['¿Qué falta? \u2014 revisad el plan de trabajo', 'rayas'],
     ['¿Qué ha salido mal en el trabajo de esta semana?', 'mal'],
   ])('rechaza: %s', (p, motivo) => {
     expect(erroresDePregunta(p).join(' ')).toContain(motivo)

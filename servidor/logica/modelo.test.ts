@@ -37,7 +37,7 @@ describe('Llamada al modelo', () => {
   })
 
   it('el prompt de sistema no contiene rayas largas', () => {
-    expect(PROMPT_SISTEMA).not.toContain('—')
+    expect(PROMPT_SISTEMA).not.toContain('\u2014')
   })
 
   it('un rechazo del modelo se trata como error (y la agenda usará el banco)', async () => {

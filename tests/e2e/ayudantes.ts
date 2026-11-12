@@ -37,7 +37,7 @@ export async function abrirMenuSiMovil(page: Page) {
 
 export async function sinRayasLargas(page: Page) {
   const texto = await page.locator('body').innerText()
-  expect(texto).not.toContain('—')
+  expect(texto).not.toContain('\u2014')
 }
 
 /** Registra un estudiante con un código y acepta el consentimiento. */
