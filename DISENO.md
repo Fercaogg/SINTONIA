@@ -189,6 +189,19 @@ Dos columnas en escritorio: a la izquierda, un panel azul marino con dos manchas
 
 ---
 
+### Gráficos de SINTONÍA (panel de la dirección)
+
+Colores comprobados con el validador de paletas (luminosidad, croma, separación para los tres tipos de daltonismo y contraste con el fondo). Se usan solo colores de la paleta de WORKWELL360:
+
+| Serie | Color | Origen |
+|---|---|---|
+| Estudiantes (o serie única) | `#0A4A6C` azul marino | WW360 main.css:18 |
+| Tutores (o serie única) | `#248a73` verde oscuro | WW360 tailwind.config.js:15 |
+
+Resultado del validador para esta pareja: separación con daltonismo ΔE 20,3 (aprobado, mínimo 8), visión normal ΔE 20,6 (aprobado) y contraste con el fondo de al menos 3:1 en los dos (aprobado). Las comprobaciones de "banda de luminosidad" y "croma mínimo" no se superan porque la paleta de WORKWELL360 es de tonos apagados a propósito. Para compensarlo, cada gráfico lleva leyenda, etiqueta directa del último valor y una tabla con todos los datos. La pareja de WORKWELL360 (`#34C6A3` con `#0A4A6C`) se descartó porque el verde claro solo tiene un contraste de 2,1:1 con el fondo.
+
+Especificaciones de las marcas: líneas de 2 px, marcadores de 8 px con anillo blanco de 2 px, barras de 24 px como máximo con el extremo redondeado (4 px) y la base recta, y cuadrícula de 1 px en `#E3EAEA`. Sin semáforos.
+
 ## 6. Estados de pantalla
 
 | Estado | Cómo lo resuelve WORKWELL360 | Origen |

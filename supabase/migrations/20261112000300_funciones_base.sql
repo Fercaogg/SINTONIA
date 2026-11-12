@@ -107,11 +107,14 @@ begin
 end
 $$;
 
+-- AES-256. La clave es aleatoria (256 bits), así que no hace falta el
+-- estiramiento de contraseña de OpenPGP (s2k-mode=1: con sal, sin iteraciones),
+-- que haría muy lenta la exportación.
 create or replace function private.cifrar_bienestar(p_valor integer)
 returns bytea
 language sql volatile security definer set search_path = ''
 as $$
-  select extensions.pgp_sym_encrypt(p_valor::text, private.clave_bienestar())
+  select extensions.pgp_sym_encrypt(p_valor::text, private.clave_bienestar(), 'cipher-algo=aes256, s2k-mode=1')
 $$;
 
 create or replace function private.descifrar_bienestar(p_cifrado bytea)

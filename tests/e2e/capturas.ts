@@ -9,6 +9,7 @@ const carpeta = 'docs/capturas'
 async function foto(page: Page, nombre: string, proyecto: string) {
   await page.waitForLoadState('networkidle')
   await page.evaluate(() => document.fonts.ready)
+  await page.mouse.move(0, 0)
   // En una captura de página completa, los elementos fijos (cabecera del móvil,
   // botón de envío) aparecerían a mitad de imagen: se dejan en su sitio normal.
   await page.addStyleTag({ content: '.sticky { position: static !important; }' })
@@ -156,4 +157,16 @@ test('pantallas de Puente al doctorado y cuestionarios', async ({ page }, info) 
   await page.goto('/investigacion/cuestionarios')
   await page.getByRole('heading', { name: 'Cuestionario inicial' }).waitFor()
   await foto(page, '28-investigacion-cuestionarios', p)
+})
+
+test('panel de la dirección y datos de investigación', async ({ page }, info) => {
+  const p = info.project.name
+  await entrarConContrasena(page, 'direccion@usal.es')
+  await page.getByRole('heading', { name: 'Todos los datos' }).waitFor()
+  await foto(page, '29-direccion-resumen', p)
+  await page.evaluate(() => localStorage.clear())
+  await entrarConContrasena(page, 'investigador@usal.es')
+  await page.goto('/investigacion/datos')
+  await page.getByRole('heading', { name: 'Registro de auditoría' }).waitFor()
+  await foto(page, '30-investigacion-datos', p)
 })

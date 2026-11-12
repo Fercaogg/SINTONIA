@@ -1,6 +1,6 @@
 # Arquitectura de SINTONÍA: quién ve qué
 
-Versión de la Fase 5. Se completará en las fases siguientes (sorteo, agenda, panel de dirección y exportación).
+Versión de la Fase 6. Se completará en las fases siguientes (sorteo, agenda, panel de dirección y exportación).
 
 Este documento está pensado para el apartado CTS del TFM: cada decisión sobre quién ve qué dato es una decisión de diseño que inclina la herramienta hacia el acompañamiento o hacia la vigilancia.
 
@@ -135,3 +135,27 @@ sequenceDiagram
 - Los correos son el único momento en que se juntan nombre, correo y actividad, y solo los ve el servidor.
 - Recordatorios: uno al abrirse el check-in y otro 48 horas antes del cierre, solo a quien no ha respondido y los tiene activados.
 - Aviso de apoyo a la dirección: solo el máster y, si el estudiante lo autorizó, su nombre. Nunca respuestas ni bienestar.
+
+## 10. Panel de la dirección: la regla de las 5 personas
+
+- La base de datos calcula todas las cifras y **suprime** cualquiera calculada sobre menos de 5 personas antes de enviarla. La dirección nunca recibe ese valor: solo la marca "suprimida". Tampoco recibe cuántas personas había, porque eso también sería una cifra sobre pocas personas.
+- Cifras y personas sobre las que se calculan:
+
+| Cifra | Personas que cuentan |
+|---|---|
+| Estudiantes participantes | los estudiantes participantes |
+| Tasa de respuesta de estudiantes | los estudiantes participantes |
+| Tasa de respuesta de tutores | los tutores con estudiantes |
+| Avance medio según los estudiantes | los estudiantes que respondieron |
+| Avance medio según los tutores | los tutores que respondieron |
+| Desajuste medio | las parejas con las dos respuestas |
+| Agendas generadas | las parejas que entraron en el sorteo |
+
+- El mínimo (5) se puede subir en la tabla `configuracion` (`minimo_anonimato`).
+- Nunca hay datos por tutor/a, filas individuales ni bienestar, ni siquiera agregado.
+- **Límite conocido:** comparando dos semanas en las que el grupo cambia en una sola persona, en teoría se podría deducir algo de esa persona. Con grupos de 30 a 50 parejas y medias redondeadas a dos decimales el riesgo es bajo, pero existe. Una mejora posible es añadir un pequeño ruido aleatorio a las medias (privacidad diferencial).
+
+## 11. Exportación para la investigación
+
+- Solo el investigador puede descargarla, siempre con códigos seudónimos.
+- Es el único lugar donde el investigador recibe el bienestar. Cada descarga queda en la auditoría, con el número de filas.

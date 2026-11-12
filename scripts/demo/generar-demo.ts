@@ -1,0 +1,165 @@
+/**
+ * DATOS SIMULADOS DE DEMOSTRACIÓN
+ *
+ * 1 máster, 4 tutores, 12 estudiantes y 6 semanas simuladas. Todos los
+ * nombres son inventados y los correos usan el dominio reservado
+ * sintonia.example, que no existe.
+ *
+ * La simulación usa el proceso real de cierre de semana (desajuste, sorteo y
+ * agenda). Semana a semana: se escriben los check-ins, se cierra la semana y
+ * la agenda recibida influye un poco en la semana siguiente (para que el
+ * análisis de ejemplo tenga algo que mostrar).
+ *
+ * SOLO para bases de datos de demostración: se niega a ejecutarse si la base
+ * de datos ya tiene personas registradas.
+ */
+
+import type pg from 'pg'
+import { cerrarSemanas, type Almacen } from '../../servidor/cierre-semana'
+
+export const CONTRASENA_DEMO = 'demo-sintonia'
+export const DOMINIO_DEMO = 'sintonia.example'
+export const SEMANAS_SIMULADAS = 6
+
+export const CUENTAS_DEMO = {
+  investigador: `investigacion@${DOMINIO_DEMO}`,
+  direccion: `direccion@${DOMINIO_DEMO}`,
+  tutor: `tutor1@${DOMINIO_DEMO}`,
+  estudiante: `estudiante01@${DOMINIO_DEMO}`,
+}
+
+const TUTORES = ['Rosa Castaño', 'Miguel Ferrer', 'Lucía Benítez', 'Andrés Quiroga']
+const ESTUDIANTES = [
+  'Irene Montes', 'Pablo Ibarra', 'Sara Llorente', 'Daniel Ortega', 'Nuria Salcedo', 'Javier Prieto',
+  'Marta Escudero', 'Óscar Villar', 'Clara Aranda', 'Hugo Medina', 'Laura Peñalver', 'Adrián Soto',
+]
+
+/** Generador pseudoaleatorio reproducible (mulberry32). */
+function azar(semilla: number) {
+  let a = semilla >>> 0
+  return () => {
+    a = (a + 0x6d2b79f5) >>> 0
+    let t = a
+    t = Math.imul(t ^ (t >>> 15), t | 1)
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61)
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296
+  }
+}
+
+const escala = (v: number) => Math.min(5, Math.max(1, Math.round(v)))
+
+export async function generarDemo(opciones: { bd: pg.Client; almacen: Almacen; semilla?: number }) {
+  const { bd, almacen } = opciones
+  const r = azar(opciones.semilla ?? 2027)
+  const q = (sql: string, p: unknown[] = []) => bd.query(sql, p).then((x) => x.rows)
+
+  const [{ n }] = await q(`select count(*)::int as n from public.perfiles`)
+  if (n > 0) throw new Error('Esta base de datos ya tiene personas registradas: la demostración solo se crea en una base de datos vacía.')
+
+  await q(`insert into private.ajustes (clave, valor) values ('modo', 'demo') on conflict (clave) do update set valor = 'demo'`)
+  await q(`update public.configuracion set valor = $1 where clave = 'dominios_permitidos'`, [DOMINIO_DEMO])
+
+  const cuenta = async (email: string, datos: Record<string, string>) =>
+    (await q(
+      `insert into auth.users (email, raw_user_meta_data, encrypted_password, email_confirmed_at)
+       values ($1, $2, extensions.crypt($3, extensions.gen_salt('bf')), now()) returning id`,
+      [email, JSON.stringify(datos), CONTRASENA_DEMO],
+    ))[0].id as string
+  const consentir = (uid: string) => q(`insert into public.consentimientos (user_id, version) values ($1, 1)`, [uid])
+
+  // Personas y códigos (directamente en la base de datos, como lo haría el investigador).
+  await q(`insert into private.investigadores_autorizados (email) values ($1)`, [CUENTAS_DEMO.investigador])
+  await cuenta(CUENTAS_DEMO.investigador, { nombre: 'Equipo de investigación (demo)' })
+  const [{ id: estudio }] = await q(`select id from public.estudios order by created_at limit 1`)
+  const [{ id: master }] = await q(`insert into public.masters (estudio_id, nombre) values ($1, 'Máster de demostración') returning id`, [estudio])
+  const codigo = async (rol: string, tutor: string | null, etiqueta: string) =>
+    (await q(`insert into public.codigos_acceso (codigo, rol, master_id, tutor_id, etiqueta) values (private.nuevo_codigo(), $1, $2, $3, $4) returning codigo`,
+      [rol, master, tutor, etiqueta]))[0].codigo as string
+
+  await cuenta(CUENTAS_DEMO.direccion, { codigo: await codigo('direccion', null, 'Dirección'), nombre: 'Dirección del máster (demo)' })
+
+  const parejas: { id: string; estudiante: string; tutorIdx: number; progreso: number; sesgo: number; respondeE: number; respondeT: number }[] = []
+  for (const [t, nombreT] of TUTORES.entries()) {
+    const tutor = await cuenta(`tutor${t + 1}@${DOMINIO_DEMO}`, { codigo: await codigo('tutor', null, `Tutor/a ${t + 1}`), nombre: nombreT })
+    await consentir(tutor)
+    for (let k = 0; k < 3; k++) {
+      const i = t * 3 + k
+      const est = await cuenta(`estudiante${String(i + 1).padStart(2, '0')}@${DOMINIO_DEMO}`, { codigo: await codigo('estudiante', tutor, ''), nombre: ESTUDIANTES[i] })
+      await consentir(est)
+      const [{ id }] = await q(`select id from public.parejas where estudiante_id = $1`, [est])
+      parejas.push({
+        id, estudiante: est, tutorIdx: t,
+        progreso: 2.5 + r() * 1.5,
+        // Algunas parejas ven el avance de forma distinta (el estudiante, más o menos que el tutor).
+        sesgo: [0, 0, 1, -1, 2, 0][Math.floor(r() * 6)],
+        respondeE: 0.8 + r() * 0.2,
+        respondeT: 0.75 + r() * 0.25,
+      })
+    }
+  }
+
+  // Puente al doctorado: la mitad lo activa. Una convocatoria ficticia con plazo
+  // dentro de la simulación (en la demostración, nunca convocatorias reales).
+  for (const p of parejas.filter(() => r() < 0.5)) {
+    await q(`update public.perfiles set puente_doctorado = true where user_id = $1`, [p.estudiante])
+    await q(`insert into public.puente_cambios (estudiante_id, activado) values ($1, true)`, [p.estudiante])
+  }
+  await q(`insert into public.convocatorias (nombre, organismo, fecha_apertura, fecha_cierre, enlace, estado)
+           values ('Convocatoria de demostración (ficticia)', 'Organismo ficticio',
+                   date_trunc('week', now() at time zone 'Europe/Madrid')::date - 7,
+                   date_trunc('week', now() at time zone 'Europe/Madrid')::date + 21,
+                   '[PENDIENTE: enlace oficial]', 'Ficticia')`)
+
+  // Las parejas existían antes de empezar el estudio.
+  const lunes = `date_trunc('week', now() at time zone 'Europe/Madrid')::date`
+  await q(`update public.parejas set created_at = (${lunes} - ${7 * (SEMANAS_SIMULADAS + 2)})::timestamp`)
+
+  // Pretest de casi todos.
+  const items = await q(`select id, tipo, opciones from public.cuestionario_items where cuestionario = 'pretest' order by orden`)
+  for (const p of parejas.filter(() => r() < 0.9)) {
+    for (const it of items) {
+      const valor = it.tipo === 'escala' ? escala(2 + r() * 3) : it.tipo === 'si_no' ? r() < 0.4 : it.opciones[Math.floor(r() * it.opciones.length)]
+      await q(`insert into public.cuestionario_respuestas (user_id, item_id, valor) values ($1, $2, $3)`, [p.estudiante, it.id, JSON.stringify(valor)])
+    }
+  }
+
+  // Semana a semana.
+  const conAgenda = new Set<string>()
+  for (let semana = 1; semana <= SEMANAS_SIMULADAS; semana++) {
+    // Con esta fecha de inicio, las semanas 1..semana ya han terminado.
+    await q(`update public.estudios set fecha_inicio = ${lunes} - ${7 * semana} where id = $1`, [estudio])
+    const momento = `(${lunes} - ${7 * semana} + ${7 * (semana - 1) + 3})::timestamp + interval '10 hours'`
+    for (const p of parejas) {
+      // Si la pareja tuvo agenda la semana anterior, sus miradas se acercan un poco.
+      const sesgo = conAgenda.has(p.id) ? p.sesgo * 0.5 : p.sesgo
+      const base = p.progreso + (r() - 0.5) * 1.5
+      if (r() < p.respondeE) {
+        await q(`insert into public.respuestas_estudiante (pareja_id, semana, avance, siguiente_paso, apoyo, created_at, updated_at)
+                 values ($1, $2, $3, $4, $5, ${momento}, ${momento})`,
+          [p.id, semana, escala(base + sesgo / 2), escala(base + (r() - 0.5)), escala(3.5 + r() * 1.5)])
+        await q(`insert into public.bienestar (estudiante_id, semana, valor_cifrado, created_at, updated_at)
+                 values ($1, $2, private.cifrar_bienestar($3), ${momento}, ${momento})`, [p.estudiante, semana, escala(2.5 + r() * 2.5)])
+      }
+      if (r() < p.respondeT) {
+        await q(`insert into public.respuestas_tutor (pareja_id, semana, avance, siguiente_paso, created_at, updated_at)
+                 values ($1, $2, $3, $4, ${momento}, ${momento})`,
+          [p.id, semana, escala(base - sesgo / 2), r() < 0.7 ? escala(base + (r() - 0.5)) : null])
+      }
+    }
+    await cerrarSemanas({ almacen, redactor: null, semilla: () => `demo-${opciones.semilla ?? 2027}-${semana}` })
+    conAgenda.clear()
+    for (const { pareja_id } of await q(`select pareja_id from public.agendas where semana = $1`, [semana])) conAgenda.add(pareja_id)
+    // La mayoría mira la agenda.
+    await q(`update public.agendas set vista_estudiante_at = now() where semana = $1 and random() < 0.85`, [semana])
+    await q(`update public.agendas set vista_tutor_at = now() where semana = $1 and random() < 0.75`, [semana])
+  }
+  // Ahora está abierta la semana 7.
+
+  // Un aviso de apoyo, con nombre autorizado.
+  const p0 = parejas[4]
+  await q(`insert into public.avisos_apoyo (master_id, estudiante_id, nombre_autorizado, created_at) values ($1, $2, $3, now() - interval '3 days')`,
+    [master, p0.estudiante, ESTUDIANTES[4]])
+
+  const [res] = await q(`select count(*) filter (where elegible)::int as elegibles, count(*) filter (where resultado)::int as con_agenda from public.sorteos`)
+  return { parejas: parejas.length, semanas: SEMANAS_SIMULADAS, ...res, proporcion: res.con_agenda / res.elegibles }
+}

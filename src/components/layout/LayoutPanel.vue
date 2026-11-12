@@ -43,6 +43,7 @@ const MENUS: Record<Rol, Enlace[]> = {
     { to: '/investigacion/calendario', label: 'Calendario del estudio', icon: 'calendar' },
     { to: '/investigacion/convocatorias', label: 'Convocatorias', icon: 'graduation' },
     { to: '/investigacion/cuestionarios', label: 'Cuestionarios', icon: 'document' },
+    { to: '/investigacion/datos', label: 'Datos y auditoría', icon: 'download' },
     CUENTA,
     COMO,
   ],

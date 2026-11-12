@@ -65,6 +65,7 @@ const routes: RouteRecordRaw[] = [
       { path: 'calendario', component: () => import('@/views/investigacion/CalendarioView.vue'), meta: { titulo: 'Calendario del estudio' } },
       { path: 'convocatorias', component: () => import('@/views/investigacion/ConvocatoriasView.vue'), meta: { titulo: 'Convocatorias' } },
       { path: 'cuestionarios', component: () => import('@/views/investigacion/CuestionariosView.vue'), meta: { titulo: 'Cuestionarios' } },
+      { path: 'datos', component: () => import('@/views/investigacion/DatosView.vue'), meta: { titulo: 'Datos para el análisis' } },
     ],
   },
   {

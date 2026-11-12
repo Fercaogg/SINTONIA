@@ -25,3 +25,4 @@ Todo lo que el sistema necesita y que no puedo inventar. En la aplicación, cada
 | Instrucciones del cuestionario inicial y del final | Pretest y postest | Fernando |
 | Enlace, organismo, fechas y estado de cada convocatoria (FPU, FPI, contratos de la USAL y de la Junta, admisión al doctorado) | Puente al doctorado (pantalla Investigación > Convocatorias) | Fernando |
 | Cuenta de Resend (u otro proveedor) y dominio desde el que se envían los correos | Recordatorios | Fernando |
+| Plan de análisis definitivo (modelo, covariables, tratamiento de los datos que faltan) | analisis/analisis_ejemplo.R es solo una plantilla | Fernando y sus directores |
