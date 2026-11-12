@@ -45,7 +45,7 @@ describe('La línea de la agenda', () => {
   })
 
   it('no contiene rayas largas', () => {
-    expect(lineaPuente([conv(1, 'A', null, null), conv(2, 'B', null, null)])).not.toContain('—')
+    expect(lineaPuente([conv(1, 'A', null, null), conv(2, 'B', null, null)])).not.toContain('\u2014')
   })
 })
 

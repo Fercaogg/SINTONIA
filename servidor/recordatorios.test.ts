@@ -46,7 +46,7 @@ describe('Textos de los correos', () => {
 
   it('ningún texto contiene rayas largas', () => {
     const todos = [textoRecordatorio(rec(), URL_APP), textoRecordatorio(rec({ tipo: 'cierre_48h' }), URL_APP)]
-    for (const t of todos) expect(t.asunto + t.texto).not.toContain('—')
+    for (const t of todos) expect(t.asunto + t.texto).not.toContain('\u2014')
   })
 })
 
