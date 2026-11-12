@@ -76,7 +76,7 @@ test('la tutora ve a sus estudiantes y los códigos que puede repartir', async (
     await page.getByRole('button', { name: 'Aceptar y continuar' }).click()
   }
   await expect(page).toHaveURL(/\/tutor$/)
-  await expect(page.getByText('Ana de ejemplo')).toBeVisible()
+  await expect(page.getByText('Ana de ejemplo').first()).toBeVisible()
   await abrirMenuSiMovil(page)
   await page.getByRole('link', { name: 'Códigos para tus estudiantes' }).click()
   await expect(page.getByRole('heading', { name: 'Códigos para tus estudiantes' })).toBeVisible()
@@ -96,6 +96,7 @@ test('el investigador crea un máster y códigos', async ({ page }, info) => {
   await expect(page.getByText('Códigos creados:')).toBeVisible()
   await expect(page.locator('tbody tr')).toHaveCount(2)
   await sinRayasLargas(page)
+  await sinErroresDeAccesibilidad(page)
 })
 
 test('las pantallas públicas no se salen por los lados y pasan la revisión de accesibilidad', async ({ page }) => {

@@ -9,7 +9,10 @@ import { mkdirSync, writeFileSync } from 'node:fs'
 import { dirname } from 'node:path'
 import pg from 'pg'
 import { crearBaseDeDatos } from './bd.mjs'
-import { CLAVE_ANON_LOCAL, PUERTO_LOCAL } from './servidor-local.mjs'
+import { CLAVE_ANON_LOCAL, CLAVE_SERVIDOR_LOCAL, PUERTO_LOCAL, crearServidor } from './servidor-local.mjs'
+import { cerrarSemanas } from '../../servidor/cierre-semana.ts'
+import { clienteServidor, crearAlmacenSupabase } from '../../servidor/almacen-supabase.ts'
+import { sortear } from '../../servidor/logica/sorteo.ts'
 
 const CONTRASENA = 'sintonia-local'
 
@@ -69,7 +72,36 @@ for (const [i, nombre] of nombres8.entries()) {
   const uid = await cuenta(`est${i + 1}@usal.es`, { codigo: cods8[i], nombre })
   await c.query(`insert into public.consentimientos (user_id, version) values ($1, 1)`, [uid])
 }
+
+// Semanas 1 y 2 cerradas, con respuestas de las dos partes, para ver agendas.
+await c.query(`update public.parejas set created_at = now() - interval '30 days'`)
+await c.query(`insert into public.consentimientos (user_id, version) values ($1, 1)`, [tutora])
+for (const [semana, av, sp] of [[1, 3, 3], [2, 2, 3]]) {
+  await c.query(`insert into public.respuestas_tutor (pareja_id, semana, avance, siguiente_paso) values ($1, $2, $3, $4)`, [parejaAna, semana, av, sp])
+}
+const parejas8 = (await c.query(`select id from public.parejas where tutor_id = $1 order by created_at`, [tutor8])).rows.map((r) => r.id)
+for (const [i, pareja] of parejas8.entries()) {
+  const est = (await c.query(`select estudiante_id from public.parejas where id = $1`, [pareja])).rows[0].estudiante_id
+  await c.query(`insert into public.respuestas_estudiante (pareja_id, semana, avance, siguiente_paso, apoyo) values ($1, 2, $2, $3, 4)`, [pareja, 2 + (i % 4), 2 + (i % 3)])
+  await c.query(`insert into public.bienestar (estudiante_id, semana, valor_cifrado) values ($1, 2, private.cifrar_bienestar(4))`, [est])
+  await c.query(`insert into public.respuestas_tutor (pareja_id, semana, avance, siguiente_paso) values ($1, 2, $2, $3)`, [pareja, 2 + ((i + 1) % 4), i % 2 ? null : 3])
+}
 await c.end()
+
+// Cierre de las semanas 1 y 2 con el mismo proceso que en producción (sin
+// modelo de lenguaje). La semilla se elige para que Ana reciba agenda en la
+// semana 2: así la demostración local siempre enseña una agenda.
+let semilla = 0
+while (!sortear(`local-${semilla}`, parejaAna, 2, 0.5).resultado) semilla++
+const servidor = crearServidor({ baseDeDatos: nombreBd, silencioso: true })
+await new Promise((ok) => servidor.listen(0, ok))
+const urlLocal = `http://localhost:${servidor.address().port}`
+await cerrarSemanas({
+  almacen: crearAlmacenSupabase(clienteServidor(urlLocal, CLAVE_SERVIDOR_LOCAL)),
+  redactor: null,
+  semilla: () => `local-${semilla}`,
+})
+await new Promise((ok) => servidor.close(ok))
 
 if (!process.env.LOCAL_BD) writeFileSync(
   '.env.local',

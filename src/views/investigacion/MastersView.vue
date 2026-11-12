@@ -189,7 +189,7 @@ async function crearCodigos() {
           <section class="card p-5" aria-labelledby="t-lista">
             <h2 id="t-lista" class="font-semibold text-surface-900 mb-4">Códigos de este máster</h2>
             <EstadoVacio v-if="!codigos.length" icono="key" titulo="Sin códigos" texto="Crea el primero con el formulario de arriba." />
-            <div v-else class="overflow-x-auto">
+            <div v-else class="overflow-x-auto" tabindex="0" role="region" aria-label="Tabla (se puede desplazar)">
               <table class="w-full text-sm text-left">
                 <caption class="sr-only">Códigos de acceso del máster</caption>
                 <thead class="text-surface-800">

@@ -8,7 +8,7 @@ export default defineConfig({
     alias: { '@': fileURLToPath(new URL('./src', import.meta.url)) },
   },
   test: {
-    include: ['tests/**/*.test.ts', 'src/**/*.test.ts'],
+    include: ['tests/**/*.test.ts', 'src/**/*.test.ts', 'servidor/**/*.test.ts'],
     environmentMatchGlobs: [['src/**', 'jsdom']],
     environment: 'node',
     testTimeout: 30000,

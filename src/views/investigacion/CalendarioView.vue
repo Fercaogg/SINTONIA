@@ -13,6 +13,7 @@ interface Estudio {
   dia_apertura: number
   dia_cierre: number
   zona_horaria: string
+  probabilidad_agenda: number
   estado: Calendario
   ventanas: { semana: number; abre: string; cierra: string }[]
 }
@@ -20,6 +21,7 @@ interface Estudio {
 const DIAS = ['lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado', 'domingo']
 
 const estudio = ref<Estudio | null>(null)
+const sorteos = ref<{ semana: number; parejas: number; elegibles: number; con_agenda: number; sin_agenda: number; con_desajuste: number }[]>([])
 const form = ref({ fecha_inicio: '', semanas: 10, dia_apertura: 1, dia_cierre: 7 })
 const cargando = ref(true)
 const guardando = ref(false)
@@ -34,6 +36,7 @@ function rellenar(e: Estudio) {
 onMounted(async () => {
   try {
     rellenar(await llamar<Estudio>('ver_estudio'))
+    sorteos.value = await llamar('resumen_sorteos')
   } catch (e) {
     error.value = mensajeDeError(e)
   } finally {
@@ -100,7 +103,7 @@ async function guardar() {
 
       <section v-if="estudio?.ventanas.length" class="card p-5 sm:p-6 mt-6" aria-labelledby="t-vent">
         <h2 id="t-vent" class="font-semibold text-surface-900 mb-4">Semanas</h2>
-        <div class="overflow-x-auto">
+        <div class="overflow-x-auto" tabindex="0" role="region" aria-label="Tabla (se puede desplazar)">
           <table class="w-full text-sm text-left">
             <caption class="sr-only">Apertura y cierre de cada semana</caption>
             <thead class="text-surface-800">
@@ -120,6 +123,37 @@ async function guardar() {
                 <td class="py-2 pr-3">{{ v.semana }}</td>
                 <td class="py-2 pr-3">{{ desdeApertura(v.abre) }}</td>
                 <td class="py-2">{{ hastaCierre(v.cierra) }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="card p-5 sm:p-6 mt-6" aria-labelledby="t-sorteos">
+        <h2 id="t-sorteos" class="font-semibold text-surface-900 mb-1">Sorteos por semana</h2>
+        <p class="text-sm texto-suave mb-4">Cada pareja con los dos check-ins entra en el sorteo de la agenda (probabilidad {{ estudio?.probabilidad_agenda ?? 0.5 }}).</p>
+        <p v-if="!sorteos.length" class="text-sm texto-suave">Todavía no se ha cerrado ninguna semana.</p>
+        <div v-else class="overflow-x-auto" tabindex="0" role="region" aria-label="Tabla (se puede desplazar)">
+          <table class="w-full text-sm text-left tabular-nums">
+            <caption class="sr-only">Resultado de los sorteos por semana</caption>
+            <thead class="text-surface-800">
+              <tr class="border-b border-surface-200">
+                <th scope="col" class="py-2 pr-3 font-semibold">Semana</th>
+                <th scope="col" class="py-2 pr-3 font-semibold">Parejas</th>
+                <th scope="col" class="py-2 pr-3 font-semibold">Con los dos check-ins</th>
+                <th scope="col" class="py-2 pr-3 font-semibold">Con agenda</th>
+                <th scope="col" class="py-2 pr-3 font-semibold">Sin agenda</th>
+                <th scope="col" class="py-2 font-semibold">Proporción con agenda</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="s in sorteos" :key="s.semana" class="border-b border-surface-200 last:border-0">
+                <td class="py-2 pr-3">{{ s.semana }}</td>
+                <td class="py-2 pr-3">{{ s.parejas }}</td>
+                <td class="py-2 pr-3">{{ s.elegibles }}</td>
+                <td class="py-2 pr-3">{{ s.con_agenda }}</td>
+                <td class="py-2 pr-3">{{ s.sin_agenda }}</td>
+                <td class="py-2">{{ s.elegibles ? (s.con_agenda / s.elegibles).toLocaleString('es-ES', { maximumFractionDigits: 2 }) : '' }}</td>
               </tr>
             </tbody>
           </table>

@@ -31,7 +31,7 @@ export default defineConfig({
       ],
   webServer: [
     {
-      command: 'node scripts/local/preparar-bd.mjs && node scripts/local/servidor-local.mjs',
+      command: 'npx vite-node scripts/local/preparar-bd.mjs && node scripts/local/servidor-local.mjs',
       port: PUERTO_API,
       reuseExistingServer: false,
       env: {

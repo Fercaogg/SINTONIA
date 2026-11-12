@@ -5,14 +5,16 @@ import { RouterLink } from 'vue-router'
 import { useSesion } from '@/stores/sesion'
 import { llamar, mensajeDeError } from '@/lib/api'
 import { hastaCierre } from '@/lib/fechas'
-import type { CheckinEstudiante } from '@/lib/tipos-checkin'
+import type { AgendaSemana, CheckinEstudiante } from '@/lib/tipos-checkin'
 import AppIcon from '@/components/comun/AppIcon.vue'
 import AvisoError from '@/components/comun/AvisoError.vue'
 import EstadoCarga from '@/components/comun/EstadoCarga.vue'
 import EstadoCalendario from '@/components/checkin/EstadoCalendario.vue'
+import TarjetaAgenda from '@/components/agenda/TarjetaAgenda.vue'
 
 const sesion = useSesion()
 const datos = ref<CheckinEstudiante | null>(null)
+const agenda = ref<AgendaSemana | null>(null)
 const cargando = ref(true)
 const error = ref('')
 
@@ -20,7 +22,9 @@ const nombre = computed(() => sesion.perfil?.nombre?.split(' ')[0] ?? '')
 
 onMounted(async () => {
   try {
-    datos.value = await llamar<CheckinEstudiante>('mi_checkin')
+    const [d, a] = await Promise.all([llamar<CheckinEstudiante>('mi_checkin'), llamar<AgendaSemana | null>('mi_agenda')])
+    datos.value = d
+    agenda.value = a
   } catch (e) {
     error.value = mensajeDeError(e)
   } finally {
@@ -59,12 +63,7 @@ onMounted(async () => {
         </RouterLink>
       </section>
 
-      <section class="card p-5 sm:p-6 mt-4" aria-labelledby="t-agenda">
-        <h2 id="t-agenda" class="font-semibold text-surface-900 flex items-center gap-2">
-          <AppIcon name="chat" :size="18" /> Agenda para la tutoría
-        </h2>
-        <p class="text-sm texto-suave mt-1">Cuando haya preguntas para tu próxima tutoría, las verás aquí.</p>
-      </section>
+      <TarjetaAgenda class="mt-4" :agenda="agenda" otra-persona="Tu tutor/a" />
 
       <div class="grid sm:grid-cols-2 gap-4 mt-4">
         <RouterLink to="/estudiante/historial" class="card p-5 hover:shadow-elevated no-underline">

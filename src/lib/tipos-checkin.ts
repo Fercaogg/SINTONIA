@@ -35,3 +35,10 @@ export interface CheckinTutor {
   items: Item[]
   estudiantes: { pareja_id: string; nombre: string; avance: number | null; siguiente_paso: number | null }[]
 }
+
+export interface AgendaSemana {
+  estado: 'agenda' | 'sin_agenda'
+  semana: number
+  preguntas?: string[]
+  linea_puente?: string | null
+}

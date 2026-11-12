@@ -5,15 +5,17 @@ import { RouterLink } from 'vue-router'
 import { llamar, mensajeDeError } from '@/lib/api'
 import { hastaCierre } from '@/lib/fechas'
 import { useSesion } from '@/stores/sesion'
-import type { CheckinTutor } from '@/lib/tipos-checkin'
+import type { AgendaSemana, CheckinTutor } from '@/lib/tipos-checkin'
 import AppIcon from '@/components/comun/AppIcon.vue'
 import EstadoCarga from '@/components/comun/EstadoCarga.vue'
 import EstadoVacio from '@/components/comun/EstadoVacio.vue'
 import AvisoError from '@/components/comun/AvisoError.vue'
 import EstadoCalendario from '@/components/checkin/EstadoCalendario.vue'
+import TarjetaAgenda from '@/components/agenda/TarjetaAgenda.vue'
 
 const sesion = useSesion()
 const datos = ref<CheckinTutor | null>(null)
+const agendas = ref<{ pareja_id: string; nombre: string; agenda: AgendaSemana | null }[]>([])
 const cargando = ref(true)
 const error = ref('')
 
@@ -21,7 +23,9 @@ const respondidos = computed(() => datos.value?.estudiantes.filter((e) => e.avan
 
 onMounted(async () => {
   try {
-    datos.value = await llamar<CheckinTutor>('checkin_tutor')
+    const [d, a] = await Promise.all([llamar<CheckinTutor>('checkin_tutor'), llamar<typeof agendas.value>('agendas_tutor')])
+    datos.value = d
+    agendas.value = a
   } catch (e) {
     error.value = mensajeDeError(e)
   } finally {
@@ -66,19 +70,18 @@ onMounted(async () => {
           </RouterLink>
         </section>
 
-        <section class="card p-5 sm:p-6 mt-4" aria-labelledby="t-agenda">
-          <h2 id="t-agenda" class="font-semibold text-surface-900 flex items-center gap-2">
-            <AppIcon name="chat" :size="18" /> Agendas para las tutorías
-          </h2>
-          <p class="text-sm texto-suave mt-1">Cuando haya preguntas para la próxima tutoría con alguno de tus estudiantes, las verás aquí.</p>
-        </section>
+        <h2 class="font-display text-xl font-semibold text-surface-900 mt-8 mb-3">Agendas para las tutorías</h2>
+        <div class="space-y-4">
+          <TarjetaAgenda
+            v-for="(a, i) in agendas"
+            :key="a.pareja_id"
+            :agenda="a.agenda"
+            :titulo="a.nombre"
+            :id-titulo="`t-agenda-${i}`"
+            otra-persona="Tu estudiante"
+          />
+        </div>
 
-        <section class="card p-5 mt-4" aria-labelledby="mis-est">
-          <h2 id="mis-est" class="font-semibold text-surface-900 mb-3">Tus estudiantes</h2>
-          <ul class="divide-y divide-surface-200">
-            <li v-for="e in datos.estudiantes" :key="e.pareja_id" class="py-3 text-surface-900">{{ e.nombre }}</li>
-          </ul>
-        </section>
       </template>
     </template>
   </div>

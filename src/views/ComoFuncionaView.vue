@@ -80,7 +80,7 @@ const quienVe = [
             </dl>
           </li>
         </ul>
-        <div class="card overflow-x-auto hidden sm:block">
+        <div class="card overflow-x-auto hidden sm:block" tabindex="0" role="region" aria-label="Tabla de quién ve qué">
           <table class="w-full text-sm text-left">
             <caption class="sr-only">Quién puede ver cada dato</caption>
             <thead class="bg-surface-100 text-surface-800">

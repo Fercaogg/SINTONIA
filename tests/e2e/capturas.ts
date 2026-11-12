@@ -55,7 +55,7 @@ test('pantallas de tutora, dirección e investigación', async ({ page }, info) 
     await page.getByLabel(/He leído el texto/).check()
     await page.getByRole('button', { name: 'Aceptar y continuar' }).click()
   }
-  await page.getByRole('heading', { name: 'Tus estudiantes' }).waitFor()
+  await page.getByRole('heading', { name: 'Agendas para las tutorías' }).waitFor()
   await foto(page, '08-tutor-inicio', p)
   await page.goto('/tutor/codigos')
   await page.getByRole('heading', { name: 'Códigos para tus estudiantes' }).waitFor()
@@ -119,6 +119,10 @@ test('pantallas de los check-ins y de la cuenta', async ({ page }, info) => {
   for (let i = 0; i < 3; i++) await tarjetas.nth(i).getByRole('radiogroup').first().getByRole('radio', { name: String(i + 2) }).click()
   await foto(page, '20-tutor-checkin', p)
 
+  await page.goto('/tutor')
+  await page.getByRole('heading', { name: 'Agendas para las tutorías' }).waitFor()
+  await foto(page, '23-tutor-agendas', p)
+
   await page.evaluate(() => localStorage.clear())
   await entrarConContrasena(page, 'direccion@usal.es')
   await page.goto('/direccion/avisos')
@@ -128,6 +132,6 @@ test('pantallas de los check-ins y de la cuenta', async ({ page }, info) => {
   await page.evaluate(() => localStorage.clear())
   await entrarConContrasena(page, 'investigador@usal.es')
   await page.goto('/investigacion/calendario')
-  await page.getByRole('heading', { name: 'Semanas' }).waitFor()
+  await page.getByRole('heading', { name: 'Sorteos por semana' }).waitFor()
   await foto(page, '22-investigacion-calendario', p)
 })

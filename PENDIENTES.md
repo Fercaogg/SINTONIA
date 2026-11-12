@@ -19,3 +19,6 @@ Todo lo que el sistema necesita y que no puedo inventar. En la aplicación, cada
 | Logotipo definitivo | Toda la interfaz (ahora es provisional) | Fernando |
 | Correo de la persona investigadora que administrará SINTONÍA | Alta inicial en Supabase | Fernando |
 | Comprobar en el proyecto real de Supabase que la base de datos puede borrar la cuenta de acceso. Si no, el servidor terminará el borrado (está previsto). | Borrado de datos | Claude, en la Fase 7 |
+| Revisar y aprobar el banco de 14 preguntas provisionales de la agenda (tabla banco_preguntas) | Agenda sin modelo | Fernando y sus directores |
+| Confirmar que el sorteo incluye a todas las parejas con los dos check-ins, aunque no haya desajuste relevante | Microensayo aleatorizado | Fernando |
+| Decidir si se usa el modelo de lenguaje en el piloto (AGENDA_MODO) y quién paga la clave de la API | Agenda | Fernando |

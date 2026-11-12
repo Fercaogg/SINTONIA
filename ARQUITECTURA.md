@@ -1,6 +1,6 @@
 # Arquitectura de SINTONÍA: quién ve qué
 
-Versión de la Fase 3. Se completará en las fases siguientes (sorteo, agenda, panel de dirección y exportación).
+Versión de la Fase 4. Se completará en las fases siguientes (sorteo, agenda, panel de dirección y exportación).
 
 Este documento está pensado para el apartado CTS del TFM: cada decisión sobre quién ve qué dato es una decisión de diseño que inclina la herramienta hacia el acompañamiento o hacia la vigilancia.
 
@@ -57,6 +57,9 @@ Las respuestas solo llevan el código de la pareja. El nombre está en otra tabl
 | Códigos de acceso | No | Los suyos sin usar, para repartirlos | No | Todos |
 | Consentimientos | Los suyos | Los suyos | Los suyos | Todos |
 | Avisos de "Necesito apoyo" | Los suyos | **No** | Los de su máster, mediante una función que solo da la fecha y el nombre **si el estudiante lo ha autorizado** | No |
+| Desajustes calculados | **No** | **No** | **No** | Sí (seudónimos) |
+| Sorteos | **No** | **No** | **No** | Sí (seudónimos) |
+| Agenda de la pareja | La suya | La de cada pareja suya | **No** | Sí (seudónimos) |
 | Auditoría | No | No | No | Sí |
 | Resúmenes del máster (Fase 6) | No | No | Sí, con un mínimo de 5 personas | Sí |
 
@@ -96,3 +99,30 @@ El investigador nunca necesita conocer nombres: reconoce a los tutores por la et
 | Rectificación | Mi cuenta > Nombre | Cambia el nombre. |
 | Retirada | Mi cuenta > Retirarme y conservar | Deja de participar; las respuestas anteriores se conservan sin nombre. |
 | Supresión | Mi cuenta > Retirarme y borrar | Se borran la cuenta, la identidad, las respuestas, el bienestar, los avisos y lo que el tutor respondió sobre el estudiante. |
+
+## 8. Cierre de semana: desajuste, sorteo y agenda
+
+```mermaid
+sequenceDiagram
+  participant C as Vercel Cron (cada día)
+  participant S as Servidor
+  participant B as Base de datos
+  participant M as Modelo de lenguaje (opcional)
+  C->>S: /api/cerrar-semana (con CRON_SECRET)
+  S->>B: semanas cerradas sin procesar
+  S->>B: check-ins de la semana (solo códigos y números)
+  S->>S: desajuste (servidor/logica/desajuste.ts)
+  S->>S: sorteo con semilla (servidor/logica/sorteo.ts)
+  S->>B: GUARDA desajustes y sorteos
+  loop parejas con agenda
+    S-->>M: solo ítem, signo, magnitud y semana
+    M-->>S: 3 preguntas (JSON)
+    S->>S: validación (si falla: banco de preguntas)
+    S->>B: guarda la agenda (exige un sorteo favorable guardado)
+  end
+  S->>B: semana procesada
+```
+
+- La base de datos **no permite** guardar una agenda sin un sorteo favorable guardado antes (clave foránea y comprobación en la función).
+- Ni el estudiante ni el tutor ven la diferencia, el desajuste ni el resultado del sorteo: solo ven las tres preguntas o el mensaje "Esta semana no hay agenda. Sigue como siempre."
+- Lo que se envía al modelo queda guardado con la agenda (`entrada_modelo`), para poder comprobar que nunca contiene datos personales.

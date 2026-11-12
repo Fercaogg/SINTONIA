@@ -15,6 +15,8 @@ import { urlDe } from './bd.mjs'
 
 export const SECRETO_LOCAL = 'secreto-local-de-desarrollo-sintonia-no-usar-en-produccion'
 export const CLAVE_ANON_LOCAL = jwt.sign({ role: 'anon', iss: 'sintonia-local' }, SECRETO_LOCAL)
+// Clave de servidor local (equivale a la service_role de Supabase). Solo para desarrollo.
+export const CLAVE_SERVIDOR_LOCAL = jwt.sign({ role: 'service_role', iss: 'sintonia-local' }, SECRETO_LOCAL)
 export const PUERTO_LOCAL = Number(process.env.LOCAL_API_PORT || 54321)
 
 const DURACION = 3600
@@ -106,7 +108,8 @@ export function crearServidor({ baseDeDatos = 'sintonia_local', urlApp = 'http:/
     const cliente = await pool.connect()
     try {
       await cliente.query('begin')
-      await cliente.query(`set local role ${claims.role === 'authenticated' ? 'authenticated' : 'anon'}`)
+      const rol = ['authenticated', 'service_role'].includes(claims.role) ? claims.role : 'anon'
+      await cliente.query(`set local role ${rol}`)
       await cliente.query(`select set_config('request.jwt.claims', $1, true)`, [JSON.stringify(claims)])
       const valores = claves.map((k) => (args[k] !== null && typeof args[k] === 'object' ? JSON.stringify(args[k]) : args[k]))
       const { rows } = await cliente.query(`select public.${funcion}(${lista}) as r`, valores)
