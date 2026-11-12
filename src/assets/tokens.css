@@ -1,0 +1,38 @@
+/*
+  Tokens de diseño de SINTONÍA, heredados de WORKWELL360.
+  Origen de cada valor: DISENO.md (WW360 = código fuente de WORKWELL360).
+  Ninguna pantalla escribe colores directamente: todas usan estas variables
+  o las clases de Tailwind equivalentes (tailwind.config.js).
+*/
+
+:root {
+  /* Marca */
+  --color-primary: #34C6A3;          /* WW360 main.css:15. Identidad: logo, progreso, selección */
+  --color-primary-hover: #2FB393;    /* WW360 main.css:16 */
+  --color-primary-light: #4ED7C2;    /* WW360 main.css:17 */
+  --color-accion: #1d7060;           /* WW360 tailwind.config.js:16. Botones y enlaces (5,93:1) */
+  --color-accion-hover: #0A4A6C;     /* WW360 main.css:18 */
+  --color-primary-tint-08: rgba(52,198,163,0.08); /* WW360 tailwind.config.js:8 */
+  --color-primary-tint-15: rgba(52,198,163,0.15); /* WW360 tailwind.config.js:9 */
+  --color-primary-tint-40: rgba(52,198,163,0.4);  /* WW360 tailwind.config.js:10 */
+
+  /* Neutros */
+  --color-heading: #0A4A6C;          /* WW360 main.css:18 */
+  --color-label: #3A4A54;            /* WW360 main.css:19 */
+  --color-body: #5A6B75;             /* WW360 main.css:20 */
+  --color-muted: #8A9BA5;            /* WW360 tailwind.config.js:22. Solo decoración */
+  --color-bg: #F5F7F6;               /* WW360 main.css:21 */
+  --color-surface-alt: #F0F4F3;      /* WW360 tailwind.config.js:20 */
+  --color-border: #E3EAEA;           /* WW360 main.css:22 */
+  --color-white: #FFFFFF;
+
+  /* Sombras: WW360 main.css:24 a 26 */
+  --shadow-soft: 0 1px 3px rgba(0,0,0,0.04), 0 4px 12px rgba(10,74,108,0.06);
+  --shadow-card: rgba(10,74,108,0.15) 0px 20px 40px -20px, rgba(0,0,0,0.08) 0px 10px 20px -10px;
+  --shadow-elevated: rgba(10,74,108,0.15) 0px 20px 40px -12px, rgba(0,0,0,0.08) 0px 10px 20px -8px;
+
+  /* Radios: WW360 main.css:28 a 30 */
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
+}

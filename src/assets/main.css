@@ -1,0 +1,221 @@
+/*
+  Estilos base de SINTONÍA. Adaptados de WORKWELL360 (src/assets/main.css)
+  con los cambios de accesibilidad aprobados (ver DISENO.md, apartado 1.5).
+*/
+
+@import './tokens.css';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    background-color: var(--color-bg);
+    color: var(--color-heading);
+    min-height: 100vh;
+  }
+
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-border) transparent;
+  }
+
+  /* Foco visible para quien navega con teclado */
+  :focus-visible {
+    outline: 3px solid var(--color-accion);
+    outline-offset: 2px;
+  }
+
+  a {
+    color: var(--color-accion);
+  }
+
+  .tabular-nums {
+    font-variant-numeric: tabular-nums;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+}
+
+@layer components {
+  .card {
+    @apply bg-white border border-surface-200;
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-card);
+    transition: box-shadow 0.3s ease, transform 0.3s ease;
+  }
+
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 px-[18px] py-[10px] min-h-tactil
+           text-white font-medium text-base transition-all duration-200 ease-out;
+    background-color: var(--color-accion);
+    border-radius: var(--radius-md);
+  }
+  .btn-primary:hover:not(:disabled) {
+    background-color: var(--color-accion-hover);
+  }
+  .btn-primary:disabled {
+    @apply opacity-50 cursor-not-allowed;
+  }
+
+  .btn-secondary {
+    @apply inline-flex items-center justify-center gap-2 px-[18px] py-[10px] min-h-tactil
+           bg-transparent font-medium text-base border transition-all duration-200;
+    color: var(--color-accion);
+    border-color: var(--color-accion);
+    border-radius: var(--radius-md);
+  }
+  .btn-secondary:hover:not(:disabled) {
+    background-color: var(--color-primary-tint-08);
+  }
+
+  .btn-danger {
+    @apply inline-flex items-center justify-center gap-2 px-[18px] py-[10px] min-h-tactil
+           bg-red-700 text-white font-medium text-base transition-all duration-200;
+    border-radius: var(--radius-md);
+  }
+  .btn-danger:hover:not(:disabled) {
+    @apply bg-red-800;
+  }
+
+  .enlace {
+    @apply font-medium underline underline-offset-2;
+    color: var(--color-accion);
+  }
+  .enlace:hover {
+    color: var(--color-accion-hover);
+  }
+
+  .input-field {
+    @apply w-full px-4 py-3 bg-white text-base transition-all duration-200 outline-none min-h-tactil;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    color: var(--color-heading);
+  }
+  .input-field::placeholder {
+    color: var(--color-body);
+  }
+  .input-field:focus {
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 2px var(--color-primary-tint-15);
+  }
+
+  .label {
+    @apply block text-sm font-medium mb-1.5;
+    color: var(--color-label);
+  }
+
+  .titulo-pagina {
+    @apply font-display text-2xl sm:text-3xl font-semibold tracking-tight;
+    color: var(--color-heading);
+  }
+
+  .texto-suave {
+    color: var(--color-body);
+  }
+
+  .badge {
+    @apply inline-flex items-center gap-1 px-2.5 py-1 text-xs font-medium;
+    border-radius: var(--radius-sm);
+  }
+  .badge-green {
+    background-color: rgba(52,198,163,0.2);
+    color: var(--color-heading);
+    border: 1px solid var(--color-primary-tint-40);
+  }
+  .badge-amber {
+    @apply bg-amber-100 text-amber-800;
+  }
+  .badge-sky {
+    background-color: rgba(78,215,194,0.15);
+    color: var(--color-heading);
+  }
+
+  .stat-card {
+    @apply card p-6 flex flex-col gap-2;
+  }
+  .stat-value {
+    @apply text-3xl font-bold tabular-nums;
+    color: var(--color-heading);
+  }
+  .stat-label {
+    @apply text-xs font-medium uppercase;
+    color: var(--color-label);
+    letter-spacing: 0.05em;
+  }
+
+  .sidebar-link {
+    @apply flex items-center gap-3 px-4 py-2.5 min-h-tactil text-sm font-medium transition-all duration-200;
+    border-radius: var(--radius-md);
+    color: var(--color-label);
+  }
+  .sidebar-link:hover {
+    background-color: var(--color-primary-tint-08);
+    color: var(--color-heading);
+  }
+  .sidebar-link.active {
+    background-color: var(--color-accion);
+    color: #ffffff;
+  }
+
+  /* Variante para el menú azul marino (dirección e investigación) */
+  .sidebar-link-oscuro {
+    @apply flex items-center gap-3 px-4 py-2.5 min-h-tactil text-sm font-medium transition-all duration-200 text-white/85;
+    border-radius: var(--radius-md);
+  }
+  .sidebar-link-oscuro:hover {
+    @apply bg-white/10 text-white;
+  }
+  .sidebar-link-oscuro.active {
+    @apply bg-white text-surface-900;
+  }
+
+  .aviso-error {
+    @apply p-4 rounded-xl bg-red-50 border border-red-200 text-red-700 text-sm flex items-start gap-3;
+  }
+  .aviso-exito {
+    @apply p-4 rounded-xl text-sm flex items-start gap-3;
+    background-color: var(--color-primary-tint-08);
+    border: 1px solid var(--color-primary-tint-40);
+    color: var(--color-heading);
+  }
+  .aviso-pendiente {
+    @apply p-3 rounded-xl bg-amber-50 border border-amber-200 text-amber-900 text-sm;
+  }
+
+  .fade-in {
+    animation: fadeIn 0.4s ease-out;
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .slide-up {
+    animation: slideUp 0.5s ease-out;
+  }
+  @keyframes slideUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .solo-lector {
+    @apply sr-only;
+  }
+}

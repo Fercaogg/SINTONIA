@@ -14,6 +14,7 @@ Todo lo que el sistema necesita y que no puedo inventar. En la aplicación, cada
 | Bloque de conocimiento sobre convocatorias predoctorales | Pretest y postest | Fernando |
 | Fecha de inicio del piloto y días de apertura y cierre de cada semana | Calendario del estudio | Fernando |
 | Nombres de los dos másteres del piloto y correos de su dirección | Alta de másteres | Fernando |
-| Dominio o dominios de correo institucional admitidos (por ejemplo, @usal.es) | Registro | Fernando |
+| Dominio o dominios de correo institucional admitidos (ahora solo se admite usal.es; ¿hay otro para estudiantes?) | Registro | Fernando |
 | Remitente de los correos (dirección y nombre) | Recordatorios | Fernando |
 | Logotipo definitivo | Toda la interfaz (ahora es provisional) | Fernando |
+| Correo de la persona investigadora que administrará SINTONÍA | Alta inicial en Supabase | Fernando |
