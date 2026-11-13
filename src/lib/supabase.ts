@@ -4,7 +4,10 @@
 
 import { createClient } from '@supabase/supabase-js'
 
-const url = import.meta.env.VITE_SUPABASE_URL
+// Admite una dirección relativa (por ejemplo, /supabase) para probar la
+// aplicación detrás de un proxy, con la misma dirección que la página.
+const urlEntorno: string | undefined = import.meta.env.VITE_SUPABASE_URL
+const url = urlEntorno?.startsWith('/') ? `${window.location.origin}${urlEntorno}` : urlEntorno
 const clave = import.meta.env.VITE_SUPABASE_ANON_KEY
 
 if (!url || !clave) {
