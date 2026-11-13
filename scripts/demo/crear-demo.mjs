@@ -17,7 +17,9 @@ import { clienteServidor, crearAlmacenSupabase } from '../../servidor/almacen-su
 import { generarDemo, CONTRASENA_DEMO, CUENTAS_DEMO } from './generar-demo.ts'
 
 const remoto = process.argv.includes('--remoto')
-const reiniciar = process.argv.includes('--reiniciar')
+// En local la base de datos se crea siempre de cero, así que --reiniciar solo
+// hace falta (y solo se usa) con --remoto.
+const reiniciar = remoto && process.argv.includes('--reiniciar')
 
 let bd, almacen, cerrar = async () => {}
 if (remoto) {
