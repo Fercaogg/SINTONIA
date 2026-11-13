@@ -1,6 +1,6 @@
 # Arquitectura de SINTONÍA: quién ve qué
 
-Versión de la Fase 6. Se completará en las fases siguientes (sorteo, agenda, panel de dirección y exportación).
+Versión final (Fase 7). Se completará en las fases siguientes (sorteo, agenda, panel de dirección y exportación).
 
 Este documento está pensado para el apartado CTS del TFM: cada decisión sobre quién ve qué dato es una decisión de diseño que inclina la herramienta hacia el acompañamiento o hacia la vigilancia.
 
@@ -52,7 +52,7 @@ Las respuestas solo llevan el código de la pareja. El nombre está en otra tabl
 | Perfiles seudónimos | El suyo | El suyo | El suyo | Todos (sin nombres) |
 | Parejas | La suya | Las suyas | No | Todas (seudónimas) |
 | Respuestas del estudiante | Las suyas | **No** | **No** | Todas (seudónimas) |
-| Respuestas del tutor | **No** | Las suyas | **No** | Todas (seudónimas) |
+| Respuestas del tutor | **No** | Las suyas (un cotutor no ve las del otro) | **No** | Todas (seudónimas) |
 | Bienestar | Solo el suyo | **No** | **No** | **No** en la tabla. Solo dentro de la exportación seudonimizada, que queda registrada (Fase 6) |
 | Códigos de acceso | No | Los suyos sin usar, para repartirlos | No | Todos |
 | Consentimientos | Los suyos | Los suyos | Los suyos | Todos |
@@ -159,3 +159,31 @@ sequenceDiagram
 
 - Solo el investigador puede descargarla, siempre con códigos seudónimos.
 - Es el único lugar donde el investigador recibe el bienestar. Cada descarga queda en la auditoría, con el número de filas.
+
+## 12. Demostración separada de los datos reales
+
+- La demostración usa otro proyecto de Supabase y otro de Vercel.
+- La base de datos de demostración está marcada como tal (`private.ajustes`, `modo = demo`). La aplicación lo consulta al arrancar:
+  - si la base de datos es de demostración, muestra siempre el aviso "Demostración", aunque la aplicación se haya configurado mal;
+  - los accesos rápidos solo aparecen si la aplicación **y** la base de datos son de demostración.
+- El generador se niega a ejecutarse en una base de datos con personas registradas, y solo puede vaciar bases de datos marcadas como demostración.
+- La demostración solo admite el dominio inventado `sintonia.example`.
+
+## 13. Dónde se procesan los datos
+
+| Pieza | Dónde |
+|---|---|
+| Base de datos y acceso (Supabase) | Región de la UE elegida al crear el proyecto (por ejemplo, Fráncfort) |
+| Tareas automáticas y correos (funciones de Vercel) | Fráncfort (`fra1`, en `vercel.json`) |
+| Páginas de la aplicación (Vercel) | Red de distribución de Vercel: solo archivos públicos, sin datos |
+| Modelo de lenguaje (opcional) | Anthropic; solo recibe datos no personales |
+| Correo (Resend) | Proveedor de correo; recibe la dirección y el texto del recordatorio |
+
+## 14. Cotutoría y cambio de tutor
+
+Siguiendo los reglamentos de TFG y TFM de la USAL (ver [NORMATIVA.md](NORMATIVA.md)):
+
+- Cada pareja tiene un tutor principal y hasta dos cotutores. Todos hacen su propio check-in y ven la misma agenda; **ninguno ve las respuestas de los demás** ni las del estudiante.
+- El desajuste se calcula entre el estudiante y cada tutor. El sorteo es uno por estudiante, y hay desajuste relevante si lo hay con cualquiera de sus tutores.
+- El investigador refleja los cambios de tutor y las cotutorías que decide la comisión académica. Quedan en la auditoría y en la exportación, y las respuestas anteriores se conservan con el código de quien las dio.
+- En tesis doctorales, la interfaz habla de director/a, doctorando/a y codirección.

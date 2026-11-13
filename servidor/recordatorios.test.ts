@@ -32,6 +32,11 @@ describe('Textos de los correos', () => {
     expect(texto.toLowerCase()).not.toMatch(/olvid|urgente|obligatori|debes|último aviso|recuerda que tienes que/)
   })
 
+  it('en una tesis habla de doctorandos/as', () => {
+    expect(textoRecordatorio(rec({ rol: 'tutor', tipo_trabajo: 'TESIS' }), URL_APP).texto).toContain('sobre tus doctorandos/as')
+    expect(textoRecordatorio(rec({ rol: 'tutor', tipo_trabajo: 'TFM' }), URL_APP).texto).toContain('sobre tus estudiantes')
+  })
+
   it('el del tutor enlaza a su check-in', () => {
     expect(textoRecordatorio(rec({ rol: 'tutor' }), URL_APP).texto).toContain(`${URL_APP}/tutor/checkin`)
   })

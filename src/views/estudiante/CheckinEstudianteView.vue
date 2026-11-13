@@ -12,6 +12,7 @@ import EstadoCarga from '@/components/comun/EstadoCarga.vue'
 import EscalaTactil from '@/components/checkin/EscalaTactil.vue'
 import EstadoCalendario from '@/components/checkin/EstadoCalendario.vue'
 import AvisoBienestar from '@/components/checkin/AvisoBienestar.vue'
+import { useTerminos } from '@/lib/terminos'
 
 const datos = ref<CheckinEstudiante | null>(null)
 const respuestas = ref<Record<string, number | null>>({ avance: null, siguiente_paso: null, apoyo: null, bienestar: null })
@@ -59,13 +60,18 @@ async function enviar() {
     enviando.value = false
   }
 }
+
+const { t } = useTerminos()
 </script>
 
 <template>
   <div class="max-w-lg mx-auto fade-in">
     <EstadoCarga v-if="cargando" />
     <AvisoError v-else-if="!datos" :mensaje="error" />
-    <EstadoCalendario v-else-if="!abierta" :calendario="datos.calendario" />
+    <template v-else-if="!abierta">
+      <h1 class="titulo-pagina mb-6">Check-in semanal</h1>
+      <EstadoCalendario :calendario="datos.calendario" />
+    </template>
 
     <!-- Guardado -->
     <div v-else-if="guardado" class="text-center pt-8">
@@ -116,7 +122,7 @@ async function enviar() {
       <div class="space-y-4">
         <section v-for="item in items" :key="item.clave" class="card p-5 sm:p-6">
           <div class="flex items-start justify-between gap-3 mb-4">
-            <h2 :id="`p-${item.clave}`" class="font-display text-lg font-semibold text-surface-900 leading-snug">{{ item.texto }}</h2>
+            <h2 :id="`p-${item.clave}`" class="font-display text-lg font-semibold text-surface-900 leading-snug">{{ t(item.texto) }}</h2>
           </div>
           <p v-if="item.privado" class="badge badge-sky mb-4 -mt-2">
             <AppIcon name="lock" :size="14" /> Solo lo ves tú

@@ -16,6 +16,7 @@
 
 import type pg from 'pg'
 import { cerrarSemanas, type Almacen } from '../../servidor/cierre-semana'
+import { sortear } from '../../servidor/logica/sorteo'
 
 export const CONTRASENA_DEMO = 'demo-sintonia'
 export const DOMINIO_DEMO = 'sintonia.example'
@@ -48,11 +49,13 @@ function azar(semilla: number) {
 
 const escala = (v: number) => Math.min(5, Math.max(1, Math.round(v)))
 
-export async function generarDemo(opciones: { bd: pg.Client; almacen: Almacen; semilla?: number }) {
+export async function generarDemo(opciones: { bd: pg.Client; almacen: Almacen; semilla?: number; reiniciar?: boolean }) {
   const { bd, almacen } = opciones
   const r = azar(opciones.semilla ?? 2027)
   const q = (sql: string, p: unknown[] = []) => bd.query(sql, p).then((x) => x.rows)
 
+  // Reiniciar solo vacía bases de datos marcadas como demostración.
+  if (opciones.reiniciar) await q(`select private.vaciar_demo()`)
   const [{ n }] = await q(`select count(*)::int as n from public.perfiles`)
   if (n > 0) throw new Error('Esta base de datos ya tiene personas registradas: la demostración solo se crea en una base de datos vacía.')
 
@@ -79,9 +82,11 @@ export async function generarDemo(opciones: { bd: pg.Client; almacen: Almacen; s
   await cuenta(CUENTAS_DEMO.direccion, { codigo: await codigo('direccion', null, 'Dirección'), nombre: 'Dirección del máster (demo)' })
 
   const parejas: { id: string; estudiante: string; tutorIdx: number; progreso: number; sesgo: number; respondeE: number; respondeT: number }[] = []
+  const tutoresIds: string[] = []
   for (const [t, nombreT] of TUTORES.entries()) {
     const tutor = await cuenta(`tutor${t + 1}@${DOMINIO_DEMO}`, { codigo: await codigo('tutor', null, `Tutor/a ${t + 1}`), nombre: nombreT })
     await consentir(tutor)
+    tutoresIds.push(tutor)
     for (let k = 0; k < 3; k++) {
       const i = t * 3 + k
       const est = await cuenta(`estudiante${String(i + 1).padStart(2, '0')}@${DOMINIO_DEMO}`, { codigo: await codigo('estudiante', tutor, ''), nombre: ESTUDIANTES[i] })
@@ -98,9 +103,14 @@ export async function generarDemo(opciones: { bd: pg.Client; almacen: Almacen; s
     }
   }
 
-  // Puente al doctorado: la mitad lo activa. Una convocatoria ficticia con plazo
+  // Cotutoría: la tutora 2 es cotutora de la primera pareja (Reglamento de
+  // TFM, art. 4.3). Responde por su cuenta cada semana.
+  const cotutora = tutoresIds[1]
+  await q(`insert into public.cotutores (pareja_id, tutor_id, created_at) values ($1, $2, now() - interval '${7 * (SEMANAS_SIMULADAS + 2)} days')`, [parejas[0].id, cotutora])
+
+  // Puente al doctorado: la mitad lo activa (siempre la cuenta de acceso rápido). Una convocatoria ficticia con plazo
   // dentro de la simulación (en la demostración, nunca convocatorias reales).
-  for (const p of parejas.filter(() => r() < 0.5)) {
+  for (const p of parejas.filter((_, i) => i === 0 || r() < 0.5)) {
     await q(`update public.perfiles set puente_doctorado = true where user_id = $1`, [p.estudiante])
     await q(`insert into public.puente_cambios (estudiante_id, activado) values ($1, true)`, [p.estudiante])
   }
@@ -114,9 +124,12 @@ export async function generarDemo(opciones: { bd: pg.Client; almacen: Almacen; s
   const lunes = `date_trunc('week', now() at time zone 'Europe/Madrid')::date`
   await q(`update public.parejas set created_at = (${lunes} - ${7 * (SEMANAS_SIMULADAS + 2)})::timestamp`)
 
-  // Pretest de casi todos.
+  // En la demostración, el cuestionario inicial sigue abierto para poder enseñarlo.
+  await q(`update public.cuestionarios set hasta_semana = ${SEMANAS_SIMULADAS + 1} where clave = 'pretest'`)
+
+  // Pretest de casi todos (menos la cuenta de acceso rápido, para enseñarlo vacío).
   const items = await q(`select id, tipo, opciones from public.cuestionario_items where cuestionario = 'pretest' order by orden`)
-  for (const p of parejas.filter(() => r() < 0.9)) {
+  for (const p of parejas.filter((_, i) => i !== 0 && r() < 0.9)) {
     for (const it of items) {
       const valor = it.tipo === 'escala' ? escala(2 + r() * 3) : it.tipo === 'si_no' ? r() < 0.4 : it.opciones[Math.floor(r() * it.opciones.length)]
       await q(`insert into public.cuestionario_respuestas (user_id, item_id, valor) values ($1, $2, $3)`, [p.estudiante, it.id, JSON.stringify(valor)])
@@ -133,20 +146,32 @@ export async function generarDemo(opciones: { bd: pg.Client; almacen: Almacen; s
       // Si la pareja tuvo agenda la semana anterior, sus miradas se acercan un poco.
       const sesgo = conAgenda.has(p.id) ? p.sesgo * 0.5 : p.sesgo
       const base = p.progreso + (r() - 0.5) * 1.5
-      if (r() < p.respondeE) {
+      const siempre = p === parejas[0] && semana === SEMANAS_SIMULADAS
+      if (siempre || r() < p.respondeE) {
         await q(`insert into public.respuestas_estudiante (pareja_id, semana, avance, siguiente_paso, apoyo, created_at, updated_at)
                  values ($1, $2, $3, $4, $5, ${momento}, ${momento})`,
           [p.id, semana, escala(base + sesgo / 2), escala(base + (r() - 0.5)), escala(3.5 + r() * 1.5)])
         await q(`insert into public.bienestar (estudiante_id, semana, valor_cifrado, created_at, updated_at)
                  values ($1, $2, private.cifrar_bienestar($3), ${momento}, ${momento})`, [p.estudiante, semana, escala(2.5 + r() * 2.5)])
       }
-      if (r() < p.respondeT) {
+      if (siempre || r() < p.respondeT) {
         await q(`insert into public.respuestas_tutor (pareja_id, semana, avance, siguiente_paso, created_at, updated_at)
                  values ($1, $2, $3, $4, ${momento}, ${momento})`,
           [p.id, semana, escala(base - sesgo / 2), r() < 0.7 ? escala(base + (r() - 0.5)) : null])
       }
+      if (p === parejas[0] && r() < 0.85) {
+        await q(`insert into public.respuestas_tutor (pareja_id, tutor_id, principal, semana, avance, siguiente_paso, created_at, updated_at)
+                 values ($1, $2, false, $3, $4, null, ${momento}, ${momento})`,
+          [p.id, cotutora, semana, escala(base - 1 + (r() - 0.5))])
+      }
     }
-    await cerrarSemanas({ almacen, redactor: null, semilla: () => `demo-${opciones.semilla ?? 2027}-${semana}` })
+    // En la última semana, la semilla se elige para que la cuenta de acceso
+    // rápido del estudiante tenga agenda (así la demostración la enseña).
+    let semilla = `demo-${opciones.semilla ?? 2027}-${semana}`
+    if (semana === SEMANAS_SIMULADAS) {
+      for (let k = 0; !sortear(semilla, parejas[0].id, semana, 0.5).resultado; k++) semilla = `demo-${opciones.semilla ?? 2027}-${semana}-${k}`
+    }
+    await cerrarSemanas({ almacen, redactor: null, semilla: () => semilla })
     conAgenda.clear()
     for (const { pareja_id } of await q(`select pareja_id from public.agendas where semana = $1`, [semana])) conAgenda.add(pareja_id)
     // La mayoría mira la agenda.

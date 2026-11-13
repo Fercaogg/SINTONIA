@@ -62,6 +62,7 @@ const routes: RouteRecordRaw[] = [
     meta: { rol: 'investigador' },
     children: [
       { path: '', component: () => import('@/views/investigacion/MastersView.vue'), meta: { titulo: 'Másteres y códigos' } },
+      { path: 'parejas', component: () => import('@/views/investigacion/ParejasView.vue'), meta: { titulo: 'Parejas y tutores' } },
       { path: 'calendario', component: () => import('@/views/investigacion/CalendarioView.vue'), meta: { titulo: 'Calendario del estudio' } },
       { path: 'convocatorias', component: () => import('@/views/investigacion/ConvocatoriasView.vue'), meta: { titulo: 'Convocatorias' } },
       { path: 'cuestionarios', component: () => import('@/views/investigacion/CuestionariosView.vue'), meta: { titulo: 'Cuestionarios' } },

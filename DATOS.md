@@ -40,12 +40,16 @@ Formato largo: **una fila por pareja y semana**, desde la semana 1 hasta la últ
 | `tut_avance` | entero | 1 a 5 o `NA` | "¿Cuánto ha avanzado esta semana?" |
 | `tut_siguiente_paso` | entero | 1 a 5 o `NA` | "¿Tiene claro su siguiente paso?" (opcional para el tutor/a). |
 | `tut_respondido_at` | fecha y hora | | Última vez que el tutor/a guardó su check-in. |
+| `n_cotutores` | entero | 0 a 2 | Cotutores que tenía la pareja esa semana, además del tutor principal. |
+| `cotutores_respondieron` | entero | 0 a 2 | Cotutores que hicieron su check-in esa semana. Sus respuestas están en el archivo de tutores (apartado 3). |
+
+Las columnas `id_tutor`, `tut_*` y `dif_*` corresponden al **tutor principal**: quien respondió como principal esa semana o, si no respondió nadie, el tutor principal actual.
 
 ### Desajuste (calculado al cerrar la semana)
 
 | Variable | Tipo | Valores | Descripción |
 |---|---|---|---|
-| `dif_avance` | entero | −4 a 4 o `NA` | `est_avance − tut_avance`. Positivo: el estudiante ve más avance que el tutor/a. `NA` si falta alguna respuesta o la semana no se ha cerrado. |
+| `dif_avance` | entero | −4 a 4 o `NA` | `est_avance − tut_avance` (con el tutor principal). Positivo: el estudiante ve más avance que el tutor/a. `NA` si falta alguna respuesta o la semana no se ha cerrado. |
 | `dif_siguiente_paso` | entero | −4 a 4 o `NA` | Lo mismo para el siguiente paso. `NA` también si el tutor/a no respondió ese ítem. |
 | `relevante_avance` | 0/1 | | 1 si el desajuste en el avance es relevante según la regla. |
 | `relevante_siguiente_paso` | 0/1 | | Lo mismo para el siguiente paso. |
@@ -57,7 +61,7 @@ Formato largo: **una fila por pareja y semana**, desde la semana 1 hasta la últ
 
 | Variable | Tipo | Valores | Descripción |
 |---|---|---|---|
-| `sorteo_elegible` | 0/1 o `NA` | | 1 si la pareja tenía los dos check-ins y entró en el sorteo. `NA` si la semana aún no se ha cerrado. |
+| `sorteo_elegible` | 0/1 o `NA` | | 1 si respondieron el estudiante y al menos uno de sus tutores, y la pareja entró en el sorteo. `NA` si la semana aún no se ha cerrado. |
 | `sorteo_motivo_no_elegible` | texto | `falta_estudiante`, `falta_tutor`, `faltan_ambos`, `sin_tutor`, `retirado` o `NA` | Por qué no hubo sorteo. |
 | `sorteo_probabilidad` | decimal | 0 a 1 | Probabilidad de recibir agenda (0,5 por defecto). |
 | `sorteo_valor` | decimal | 0 a 1 | Número aleatorio de la pareja: HMAC-SHA256(semilla, "pareja:semana") convertido a [0, 1). |
@@ -93,6 +97,8 @@ Formato largo: **una fila por pareja y semana**, desde la semana 1 hasta la últ
 |---|---|---|---|
 | `estudiante_retirado` | 0/1 | | 1 si el estudiante se ha retirado del estudio (conservando sus respuestas anteriores). |
 
+Con cotutoría, el sorteo y la agenda son uno por estudiante: hay desajuste relevante si lo hay con cualquiera de sus tutores (`relevante_*` y `motivo_*` de este archivo se refieren al tutor principal; los de cada tutor están en el archivo de tutores).
+
 ---
 
 ## 2. Pretest y postest (`sintonia_pretest_AAAA-MM-DD.csv` y `sintonia_postest_AAAA-MM-DD.csv`)
@@ -114,7 +120,31 @@ Las variables de los cuestionarios se definen en la tabla `cuestionario_items` (
 
 ---
 
-## 3. Notas para el análisis
+## 3. Respuestas de cada tutor (`sintonia_tutores_AAAA-MM-DD.csv`)
+
+Formato largo: **una fila por pareja, semana y tutor que respondió** (tutor principal y cotutores). Sirve para analizar la cotutoría.
+
+| Variable | Tipo | Valores | Descripción |
+|---|---|---|---|
+| `id_pareja`, `id_estudiante`, `id_tutor`, `master`, `semana` | | | Como en el archivo semanal; `id_tutor` es quien respondió. |
+| `tutor_principal` | 0/1 | | 1 si respondió como tutor principal; 0, como cotutor. |
+| `tut_avance`, `tut_siguiente_paso` | entero | 1 a 5 o `NA` | Sus respuestas. |
+| `dif_avance`, `dif_siguiente_paso` | entero | −4 a 4 o `NA` | Diferencia entre el estudiante y este tutor. |
+| `relevante_avance`, `relevante_siguiente_paso`, `motivo_avance`, `motivo_siguiente_paso`, `regla_version` | | | Desajuste con este tutor (como en el archivo semanal). |
+| `tut_respondido_at` | fecha y hora | | Última vez que guardó su check-in. |
+
+## 4. Cambios de tutor (`sintonia_cambios_tutor_AAAA-MM-DD.csv`)
+
+| Variable | Tipo | Descripción |
+|---|---|---|
+| `id_pareja` | texto | Pareja. |
+| `id_tutor_anterior` | texto | Tutor principal anterior (`NA` si ya no existe). |
+| `id_tutor_nuevo` | texto | Nuevo tutor principal. |
+| `cambiado_at` | fecha y hora | Momento del cambio. |
+
+---
+
+## 5. Notas para el análisis
 
 - **Tratamiento:** `sorteo_resultado` (aleatorizado cada semana entre las parejas elegibles). Las parejas con `sorteo_elegible = 0` no participan en el sorteo de esa semana.
 - **Resultado proximal sugerido:** el desajuste de la semana siguiente (por ejemplo, `abs(dif_avance)` en `semana + 1`), como hace el script de ejemplo.

@@ -7,6 +7,7 @@ import AppIcon from '@/components/comun/AppIcon.vue'
 import AvisoError from '@/components/comun/AvisoError.vue'
 import EstadoCarga from '@/components/comun/EstadoCarga.vue'
 import Pendiente from '@/components/comun/Pendiente.vue'
+import { useTerminos } from '@/lib/terminos'
 
 interface Convocatoria {
   id: number
@@ -20,15 +21,17 @@ interface Convocatoria {
 
 const activado = ref(false)
 const convocatorias = ref<Convocatoria[]>([])
+const normativa = ref<{ titulo: string; descripcion: string | null; url: string }[]>([])
 const cargando = ref(true)
 const guardando = ref(false)
 const error = ref('')
 
 onMounted(async () => {
   try {
-    const r = await llamar<{ activado: boolean; convocatorias: Convocatoria[] }>('mi_puente')
+    const r = await llamar<{ activado: boolean; convocatorias: Convocatoria[]; normativa: typeof normativa.value }>('mi_puente')
     activado.value = r.activado
     convocatorias.value = r.convocatorias
+    normativa.value = r.normativa ?? []
   } catch (e) {
     error.value = mensajeDeError(e)
   } finally {
@@ -50,6 +53,8 @@ async function cambiar() {
 }
 
 const esEnlace = (t: string) => /^https?:\/\//.test(t)
+
+const { t } = useTerminos()
 </script>
 
 <template>
@@ -69,7 +74,7 @@ const esEnlace = (t: string) => /^https?:\/\//.test(t)
             <h2 id="t-activar" class="font-semibold text-surface-900">Avisarme de los plazos en la agenda</h2>
             <p class="text-sm texto-suave mt-1 leading-relaxed">
               Si lo activas, cuando una convocatoria abra o cierre en las próximas 4 semanas, la agenda de la tutoría
-              incluirá una línea para comentarlo. Tu tutor/a también verá esa línea. Puedes desactivarlo cuando quieras.
+              incluirá una línea para comentarlo. {{ t('Tu tutor/a también verá esa línea.') }} Puedes desactivarlo cuando quieras.
             </p>
           </div>
           <button
@@ -78,15 +83,20 @@ const esEnlace = (t: string) => /^https?:\/\//.test(t)
             :aria-checked="activado"
             aria-labelledby="t-activar"
             :disabled="guardando"
-            class="relative shrink-0 w-14 h-8 rounded-full transition-colors duration-200 mt-1"
-            :class="activado ? 'bg-brand-900' : 'bg-surface-300'"
+            class="shrink-0 w-14 h-11 flex items-center"
             @click="cambiar"
           >
+            <!-- Zona táctil de 44 px de alto; el carril visible mide 32 px. -->
             <span
-              class="absolute top-1 left-1 w-6 h-6 rounded-full bg-white shadow transition-transform duration-200"
-              :class="{ 'translate-x-6': activado }"
+              class="relative w-14 h-8 rounded-full transition-colors duration-200"
+              :class="activado ? 'bg-brand-900' : 'bg-surface-300'"
               aria-hidden="true"
-            />
+            >
+              <span
+                class="absolute top-1 left-1 w-6 h-6 rounded-full bg-white shadow transition-transform duration-200"
+                :class="{ 'translate-x-6': activado }"
+              />
+            </span>
           </button>
         </div>
         <p class="text-sm font-medium mt-3" :class="activado ? 'text-brand-900' : 'texto-suave'" aria-live="polite">
@@ -121,6 +131,18 @@ const esEnlace = (t: string) => /^https?:\/\//.test(t)
           </div>
         </li>
       </ul>
+
+      <section v-if="normativa.length" class="mt-8" aria-labelledby="t-norm">
+        <h2 id="t-norm" class="font-display text-xl font-semibold text-surface-900 mb-3">Normativa del doctorado</h2>
+        <ul class="card divide-y divide-surface-200">
+          <li v-for="n in normativa" :key="n.url" class="p-4">
+            <a :href="n.url" target="_blank" rel="noopener" class="enlace">
+              {{ n.titulo }} <span class="sr-only">(documento oficial, se abre en otra pestaña)</span>
+            </a>
+            <p v-if="n.descripcion" class="text-sm texto-suave mt-1">{{ n.descripcion }}</p>
+          </li>
+        </ul>
+      </section>
     </template>
   </div>
 </template>

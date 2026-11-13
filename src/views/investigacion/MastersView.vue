@@ -107,7 +107,7 @@ async function crearCodigos() {
       <p v-if="aviso" class="aviso-exito mb-6" role="status">{{ aviso }}</p>
 
       <div class="grid gap-6 lg:grid-cols-3">
-        <section class="card p-5 lg:col-span-1" aria-labelledby="t-masters">
+        <section class="card p-5 lg:col-span-1 min-w-0" aria-labelledby="t-masters">
           <h2 id="t-masters" class="font-semibold text-surface-900 mb-4">Másteres</h2>
           <ul v-if="masters.length" class="space-y-2 mb-6">
             <li v-for="m in masters" :key="m.id">
@@ -143,7 +143,7 @@ async function crearCodigos() {
           </form>
         </section>
 
-        <div v-if="master" class="lg:col-span-2 space-y-6">
+        <div v-if="master" class="lg:col-span-2 space-y-6 min-w-0">
           <section class="card p-5" aria-labelledby="t-codigos">
             <h2 id="t-codigos" class="font-semibold text-surface-900 mb-4">Crear códigos para {{ master.nombre }}</h2>
             <form class="grid gap-4 sm:grid-cols-2" @submit.prevent="crearCodigos">

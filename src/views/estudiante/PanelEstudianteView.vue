@@ -11,6 +11,7 @@ import AvisoError from '@/components/comun/AvisoError.vue'
 import EstadoCarga from '@/components/comun/EstadoCarga.vue'
 import EstadoCalendario from '@/components/checkin/EstadoCalendario.vue'
 import TarjetaAgenda from '@/components/agenda/TarjetaAgenda.vue'
+import { useTerminos } from '@/lib/terminos'
 
 const sesion = useSesion()
 const datos = ref<CheckinEstudiante | null>(null)
@@ -38,6 +39,8 @@ onMounted(async () => {
     cargando.value = false
   }
 })
+
+const { t } = useTerminos()
 </script>
 
 <template>
@@ -81,7 +84,7 @@ onMounted(async () => {
         </RouterLink>
       </section>
 
-      <TarjetaAgenda class="mt-4" :agenda="agenda" otra-persona="Tu tutor/a" />
+      <TarjetaAgenda class="mt-4" :agenda="agenda" :otra-persona="t('Tu tutor/a')" />
 
       <div class="grid sm:grid-cols-2 gap-4 mt-4">
         <RouterLink to="/estudiante/historial" class="card p-5 hover:shadow-elevated no-underline">

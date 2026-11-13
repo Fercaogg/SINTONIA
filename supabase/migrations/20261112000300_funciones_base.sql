@@ -202,6 +202,25 @@ create trigger sintonia_alta_usuario
   after insert on auth.users
   for each row execute function private.alta_usuario();
 
+-- Si una respuesta de tutor se guarda sin indicar quién responde (por ejemplo,
+-- en los datos de prueba), se asigna al tutor principal de la pareja.
+create or replace function private.completar_respuesta_tutor()
+returns trigger
+language plpgsql security definer set search_path = ''
+as $$
+begin
+  if new.tutor_id is null then
+    select tutor_id into new.tutor_id from public.parejas where id = new.pareja_id;
+    new.principal := true;
+  end if;
+  return new;
+end
+$$;
+
+create trigger sintonia_completar_respuesta_tutor
+  before insert on public.respuestas_tutor
+  for each row execute function private.completar_respuesta_tutor();
+
 -- ---------------------------------------------------------------------------
 -- Funciones públicas: cualquier visitante
 -- ---------------------------------------------------------------------------
@@ -342,11 +361,12 @@ begin
     perform private.error('SIN_PERMISO', 'No tienes permiso para hacer esto.');
   end if;
   return coalesce((
-    select jsonb_agg(jsonb_build_object('pareja_id', pa.id, 'nombre', i.nombre) order by i.nombre)
+    select jsonb_agg(jsonb_build_object('pareja_id', pa.id, 'nombre', i.nombre, 'cotutor', pa.tutor_id is distinct from auth.uid())
+                     order by i.nombre)
     from public.parejas pa
     join public.perfiles pe on pe.user_id = pa.estudiante_id and pe.retirado_at is null
     join public.identidades i on i.user_id = pa.estudiante_id
-    where pa.tutor_id = auth.uid() and pa.finalizada_at is null
+    where pa.id in (select private.parejas_como_tutor()) and pa.finalizada_at is null
   ), '[]'::jsonb);
 end
 $$;
@@ -509,7 +529,8 @@ begin
       'user_id', p.user_id,
       'seudonimo', p.seudonimo,
       'etiqueta', (select c.etiqueta from public.codigos_acceso c where c.usado_por = p.user_id limit 1),
-      'estudiantes', (select count(*) from public.parejas pa where pa.tutor_id = p.user_id)
+      'estudiantes', (select count(*) from public.parejas pa where pa.tutor_id = p.user_id),
+      'cotutorias', (select count(*) from public.cotutores c where c.tutor_id = p.user_id and c.finalizada_at is null)
     ) order by p.created_at)
     from public.perfiles p
     where p.master_id = p_master_id and p.rol = 'tutor' and p.retirado_at is null

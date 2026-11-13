@@ -3,7 +3,7 @@
 import { onMounted, ref } from 'vue'
 import { llamar, mensajeDeError } from '@/lib/api'
 import { aCsv, descargar, pivotarCuestionario, type RespuestaCuestionario } from '@/lib/csv'
-import { COLUMNAS_INVESTIGACION } from '@/lib/columnas-exportacion'
+import { COLUMNAS_CAMBIOS_TUTOR, COLUMNAS_INVESTIGACION, COLUMNAS_TUTORES } from '@/lib/columnas-exportacion'
 import { fechaCorta, horaDe } from '@/lib/fechas'
 import AppIcon from '@/components/comun/AppIcon.vue'
 import AvisoError from '@/components/comun/AvisoError.vue'
@@ -13,6 +13,11 @@ interface Registro { created_at: string; accion: string; rol: string | null; qui
 const ACCIONES: Record<string, string> = {
   exportacion_investigacion: 'Descarga de los datos semanales',
   exportacion_cuestionarios: 'Descarga de los cuestionarios',
+  exportacion_tutores: 'Descarga de las respuestas de cada tutor',
+  exportacion_cambios_tutor: 'Descarga de los cambios de tutor',
+  tutor_cambiado: 'Cambio de tutor principal',
+  cotutor_asignado: 'Cotutor/a añadido',
+  cotutor_quitado: 'Cotutor/a quitado',
   descarga_mis_datos: 'Una persona descargó sus propios datos',
   consentimiento_aceptado: 'Consentimiento aceptado',
   retirada: 'Retirada del estudio',
@@ -43,6 +48,25 @@ async function descargarSemanal() {
     const filas = await llamar<Record<string, unknown>[]>('exportar_investigacion')
     descargar(`sintonia_semanal_${hoy()}.csv`, aCsv(filas, [...COLUMNAS_INVESTIGACION]))
     aviso.value = `Descargadas ${filas.length} filas.`
+    await cargarRegistro()
+  } catch (e) {
+    error.value = mensajeDeError(e)
+  } finally {
+    trabajando.value = ''
+  }
+}
+
+async function descargarTutores() {
+  trabajando.value = 'tutores'
+  error.value = ''
+  try {
+    const [filas, cambios] = await Promise.all([
+      llamar<Record<string, unknown>[]>('exportar_tutores'),
+      llamar<Record<string, unknown>[]>('exportar_cambios_tutor'),
+    ])
+    descargar(`sintonia_tutores_${hoy()}.csv`, aCsv(filas, [...COLUMNAS_TUTORES]))
+    descargar(`sintonia_cambios_tutor_${hoy()}.csv`, aCsv(cambios, [...COLUMNAS_CAMBIOS_TUTOR]))
+    aviso.value = `Descargadas ${filas.length} respuestas de tutores y ${cambios.length} cambios de tutor.`
     await cargarRegistro()
   } catch (e) {
     error.value = mensajeDeError(e)
@@ -97,6 +121,15 @@ async function descargarCuestionarios() {
         <p class="text-sm texto-suave mt-1 mb-4">Un archivo por cuestionario: una fila por estudiante y una columna por variable.</p>
         <button type="button" class="btn-primary" :disabled="!!trabajando" @click="descargarCuestionarios">
           <AppIcon name="download" :size="16" /> {{ trabajando === 'cuestionarios' ? 'Preparando...' : 'Descargar CSV' }}
+        </button>
+      </section>
+      <section class="card p-5 sm:col-span-2" aria-labelledby="t-tut">
+        <h2 id="t-tut" class="font-semibold text-surface-900">Respuestas de cada tutor y cambios de tutor</h2>
+        <p class="text-sm texto-suave mt-1 mb-4">
+          Con cotutoría, una fila por pareja, semana y tutor (con su desajuste). Y el historial de cambios de tutor principal.
+        </p>
+        <button type="button" class="btn-primary" :disabled="!!trabajando" @click="descargarTutores">
+          <AppIcon name="download" :size="16" /> {{ trabajando === 'tutores' ? 'Preparando...' : 'Descargar CSV' }}
         </button>
       </section>
     </div>

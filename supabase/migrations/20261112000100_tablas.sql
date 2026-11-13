@@ -120,6 +120,26 @@ create table public.parejas (
   finalizada_at timestamptz
 );
 
+-- Cotutores: además del tutor principal (parejas.tutor_id), hasta dos más.
+-- El Reglamento de TFM de la USAL permite un segundo tutor y, de forma
+-- excepcional, un tercero (art. 4.3 y 4.7).
+create table public.cotutores (
+  pareja_id uuid not null references public.parejas (id) on delete cascade,
+  tutor_id uuid not null references public.perfiles (user_id) on delete cascade,
+  created_at timestamptz not null default now(),
+  finalizada_at timestamptz,
+  primary key (pareja_id, tutor_id)
+);
+
+-- Historial de cambios de tutor principal (Reglamento de TFM, art. 4.9).
+create table public.cambios_tutor (
+  id bigint generated always as identity primary key,
+  pareja_id uuid not null references public.parejas (id) on delete cascade,
+  tutor_anterior uuid references public.perfiles (user_id) on delete set null,
+  tutor_nuevo uuid references public.perfiles (user_id) on delete set null,
+  created_at timestamptz not null default now()
+);
+
 -- ---------------------------------------------------------------------------
 -- Consentimiento informado (versionado)
 -- ---------------------------------------------------------------------------
@@ -178,15 +198,19 @@ create table public.respuestas_estudiante (
   unique (pareja_id, semana)
 );
 
+-- Cada tutor (principal o cotutor) responde por separado.
 create table public.respuestas_tutor (
   id uuid primary key default gen_random_uuid(),
   pareja_id uuid not null references public.parejas (id) on delete cascade,
+  tutor_id uuid not null references public.perfiles (user_id) on delete cascade,
+  -- ¿Era el tutor principal cuando respondió?
+  principal boolean not null default true,
   semana smallint not null check (semana between 1 and 52),
   avance smallint not null check (avance between 1 and 5),
   siguiente_paso smallint check (siguiente_paso between 1 and 5),
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now(),
-  unique (pareja_id, semana)
+  unique (pareja_id, semana, tutor_id)
 );
 
 -- Bienestar: dato posiblemente de categoría especial (RGPD, art. 9).
@@ -217,5 +241,7 @@ create table public.auditoria (
 create index on public.respuestas_estudiante (semana);
 create index on public.respuestas_tutor (semana);
 create index on public.parejas (tutor_id);
+create index on public.cotutores (tutor_id);
+create index on public.respuestas_tutor (tutor_id);
 create index on public.codigos_acceso (master_id);
 create index on public.auditoria (created_at);

@@ -33,7 +33,29 @@ insert into public.convocatorias (nombre, organismo) values
   ('Ayudas para contratos predoctorales para la formación de doctores (FPI)', '[PENDIENTE]'),
   ('Contratos predoctorales de la Universidad de Salamanca', 'Universidad de Salamanca'),
   ('Contratos predoctorales de la Junta de Castilla y León', 'Junta de Castilla y León'),
-  ('Admisión al doctorado', '[PENDIENTE]');
+  ('Admisión al doctorado', 'Universidad de Salamanca (Escuela de Doctorado «Studii Salamantini»)');
+
+-- Normativa oficial del doctorado que se muestra en Puente al doctorado.
+-- Enlaces facilitados por Fernando a partir de la web de la USAL (13/11/2026).
+create table public.enlaces_normativa (
+  id serial primary key,
+  ambito text not null default 'doctorado',
+  titulo text not null,
+  descripcion text,
+  url text not null,
+  orden smallint not null default 0,
+  activo boolean not null default true
+);
+
+insert into public.enlaces_normativa (titulo, descripcion, url, orden) values
+  ('Reglamento de Doctorado de la Universidad de Salamanca', 'Aprobado por Consejo de Gobierno el 18 de julio de 2025 (BOCyL de 15 de diciembre de 2025).',
+   'https://bocyl.jcyl.es/boletines/2025/12/15/pdf/BOCYL-D-15122025-31.pdf', 1),
+  ('Reglamento de Régimen Interno de la Escuela de Doctorado «Studii Salamantini»', 'Aprobado por Consejo de Gobierno el 18 de julio de 2025 (BOCyL de 15 de diciembre de 2025).',
+   'https://bocyl.jcyl.es/boletines/2025/12/15/pdf/BOCYL-D-15122025-32.pdf', 2),
+  ('Real Decreto 99/2011, de 28 de enero, por el que se regulan las enseñanzas oficiales de doctorado', 'Texto consolidado del BOE, con las modificaciones del Real Decreto 576/2023.',
+   'https://www.boe.es/buscar/pdf/2011/BOE-A-2011-2541-consolidado.pdf', 3),
+  ('Guía de Buenas Prácticas para la Gestión Académica de los Programas de Doctorado', 'Aprobada por Consejo de Gobierno el 25 de julio de 2019.',
+   'http://posgrado.usal.es/DOCTORADO%2099/GuiaBuenasPracticas.pdf', 4);
 
 -- Lo que se decidió cada semana para cada pareja: si Puente estaba activado
 -- y, en su caso, la línea que se añadió a la agenda. Se registra aunque esa
@@ -131,6 +153,11 @@ alter table public.avisos_apoyo add column notificado_at timestamptz;
 -- Permisos de tabla
 -- ---------------------------------------------------------------------------
 
+alter table public.enlaces_normativa enable row level security;
+revoke all on public.enlaces_normativa from public, anon, authenticated;
+grant select on public.enlaces_normativa to authenticated;
+create policy "lectura general" on public.enlaces_normativa for select to authenticated using (activo or private.es_investigador());
+
 alter table public.puente_cambios enable row level security;
 alter table public.convocatorias enable row level security;
 alter table public.puente_semanal enable row level security;
@@ -172,6 +199,10 @@ begin
         'fecha_cierre', fecha_cierre, 'enlace', enlace, 'estado', estado
       ) order by coalesce(fecha_cierre, fecha_apertura, '9999-12-31'::date), id)
       from public.convocatorias where activa
+    ), '[]'::jsonb),
+    'normativa', coalesce((
+      select jsonb_agg(jsonb_build_object('titulo', titulo, 'descripcion', descripcion, 'url', url) order by orden)
+      from public.enlaces_normativa where activo and ambito = 'doctorado'
     ), '[]'::jsonb)
   );
 end
@@ -491,11 +522,13 @@ as $$
     when 'estudiante' then exists (
       select 1 from public.respuestas_estudiante r join public.parejas pa on pa.id = r.pareja_id
       where pa.estudiante_id = p_user_id and r.semana = p_semana)
+    -- El tutor ha respondido si lo ha hecho sobre todas sus parejas (como
+    -- principal o como cotutor).
     when 'tutor' then not exists (
       select 1 from public.parejas pa
       join public.perfiles pe on pe.user_id = pa.estudiante_id and pe.retirado_at is null
-      where pa.tutor_id = p_user_id and pa.finalizada_at is null
-        and not exists (select 1 from public.respuestas_tutor r where r.pareja_id = pa.id and r.semana = p_semana))
+      where private.es_tutor_de(pa.id, p_user_id) and pa.finalizada_at is null
+        and not exists (select 1 from public.respuestas_tutor r where r.pareja_id = pa.id and r.semana = p_semana and r.tutor_id = p_user_id))
     else true
   end
 $$;
@@ -529,7 +562,7 @@ begin
     resultado := resultado || coalesce((
       select jsonb_agg(jsonb_build_object(
         'user_id', p.user_id, 'email', i.email, 'nombre', i.nombre, 'rol', p.rol,
-        'tipo', v_tipo, 'semana', v_semana, 'cierra', v_cierra
+        'tipo', v_tipo, 'semana', v_semana, 'cierra', v_cierra, 'tipo_trabajo', m.tipo_trabajo
       ))
       from public.perfiles p
       join public.masters m on m.id = p.master_id and m.estudio_id = e.id
@@ -540,7 +573,7 @@ begin
         and not exists (select 1 from public.correos_enviados ce where ce.user_id = p.user_id and ce.tipo = v_tipo and ce.semana = v_semana)
         and not private.ha_respondido(p.user_id, p.rol, v_semana)
         -- Un tutor sin estudiantes no recibe recordatorios.
-        and (p.rol = 'estudiante' or exists (select 1 from public.parejas pa where pa.tutor_id = p.user_id))
+        and (p.rol = 'estudiante' or exists (select 1 from public.parejas pa where private.es_tutor_de(pa.id, p.user_id)))
     ), '[]'::jsonb);
   end loop;
   return resultado;

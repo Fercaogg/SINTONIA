@@ -33,7 +33,7 @@ export interface CheckinEstudiante {
 export interface CheckinTutor {
   calendario: Calendario
   items: Item[]
-  estudiantes: { pareja_id: string; nombre: string; avance: number | null; siguiente_paso: number | null }[]
+  estudiantes: { pareja_id: string; nombre: string; cotutor?: boolean; avance: number | null; siguiente_paso: number | null }[]
 }
 
 export interface AgendaSemana {

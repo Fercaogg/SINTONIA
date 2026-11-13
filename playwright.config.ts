@@ -19,16 +19,10 @@ export default defineConfig({
     // Sin animaciones: así la revisión de accesibilidad mide los colores finales.
     reducedMotion: 'reduce',
   },
-  projects: process.env.CAPTURAS
-    ? [
-        // npm run capturas: genera las imágenes de docs/capturas
-        { name: 'movil', testMatch: /capturas\.ts/, use: { ...devices['Pixel 7'] } },
-        { name: 'escritorio', testMatch: /capturas\.ts/, use: { ...devices['Desktop Chrome'], viewport: { width: 1366, height: 860 }, deviceScaleFactor: 2 } },
-      ]
-    : [
-        { name: 'movil', use: { ...devices['Pixel 7'] } },
-        { name: 'escritorio', use: { ...devices['Desktop Chrome'], viewport: { width: 1366, height: 860 } } },
-      ],
+  projects: [
+    { name: 'movil', use: { ...devices['Pixel 7'] } },
+    { name: 'escritorio', use: { ...devices['Desktop Chrome'], viewport: { width: 1366, height: 860 } } },
+  ],
   webServer: [
     {
       command: 'npx vite-node scripts/local/preparar-bd.mjs && node scripts/local/servidor-local.mjs',

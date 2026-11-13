@@ -11,10 +11,17 @@
     "local:db": "vite-node scripts/local/preparar-bd.mjs",
     "local:servidor": "node scripts/local/servidor-local.mjs",
     "local:tareas": "vite-node scripts/local/tareas-diarias.mjs",
+    "demo:local": "vite-node scripts/demo/crear-demo.mjs",
+    "demo:remoto": "vite-node scripts/demo/crear-demo.mjs -- --remoto",
+    "demo:servidor": "LOCAL_BD=sintonia_demo node scripts/local/servidor-local.mjs",
+    "demo:app": "vite --mode demo",
     "test": "vitest run",
     "test:bd": "vitest run tests/bd",
     "test:e2e": "playwright test --trace off",
-    "capturas": "CAPTURAS=1 playwright test --trace off",
+    "sql:unir": "node scripts/unir-sql.mjs",
+    "rendimiento": "node scripts/medir-rendimiento.mjs",
+    "test:demo": "playwright test --config playwright.demo.config.ts --trace off",
+    "capturas": "CAPTURAS=1 playwright test --config playwright.demo.config.ts --trace off",
     "typecheck": "vue-tsc --noEmit"
   },
   "engines": {

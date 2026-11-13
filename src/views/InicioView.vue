@@ -6,6 +6,8 @@ import { INICIO_ROL } from '@/lib/tipos'
 import AppLogo from '@/components/comun/AppLogo.vue'
 import AppIcon from '@/components/comun/AppIcon.vue'
 import BandaEntorno from '@/components/comun/BandaEntorno.vue'
+import AccesosDemo from '@/components/comun/AccesosDemo.vue'
+import { modoDemo } from '@/lib/supabase'
 
 const sesion = useSesion()
 const route = useRoute()
@@ -27,7 +29,7 @@ const pasos = [
           <RouterLink v-if="sesion.rol" :to="INICIO_ROL[sesion.rol]" class="btn-primary text-sm">Ir a mi panel</RouterLink>
           <template v-else>
             <RouterLink to="/acceso" class="btn-secondary text-sm">Iniciar sesión</RouterLink>
-            <RouterLink to="/registro" class="btn-primary text-sm">Registrarme</RouterLink>
+            <RouterLink v-if="!modoDemo" to="/registro" class="btn-primary text-sm">Registrarme</RouterLink>
           </template>
         </nav>
       </div>
@@ -50,8 +52,9 @@ const pasos = [
           <p class="text-lg sm:text-xl max-w-2xl mx-auto mb-10 texto-suave slide-up">
             Un registro semanal muy breve de estudiante y tutor/a para que las tutorías empiecen por lo que importa.
           </p>
+          <AccesosDemo v-if="modoDemo" class="text-left max-w-2xl mx-auto mb-6" />
           <div class="flex flex-col sm:flex-row items-center justify-center gap-3">
-            <RouterLink to="/registro" class="btn-primary px-6 py-3">Tengo un código</RouterLink>
+            <RouterLink v-if="!modoDemo" to="/registro" class="btn-primary px-6 py-3">Tengo un código</RouterLink>
             <RouterLink to="/como-funciona" class="btn-secondary px-6 py-3">Cómo funciona y tus datos</RouterLink>
           </div>
         </div>

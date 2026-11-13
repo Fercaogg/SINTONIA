@@ -146,7 +146,7 @@ describe('Check-in del tutor', () => {
     const texto = JSON.stringify(c)
     expect(texto).not.toContain('bienestar')
     expect(texto).not.toContain('apoyo')
-    expect(c.estudiantes[0]).toEqual({ pareja_id: e.parejaA, nombre: 'Ana', avance: null, siguiente_paso: null })
+    expect(c.estudiantes[0]).toEqual({ pareja_id: e.parejaA, nombre: 'Ana', cotutor: false, avance: null, siguiente_paso: null })
   })
 
   it('guarda todas sus respuestas de una vez; el siguiente paso es opcional', async () => {
@@ -277,5 +277,15 @@ describe('Mi cuenta: acceso, retirada y borrado', () => {
 
   it('la dirección no puede usar la retirada del estudio', async () => {
     await expect(bd.rpc(e.direccion, 'retirarme', { p_borrar: false })).rejects.toThrow(/estudiantes y tutores/)
+  })
+})
+
+describe('Borrados pendientes (si Supabase no deja borrar la cuenta desde la base de datos)', () => {
+  it('solo el servidor puede consultarlos y marcarlos como terminados', async () => {
+    await bd.admin(`insert into private.borrados_pendientes (user_id) values ('00000000-0000-0000-0000-000000000001')`)
+    await expect(bd.rpc(e.investigador, 'servicio_borrados_pendientes')).rejects.toThrow(/permission denied/)
+    expect(await bd.servidor('servicio_borrados_pendientes')).toEqual(['00000000-0000-0000-0000-000000000001'])
+    await bd.servidor('servicio_borrado_completado', { p_user_id: '00000000-0000-0000-0000-000000000001' })
+    expect(await bd.servidor('servicio_borrados_pendientes')).toEqual([])
   })
 })

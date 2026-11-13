@@ -6,6 +6,7 @@ import { llamar, mensajeDeError } from '@/lib/api'
 import { useSesion } from '@/stores/sesion'
 import AppIcon from '@/components/comun/AppIcon.vue'
 import AvisoError from '@/components/comun/AvisoError.vue'
+import { useTerminos } from '@/lib/terminos'
 
 const sesion = useSesion()
 const router = useRouter()
@@ -80,6 +81,8 @@ async function retirarme() {
     trabajando.value = false
   }
 }
+
+const { t } = useTerminos()
 </script>
 
 <template>
@@ -140,7 +143,7 @@ async function retirarme() {
       <form v-else class="p-4 rounded-xl border border-red-200 bg-red-50" @submit.prevent="retirarme">
         <p class="text-sm text-surface-900 mb-3">
           <template v-if="confirmando === 'borrar'">
-            Se borrarán tu cuenta, tus respuestas<template v-if="perfil?.rol === 'estudiante'">, tu bienestar y lo que tu tutor/a respondió sobre ti</template>.
+            Se borrarán tu cuenta, tus respuestas<template v-if="perfil?.rol === 'estudiante'">, tu bienestar y lo que {{ t('tu tutor/a') }} respondió sobre ti</template>.
             No se puede deshacer. Escribe <strong>BORRAR</strong> para confirmarlo.
           </template>
           <template v-else>

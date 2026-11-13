@@ -6,6 +6,7 @@ import AppIcon from '@/components/comun/AppIcon.vue'
 import EstadoCarga from '@/components/comun/EstadoCarga.vue'
 import EstadoVacio from '@/components/comun/EstadoVacio.vue'
 import AvisoError from '@/components/comun/AvisoError.vue'
+import { useTerminos } from '@/lib/terminos'
 
 const codigos = ref<{ codigo: string }[]>([])
 const cargando = ref(true)
@@ -31,13 +32,15 @@ async function copiar(codigo: string) {
     copiado.value = ''
   }
 }
+
+const { t } = useTerminos()
 </script>
 
 <template>
   <div class="fade-in max-w-2xl">
-    <h1 class="titulo-pagina">Códigos para tus estudiantes</h1>
+    <h1 class="titulo-pagina">{{ t('Códigos para tus estudiantes') }}</h1>
     <p class="texto-suave mt-1 mb-8">
-      Da un código a cada estudiante. Al registrarse con él, quedaréis enlazados como pareja. Cada código sirve una sola vez.
+      {{ t('Da un código a cada estudiante.') }} Al registrarse con él, quedaréis enlazados como pareja. Cada código sirve una sola vez.
     </p>
 
     <EstadoCarga v-if="cargando" />

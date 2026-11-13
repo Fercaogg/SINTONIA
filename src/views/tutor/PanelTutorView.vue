@@ -12,10 +12,11 @@ import EstadoVacio from '@/components/comun/EstadoVacio.vue'
 import AvisoError from '@/components/comun/AvisoError.vue'
 import EstadoCalendario from '@/components/checkin/EstadoCalendario.vue'
 import TarjetaAgenda from '@/components/agenda/TarjetaAgenda.vue'
+import { useTerminos } from '@/lib/terminos'
 
 const sesion = useSesion()
 const datos = ref<CheckinTutor | null>(null)
-const agendas = ref<{ pareja_id: string; nombre: string; agenda: AgendaSemana | null }[]>([])
+const agendas = ref<{ pareja_id: string; nombre: string; cotutor?: boolean; agenda: AgendaSemana | null }[]>([])
 const cargando = ref(true)
 const error = ref('')
 
@@ -32,12 +33,14 @@ onMounted(async () => {
     cargando.value = false
   }
 })
+
+const { t } = useTerminos()
 </script>
 
 <template>
   <div class="fade-in max-w-2xl">
     <h1 class="titulo-pagina">Hola, {{ sesion.perfil?.nombre?.split(' ')[0] }}</h1>
-    <p class="texto-suave mt-1 mb-8">Cada semana respondes sobre todos tus estudiantes en una sola pantalla.</p>
+    <p class="texto-suave mt-1 mb-8">{{ t('Cada semana respondes sobre todos tus estudiantes en una sola pantalla.') }}</p>
 
     <EstadoCarga v-if="cargando" />
     <AvisoError v-else-if="error" :mensaje="error" />
@@ -45,8 +48,8 @@ onMounted(async () => {
       <EstadoVacio
         v-if="!datos.estudiantes.length"
         icono="users"
-        titulo="Aún no hay estudiantes contigo"
-        texto="Dale a cada estudiante uno de tus códigos para que se registre."
+        :titulo="t('Aún no hay estudiantes contigo')"
+        :texto="t('Dale a cada estudiante uno de tus códigos para que se registre.')"
       >
         <RouterLink to="/tutor/codigos" class="btn-primary mt-6">Ver mis códigos</RouterLink>
       </EstadoVacio>
@@ -61,7 +64,7 @@ onMounted(async () => {
           </div>
           <div class="flex-1">
             <h2 id="t-semana" class="font-semibold text-surface-900">
-              Semana {{ datos.calendario.semana }}: {{ respondidos }} de {{ datos.estudiantes.length }} estudiantes respondidos
+              Semana {{ datos.calendario.semana }}: {{ respondidos }} de {{ datos.estudiantes.length }} {{ t('estudiantes') }} respondidos
             </h2>
             <p class="text-sm texto-suave mt-0.5">Hasta el {{ hastaCierre(datos.calendario.cierra!) }}.</p>
           </div>
@@ -76,9 +79,9 @@ onMounted(async () => {
             v-for="(a, i) in agendas"
             :key="a.pareja_id"
             :agenda="a.agenda"
-            :titulo="a.nombre"
+            :titulo="a.cotutor ? `${a.nombre} (${t('cotutoría')})` : a.nombre"
             :id-titulo="`t-agenda-${i}`"
-            otra-persona="Tu estudiante"
+            :otra-persona="t('Tu estudiante')"
           />
         </div>
 

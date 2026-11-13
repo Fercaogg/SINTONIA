@@ -10,6 +10,7 @@
  */
 
 import type { Enviador } from './correo'
+import { adaptarTexto } from '../src/lib/terminos-base'
 
 export interface Recordatorio {
   user_id: string
@@ -19,6 +20,7 @@ export interface Recordatorio {
   tipo: 'apertura' | 'cierre_48h'
   semana: number
   cierra: string
+  tipo_trabajo?: 'TFG' | 'TFM' | 'TESIS'
 }
 
 export interface AvisoPorNotificar {
@@ -49,7 +51,7 @@ const PIE = '\n\nSi prefieres no recibir estos recordatorios, puedes desactivarl
 export function textoRecordatorio(r: Recordatorio, urlApp: string): { asunto: string; texto: string } {
   const nombre = r.nombre.split(' ')[0]
   const enlace = `${urlApp}/${r.rol === 'tutor' ? 'tutor' : 'estudiante'}/checkin`
-  const que = r.rol === 'tutor' ? 'tu check-in sobre tus estudiantes' : 'tu check-in'
+  const que = adaptarTexto(r.rol === 'tutor' ? 'tu check-in sobre tus estudiantes' : 'tu check-in', r.tipo_trabajo)
   if (r.tipo === 'apertura') {
     return {
       asunto: `Ya puedes hacer el check-in de la semana ${r.semana}`,
