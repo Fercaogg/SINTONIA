@@ -8,6 +8,7 @@ import { INICIO_ROL } from '@/lib/tipos'
 import LayoutAcceso from '@/components/layout/LayoutAcceso.vue'
 import AppIcon from '@/components/comun/AppIcon.vue'
 import AvisoError from '@/components/comun/AvisoError.vue'
+import AccesosDemo from '@/components/comun/AccesosDemo.vue'
 
 const router = useRouter()
 const sesion = useSesion()
@@ -54,6 +55,7 @@ async function entrarConContrasena() {
 
 <template>
   <LayoutAcceso>
+    <AccesosDemo v-if="modoDemo" class="mb-8" />
     <template v-if="!enviado">
       <h1 class="titulo-pagina mb-2">Iniciar sesión</h1>
       <p class="texto-suave mb-8">Te enviaremos un enlace a tu correo para entrar. No necesitas contraseña.</p>
@@ -85,7 +87,7 @@ async function entrarConContrasena() {
         {{ usarContrasena ? 'Usar enlace por correo' : 'Entrar con contraseña (solo entorno de pruebas)' }}
       </button>
 
-      <p class="mt-8 text-center text-sm texto-suave">
+      <p v-if="!modoDemo" class="mt-8 text-center text-sm texto-suave">
         ¿Es tu primera vez?
         <RouterLink to="/registro" class="enlace">Regístrate con tu código</RouterLink>
       </p>

@@ -65,7 +65,10 @@ async function enviar() {
   <div class="max-w-lg mx-auto fade-in">
     <EstadoCarga v-if="cargando" />
     <AvisoError v-else-if="!datos" :mensaje="error" />
-    <EstadoCalendario v-else-if="!abierta" :calendario="datos.calendario" />
+    <template v-else-if="!abierta">
+      <h1 class="titulo-pagina mb-6">Check-in semanal</h1>
+      <EstadoCalendario :calendario="datos.calendario" />
+    </template>
 
     <!-- Guardado -->
     <div v-else-if="guardado" class="text-center pt-8">

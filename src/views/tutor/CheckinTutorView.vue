@@ -63,7 +63,10 @@ async function enviar() {
   <div class="max-w-2xl fade-in">
     <EstadoCarga v-if="cargando" />
     <AvisoError v-else-if="!datos" :mensaje="error" />
-    <EstadoCalendario v-else-if="datos.calendario.estado !== 'abierta'" :calendario="datos.calendario" />
+    <template v-else-if="datos.calendario.estado !== 'abierta'">
+      <h1 class="titulo-pagina mb-6">Check-in semanal</h1>
+      <EstadoCalendario :calendario="datos.calendario" />
+    </template>
     <EstadoVacio v-else-if="!estudiantes.length" icono="users" titulo="Aún no hay estudiantes contigo" texto="Dale a cada estudiante uno de tus códigos para que se registre.">
       <RouterLink to="/tutor/codigos" class="btn-primary mt-6">Ver mis códigos</RouterLink>
     </EstadoVacio>

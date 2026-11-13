@@ -78,15 +78,20 @@ const esEnlace = (t: string) => /^https?:\/\//.test(t)
             :aria-checked="activado"
             aria-labelledby="t-activar"
             :disabled="guardando"
-            class="relative shrink-0 w-14 h-8 rounded-full transition-colors duration-200 mt-1"
-            :class="activado ? 'bg-brand-900' : 'bg-surface-300'"
+            class="shrink-0 w-14 h-11 flex items-center"
             @click="cambiar"
           >
+            <!-- Zona táctil de 44 px de alto; el carril visible mide 32 px. -->
             <span
-              class="absolute top-1 left-1 w-6 h-6 rounded-full bg-white shadow transition-transform duration-200"
-              :class="{ 'translate-x-6': activado }"
+              class="relative w-14 h-8 rounded-full transition-colors duration-200"
+              :class="activado ? 'bg-brand-900' : 'bg-surface-300'"
               aria-hidden="true"
-            />
+            >
+              <span
+                class="absolute top-1 left-1 w-6 h-6 rounded-full bg-white shadow transition-transform duration-200"
+                :class="{ 'translate-x-6': activado }"
+              />
+            </span>
           </button>
         </div>
         <p class="text-sm font-medium mt-3" :class="activado ? 'text-brand-900' : 'texto-suave'" aria-live="polite">
