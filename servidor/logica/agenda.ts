@@ -13,7 +13,7 @@
  */
 
 import { createHash } from 'node:crypto'
-import type { Desajuste, Item } from './desajuste'
+import type { Desajuste, Item } from './desajuste.js'
 
 export interface PreguntaBanco {
   id: number

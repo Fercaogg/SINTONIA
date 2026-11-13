@@ -15,7 +15,7 @@
  */
 
 import { createHmac, randomBytes } from 'node:crypto'
-import type { SemanaPareja } from './desajuste'
+import type { SemanaPareja } from './desajuste.js'
 
 export const ALGORITMO_SORTEO = 'hmac-sha256-v1'
 

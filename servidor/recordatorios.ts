@@ -9,8 +9,8 @@
  * enviarlo dos veces; si un envío falla, se reintenta en la siguiente ejecución.
  */
 
-import type { Enviador } from './correo'
-import { adaptarTexto } from '../src/lib/terminos-base'
+import type { Enviador } from './correo.js'
+import { adaptarTexto } from '../src/lib/terminos-base.js'
 
 export interface Recordatorio {
   user_id: string

@@ -2,11 +2,15 @@
 // "Necesito apoyo", para avisar a la dirección por correo sin esperar al día
 // siguiente. Solo procesa avisos pendientes: no recibe ningún dato.
 
-import { clienteServidor, crearAlmacenSupabase } from '../servidor/almacen-supabase'
-import { enviadorDesdeEntorno } from '../servidor/correo'
-import { notificarAvisosApoyo } from '../servidor/recordatorios'
+import { clienteServidor, crearAlmacenSupabase } from '../servidor/almacen-supabase.js'
+import { enviadorDesdeEntorno } from '../servidor/correo.js'
+import { notificarAvisosApoyo } from '../servidor/recordatorios.js'
 
 export async function POST(request: Request): Promise<Response> {
+  // Sin sesión, ni siquiera se consulta nada.
+  if (!/^Bearer .+/.test(request.headers.get('authorization') || '')) {
+    return Response.json({ error: 'No autorizado' }, { status: 401 })
+  }
   const url = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL
   const clave = process.env.SUPABASE_SERVICE_ROLE_KEY
   const urlApp = process.env.APP_URL
