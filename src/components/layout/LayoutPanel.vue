@@ -14,12 +14,14 @@ import BandaEntorno from '@/components/comun/BandaEntorno.vue'
 interface Enlace { to: string; label: string; icon: string; exact?: boolean }
 
 const CUENTA: Enlace = { to: '/cuenta', label: 'Mi cuenta', icon: 'profile' }
+const CALENDARIO: Enlace = { to: '/calendario', label: 'Calendario', icon: 'calendar' }
 const COMO: Enlace = { to: '/como-funciona', label: 'Cómo funciona y tus datos', icon: 'shield' }
 
 const MENUS: Record<Rol, Enlace[]> = {
   estudiante: [
     { to: '/estudiante', label: 'Inicio', icon: 'home', exact: true },
     { to: '/estudiante/checkin', label: 'Check-in semanal', icon: 'checkin' },
+    CALENDARIO,
     { to: '/estudiante/historial', label: 'Mi histórico', icon: 'history' },
     { to: '/estudiante/puente', label: 'Puente al doctorado', icon: 'graduation' },
     { to: '/estudiante/apoyo', label: 'Necesito apoyo', icon: 'heart' },
@@ -29,6 +31,7 @@ const MENUS: Record<Rol, Enlace[]> = {
   tutor: [
     { to: '/tutor', label: 'Inicio', icon: 'home', exact: true },
     { to: '/tutor/checkin', label: 'Check-in semanal', icon: 'checkin' },
+    CALENDARIO,
     { to: '/tutor/codigos', label: 'Códigos para tus estudiantes', icon: 'key' },
     CUENTA,
     COMO,
@@ -36,6 +39,7 @@ const MENUS: Record<Rol, Enlace[]> = {
   direccion: [
     { to: '/direccion', label: 'Resumen del máster', icon: 'chart', exact: true },
     { to: '/direccion/avisos', label: 'Avisos de apoyo', icon: 'inbox' },
+    { ...CALENDARIO, label: 'Calendario del máster' },
     CUENTA,
     COMO,
   ],
@@ -43,6 +47,7 @@ const MENUS: Record<Rol, Enlace[]> = {
     { to: '/investigacion', label: 'Másteres y códigos', icon: 'building', exact: true },
     { to: '/investigacion/parejas', label: 'Parejas y tutores', icon: 'team' },
     { to: '/investigacion/calendario', label: 'Calendario del estudio', icon: 'calendar' },
+    { ...CALENDARIO, label: 'Eventos del máster' },
     { to: '/investigacion/convocatorias', label: 'Convocatorias', icon: 'graduation' },
     { to: '/investigacion/cuestionarios', label: 'Cuestionarios', icon: 'document' },
     { to: '/investigacion/datos', label: 'Datos y auditoría', icon: 'download' },

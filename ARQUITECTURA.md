@@ -65,6 +65,9 @@ Las respuestas solo llevan el código de la pareja. El nombre está en otra tabl
 | Correos electrónicos de las personas | El suyo | **No** | **No** | **No** (solo el servidor, para enviar recordatorios) |
 | Auditoría | No | No | No | Sí |
 | Resúmenes del máster (Fase 6) | No | No | Sí, con un mínimo de 5 personas | Sí |
+| Calendario: anotaciones privadas | Las suyas | Las suyas | Las suyas | Las suyas |
+| Calendario: anotaciones de la pareja | Las de su pareja | Las de sus parejas (también como cotutor) | **No** | **No** |
+| Calendario: eventos del máster | Los de su máster | Los de su máster | Los de su máster | Todos |
 
 Nadie, ni siquiera el investigador, puede escribir directamente en ninguna tabla. Todos los cambios pasan por funciones que comprueban las reglas.
 
@@ -187,3 +190,10 @@ Siguiendo los reglamentos de TFG y TFM de la USAL (ver [NORMATIVA.md](NORMATIVA.
 - El desajuste se calcula entre el estudiante y cada tutor. El sorteo es uno por estudiante, y hay desajuste relevante si lo hay con cualquiera de sus tutores.
 - El investigador refleja los cambios de tutor y las cotutorías que decide la comisión académica. Quedan en la auditoría y en la exportación, y las respuestas anteriores se conservan con el código de quien las dio.
 - En tesis doctorales, la interfaz habla de director/a, doctorando/a y codirección.
+
+## 15. Calendario
+
+- Tabla `eventos`, con RLS. Cada anotación tiene un alcance: **privado** (solo quien la anota), **pareja** (el estudiante y todos sus tutores) o **máster** (todo el máster; solo lo publican la dirección y el equipo de investigación).
+- Se lee con `mi_calendario(desde, hasta)` y se escribe con `guardar_evento` y `borrar_evento`. Las tres comprueban el perfil y, en estudiantes y tutores, el consentimiento.
+- **No es un dato de investigación**: no entra en ninguna exportación, y la dirección y el investigador no ven las anotaciones privadas ni las de las parejas. Las reglas están en `tests/bd/calendario.test.ts`.
+- Los plazos de las convocatorias de Puente al doctorado se muestran en el calendario, solo para consultarlos.

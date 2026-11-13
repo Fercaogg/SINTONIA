@@ -1,14 +1,14 @@
 # Verificación
 
-Cómo se comprueba cada criterio de aceptación del encargo y qué resultado dio la última ejecución (13 de noviembre de 2026, rama `normativa-cotutoria`, unida después a `main`).
+Cómo se comprueba cada criterio de aceptación del encargo y qué resultado dio la última ejecución (13 de noviembre de 2026, rama `calendario`, unida después a `main`).
 
 ## Resumen de las comprobaciones automáticas
 
 | Orden | Resultado |
 |---|---|
-| `npm test` (lógica, base de datos y R) | 287 tests superados, 0 fallidos |
+| `npm test` (lógica, base de datos y R) | 313 tests superados, 0 fallidos |
 | `npm run test:e2e` (navegador, móvil y escritorio) | 52 recorridos superados, 0 fallidos |
-| `npm run test:demo` (demostración, accesibilidad de todas las pantallas) | 22 comprobaciones superadas, 0 fallidas |
+| `npm run test:demo` (demostración, accesibilidad de todas las pantallas) | 26 comprobaciones superadas, 0 fallidas (también el calendario de los cuatro perfiles) |
 | `npm run rendimiento` | Check-in listo en 1,9 s en un móvil con conexión 3G y procesador lento |
 | `npm run typecheck` y `npm run build` | Sin errores |
 

@@ -185,6 +185,30 @@ export async function generarDemo(opciones: { bd: pg.Client; almacen: Almacen; s
   await q(`insert into public.avisos_apoyo (master_id, estudiante_id, nombre_autorizado, created_at) values ($1, $2, $3, now() - interval '3 days')`,
     [master, p0.estudiante, ESTUDIANTES[4]])
 
+  // Calendario: tutorías y entregas de las parejas, una nota privada y eventos
+  // del máster publicados por la dirección (todo ficticio).
+  const [{ id: direccionId }] = await q(`select id from auth.users where email = $1`, [CUENTAS_DEMO.direccion])
+  const evento = (autor: string, ambito: string, pareja: string | null, tipo: string, titulo: string, dia: number,
+    extra: { fin?: number; hora?: string; horaFin?: string; lugar?: string; nota?: string } = {}) =>
+    q(`insert into public.eventos (autor_id, ambito, pareja_id, master_id, tipo, titulo, fecha, fecha_fin, hora_inicio, hora_fin, lugar, descripcion)
+       values ($1, $2, $3, $4, $5, $6, ${lunes} + $7::int, ${lunes} + $8::int, $9::time, $10::time, $11, $12)`,
+      [autor, ambito, pareja, master, tipo, titulo, dia, extra.fin ?? null, extra.hora ?? null, extra.horaFin ?? null, extra.lugar ?? null, extra.nota ?? null])
+  await evento(direccionId, 'master', null, 'evento', 'Seminario de metodología (ficticio)', 9, { hora: '16:00', horaFin: '18:00', lugar: 'Aula 2 (ficticia)' })
+  await evento(direccionId, 'master', null, 'congreso', 'Congreso de demostración (ficticio)', 16, { fin: 18, lugar: 'Salamanca' })
+  await evento(direccionId, 'master', null, 'plazo', 'Plazo de depósito (ficticio)', 31)
+  const diasLaborables = [1, 2, 3, 4, 8, 10, 11]
+  for (const [i, p] of parejas.entries()) {
+    const tutor = tutoresIds[p.tutorIdx]
+    const nombre = ESTUDIANTES[i].split(' ')[0]
+    await evento(tutor, 'pareja', p.id, 'tutoria', `Tutoría con ${nombre}`, diasLaborables[i % diasLaborables.length],
+      { hora: `${10 + (i % 4)}:00`, horaFin: `${10 + (i % 4)}:45`, lugar: i % 2 ? 'Videollamada' : 'Despacho del tutor/a' })
+    if (i % 3 === 0) await evento(p.estudiante, 'pareja', p.id, 'entrega', 'Entrega del primer borrador', 11)
+  }
+  // La cuenta de acceso rápido del estudiante: una tutoría pasada, otra con la cotutora y una nota privada.
+  await evento(parejas[0].estudiante, 'pareja', parejas[0].id, 'tutoria', 'Tutoría para revisar el índice', -7, { hora: '12:00', horaFin: '12:30' })
+  await evento(cotutora, 'pareja', parejas[0].id, 'tutoria', 'Tutoría de seguimiento (cotutora)', 4, { hora: '17:00', horaFin: '17:30', lugar: 'Videollamada' })
+  await evento(parejas[0].estudiante, 'privado', null, 'otro', 'Repasar la bibliografía', 3, { nota: 'Solo la veo yo.' })
+
   const [res] = await q(`select count(*) filter (where elegible)::int as elegibles, count(*) filter (where resultado)::int as con_agenda from public.sorteos`)
   return { parejas: parejas.length, semanas: SEMANAS_SIMULADAS, ...res, proporcion: res.con_agenda / res.elegibles }
 }

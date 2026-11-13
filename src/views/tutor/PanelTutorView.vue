@@ -12,6 +12,7 @@ import EstadoVacio from '@/components/comun/EstadoVacio.vue'
 import AvisoError from '@/components/comun/AvisoError.vue'
 import EstadoCalendario from '@/components/checkin/EstadoCalendario.vue'
 import TarjetaAgenda from '@/components/agenda/TarjetaAgenda.vue'
+import ProximasFechas from '@/components/calendario/ProximasFechas.vue'
 import { useTerminos } from '@/lib/terminos'
 
 const sesion = useSesion()
@@ -72,6 +73,8 @@ const { t } = useTerminos()
             {{ respondidos ? 'Revisar' : 'Hacer el check-in' }}
           </RouterLink>
         </section>
+
+        <ProximasFechas class="mt-4" />
 
         <h2 class="font-display text-xl font-semibold text-surface-900 mt-8 mb-3">Agendas para las tutorías</h2>
         <div class="space-y-4">
