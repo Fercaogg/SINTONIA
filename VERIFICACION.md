@@ -1,6 +1,6 @@
 # Verificación
 
-Cómo se comprueba cada criterio de aceptación del encargo y qué resultado dio la última ejecución (13 de noviembre de 2026, rama `calendario`, unida después a `main`).
+Cómo se comprueba cada criterio de aceptación del encargo y qué resultado dio la última ejecución (13 de noviembre de 2026, rama `calendario`).
 
 ## Resumen de las comprobaciones automáticas
 
