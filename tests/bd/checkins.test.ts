@@ -146,7 +146,7 @@ describe('Check-in del tutor', () => {
     const texto = JSON.stringify(c)
     expect(texto).not.toContain('bienestar')
     expect(texto).not.toContain('apoyo')
-    expect(c.estudiantes[0]).toEqual({ pareja_id: e.parejaA, nombre: 'Ana', avance: null, siguiente_paso: null })
+    expect(c.estudiantes[0]).toEqual({ pareja_id: e.parejaA, nombre: 'Ana', cotutor: false, avance: null, siguiente_paso: null })
   })
 
   it('guarda todas sus respuestas de una vez; el siguiente paso es opcional', async () => {

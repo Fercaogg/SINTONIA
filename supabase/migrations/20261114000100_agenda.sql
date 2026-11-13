@@ -42,8 +42,10 @@ create table public.cierres_semana (
 -- Desajustes calculados
 -- ---------------------------------------------------------------------------
 
+-- Uno por pareja, semana, ítem y tutor (con cotutoría, se calcula con cada uno).
 create table public.desajustes (
   pareja_id uuid not null references public.parejas (id) on delete cascade,
+  tutor_id uuid not null references public.perfiles (user_id) on delete cascade,
   semana smallint not null,
   item text not null check (item in ('avance', 'siguiente_paso')),
   valor_estudiante smallint not null,
@@ -54,7 +56,7 @@ create table public.desajustes (
   motivo text check (motivo in ('absoluto', 'persistente')),
   regla_version text not null references public.reglas_desajuste (version),
   calculado_at timestamptz not null default now(),
-  primary key (pareja_id, semana, item)
+  primary key (pareja_id, semana, item, tutor_id)
 );
 
 -- ---------------------------------------------------------------------------
@@ -226,16 +228,27 @@ begin
     'parejas', coalesce((
       select jsonb_agg(jsonb_build_object(
         'pareja_id', pa.id,
-        'sin_tutor', pa.tutor_id is null,
-        'retirado', pe.retirado_at is not null or coalesce(pt.retirado_at is not null, false),
+        -- Sin ningún tutor activo (ni principal ni cotutor).
+        'sin_tutor', not exists (
+          select 1 from public.perfiles t
+          where t.retirado_at is null
+            and (t.user_id = pa.tutor_id
+                 or t.user_id in (select c.tutor_id from public.cotutores c where c.pareja_id = pa.id and c.finalizada_at is null))
+        ),
+        'retirado', pe.retirado_at is not null,
         'tiene_agenda', exists (select 1 from public.agendas a where a.pareja_id = pa.id and a.semana = p_semana),
         'semanas', (
           select coalesce(jsonb_agg(jsonb_build_object(
             'semana', s,
             'estudiante', (select jsonb_build_object('avance', re.avance, 'siguiente_paso', re.siguiente_paso)
                            from public.respuestas_estudiante re where re.pareja_id = pa.id and re.semana = s),
-            'tutor', (select jsonb_build_object('avance', rt.avance, 'siguiente_paso', rt.siguiente_paso)
-                      from public.respuestas_tutor rt where rt.pareja_id = pa.id and rt.semana = s)
+            -- Una respuesta por tutor (principal y cotutores), solo de tutores no retirados.
+            'tutores', (select coalesce(jsonb_agg(jsonb_build_object(
+                          'tutor_id', rt.tutor_id, 'principal', rt.principal,
+                          'avance', rt.avance, 'siguiente_paso', rt.siguiente_paso) order by rt.principal desc, rt.created_at), '[]'::jsonb)
+                        from public.respuestas_tutor rt
+                        join public.perfiles t on t.user_id = rt.tutor_id and t.retirado_at is null
+                        where rt.pareja_id = pa.id and rt.semana = s)
           ) order by s), '[]'::jsonb)
           from generate_series(greatest(1, p_semana - r.semanas_persistencia + 1), p_semana) s
         ),
@@ -248,7 +261,6 @@ begin
       from public.parejas pa
       join public.masters m on m.id = pa.master_id and m.estudio_id = p_estudio_id
       join public.perfiles pe on pe.user_id = pa.estudiante_id
-      left join public.perfiles pt on pt.user_id = pa.tutor_id
       where pa.finalizada_at is null and pa.created_at < (select v.cierra from private.ventana((select e from public.estudios e where e.id = p_estudio_id), p_semana) v)
     ), '[]'::jsonb),
     'banco', (select coalesce(jsonb_agg(jsonb_build_object('id', id, 'tipo', tipo, 'texto', texto) order by id), '[]'::jsonb)
@@ -267,8 +279,8 @@ begin
   perform private.exigir_servidor();
   insert into public.cierres_semana (estudio_id, semana) values (p_estudio_id, p_semana) on conflict do nothing;
 
-  insert into public.desajustes (pareja_id, semana, item, valor_estudiante, valor_tutor, diferencia, relevante, motivo, regla_version)
-  select (d ->> 'pareja_id')::uuid, p_semana, d ->> 'item', (d ->> 'valor_estudiante')::smallint, (d ->> 'valor_tutor')::smallint,
+  insert into public.desajustes (pareja_id, tutor_id, semana, item, valor_estudiante, valor_tutor, diferencia, relevante, motivo, regla_version)
+  select (d ->> 'pareja_id')::uuid, (d ->> 'tutor_id')::uuid, p_semana, d ->> 'item', (d ->> 'valor_estudiante')::smallint, (d ->> 'valor_tutor')::smallint,
          (d ->> 'diferencia')::smallint, (d ->> 'relevante')::boolean, d ->> 'motivo', d ->> 'regla_version'
   from jsonb_array_elements(coalesce(p_desajustes, '[]'::jsonb)) d
   on conflict do nothing;
@@ -387,11 +399,12 @@ as $$
 begin
   perform private.exigir_participante('tutor');
   return coalesce((
-    select jsonb_agg(jsonb_build_object('pareja_id', pa.id, 'nombre', i.nombre, 'agenda', private.agenda_de(pa.id, 'tutor')) order by i.nombre)
+    select jsonb_agg(jsonb_build_object('pareja_id', pa.id, 'nombre', i.nombre, 'cotutor', pa.tutor_id is distinct from auth.uid(),
+                                     'agenda', private.agenda_de(pa.id, 'tutor')) order by i.nombre)
     from public.parejas pa
     join public.perfiles pe on pe.user_id = pa.estudiante_id and pe.retirado_at is null
     join public.identidades i on i.user_id = pa.estudiante_id
-    where pa.tutor_id = auth.uid() and pa.finalizada_at is null
+    where pa.id in (select private.parejas_como_tutor()) and pa.finalizada_at is null
   ), '[]'::jsonb);
 end
 $$;

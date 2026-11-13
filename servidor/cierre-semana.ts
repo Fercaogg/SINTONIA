@@ -17,7 +17,7 @@
  * ejecución completará las agendas que falten sin volver a sortear.
  */
 
-import { calcularDesajustes, type Desajuste, type Regla, type SemanaPareja } from './logica/desajuste'
+import { calcularDesajustes, ITEMS, type Desajuste, type Regla, type RespuestaEstudiante, type SemanaPareja } from './logica/desajuste'
 import { ALGORITMO_SORTEO, motivoNoElegible, nuevaSemilla, sortear, type MotivoNoElegible } from './logica/sorteo'
 import { entradaParaModelo, seleccionarDelBanco, validarSalidaModelo, type PreguntaBanco } from './logica/agenda'
 import { VERSION_PROMPT, type Redactor } from './logica/modelo'
@@ -30,13 +30,52 @@ export interface SemanaPendiente {
   probabilidad: number
 }
 
+/** Respuesta de un tutor (principal o cotutor) en una semana. */
+export interface RespuestaDeTutor {
+  tutor_id: string
+  principal: boolean
+  avance: number
+  siguiente_paso: number | null
+}
+
+export interface SemanaDatos {
+  semana: number
+  estudiante: RespuestaEstudiante | null
+  tutores: RespuestaDeTutor[]
+}
+
 export interface DatosPareja {
   pareja_id: string
   sin_tutor: boolean
   retirado: boolean
   tiene_agenda: boolean
-  semanas: SemanaPareja[]
+  semanas: SemanaDatos[]
   preguntas_previas: string[]
+}
+
+/** Las semanas de la pareja vistas desde un tutor concreto (para el módulo del desajuste). */
+export function semanasConTutor(semanas: SemanaDatos[], tutorId: string): SemanaPareja[] {
+  return semanas.map((s) => {
+    const t = s.tutores.find((x) => x.tutor_id === tutorId)
+    return { semana: s.semana, estudiante: s.estudiante, tutor: t ? { avance: t.avance, siguiente_paso: t.siguiente_paso } : null }
+  })
+}
+
+/**
+ * Con cotutoría, el desajuste se calcula con cada tutor. Para la agenda se
+ * combina por ítem: cuenta el desajuste de mayor magnitud (y es relevante si
+ * lo es con algún tutor). Así la agenda no depende de quién es cada tutor.
+ */
+export function combinarPorItem(porTutor: Desajuste[][]): Desajuste[] {
+  const resultado: Desajuste[] = []
+  for (const item of ITEMS) {
+    const delItem = porTutor.flat().filter((d) => d.item === item)
+    if (!delItem.length) continue
+    const relevantes = delItem.filter((d) => d.relevante)
+    const candidatos = relevantes.length ? relevantes : delItem
+    resultado.push(candidatos.reduce((a, b) => (b.magnitud > a.magnitud ? b : a)))
+  }
+  return resultado
 }
 
 export interface DatosSemana {
@@ -147,7 +186,11 @@ export async function cerrarSemanas(opciones: {
     const sorteos: FilaSorteo[] = []
     for (const p of datos.parejas) {
       const actual = p.semanas.find((s) => s.semana === semana)
-      const motivo = motivoNoElegible(actual, { sinTutor: p.sin_tutor, retirado: p.retirado })
+      // Elegible si respondieron el estudiante y al menos uno de sus tutores.
+      const motivo = motivoNoElegible(
+        actual ? { semana, estudiante: actual.estudiante, tutor: actual.tutores[0] ?? null } : undefined,
+        { sinTutor: p.sin_tutor, retirado: p.retirado },
+      )
       if (motivo) {
         sorteos.push({
           pareja_id: p.pareja_id, elegible: false, motivo_no_elegible: motivo, probabilidad: null, semilla: null,
@@ -155,19 +198,24 @@ export async function cerrarSemanas(opciones: {
         })
         continue
       }
-      const desajustes = calcularDesajustes(p.semanas, semana, datos.regla)
-      desajustesPorPareja.set(p.pareja_id, desajustes)
-      for (const d of desajustes) {
-        filasDesajuste.push({
-          pareja_id: p.pareja_id, item: d.item, valor_estudiante: d.valorEstudiante, valor_tutor: d.valorTutor,
-          diferencia: d.diferencia, relevante: d.relevante, motivo: d.motivo, regla_version: d.reglaVersion,
-        })
-      }
+      // El desajuste se calcula con cada tutor que respondió esa semana.
+      const porTutor = actual!.tutores.map((t) => {
+        const desajustes = calcularDesajustes(semanasConTutor(p.semanas, t.tutor_id), semana, datos.regla)
+        for (const d of desajustes) {
+          filasDesajuste.push({
+            pareja_id: p.pareja_id, tutor_id: t.tutor_id, item: d.item, valor_estudiante: d.valorEstudiante, valor_tutor: d.valorTutor,
+            diferencia: d.diferencia, relevante: d.relevante, motivo: d.motivo, regla_version: d.reglaVersion,
+          })
+        }
+        return desajustes
+      })
+      const combinados = combinarPorItem(porTutor)
+      desajustesPorPareja.set(p.pareja_id, combinados)
       const { valor, resultado } = sortear(semilla, p.pareja_id, semana, probabilidad)
       sorteos.push({
         pareja_id: p.pareja_id, elegible: true, motivo_no_elegible: null, probabilidad, semilla,
         valor_aleatorio: valor, resultado, algoritmo_version: ALGORITMO_SORTEO,
-        desajuste_relevante: desajustes.some((d) => d.relevante),
+        desajuste_relevante: combinados.some((d) => d.relevante),
       })
     }
     // Lo que manda es lo guardado (si la semana ya se había sorteado, se respeta).
@@ -185,7 +233,10 @@ export async function cerrarSemanas(opciones: {
       const p = datos.parejas.find((x) => x.pareja_id === g.pareja_id)
       if (!p || p.tiene_agenda) continue
       const agenda = await generarAgenda({
-        desajustes: desajustesPorPareja.get(p.pareja_id) ?? calcularDesajustes(p.semanas, semana, datos.regla),
+        desajustes:
+          desajustesPorPareja.get(p.pareja_id) ??
+          combinarPorItem((p.semanas.find((x) => x.semana === semana)?.tutores ?? []).map((t) =>
+            calcularDesajustes(semanasConTutor(p.semanas, t.tutor_id), semana, datos.regla))),
         semana, semanas, banco: datos.banco, previas: p.preguntas_previas, semilla: `${semilla}:${p.pareja_id}`, redactor,
       })
       agenda.linea_puente = lineaDe.get(p.pareja_id) ?? null

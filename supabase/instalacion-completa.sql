@@ -129,6 +129,26 @@ create table public.parejas (
   finalizada_at timestamptz
 );
 
+-- Cotutores: además del tutor principal (parejas.tutor_id), hasta dos más.
+-- El Reglamento de TFM de la USAL permite un segundo tutor y, de forma
+-- excepcional, un tercero (art. 4.3 y 4.7).
+create table public.cotutores (
+  pareja_id uuid not null references public.parejas (id) on delete cascade,
+  tutor_id uuid not null references public.perfiles (user_id) on delete cascade,
+  created_at timestamptz not null default now(),
+  finalizada_at timestamptz,
+  primary key (pareja_id, tutor_id)
+);
+
+-- Historial de cambios de tutor principal (Reglamento de TFM, art. 4.9).
+create table public.cambios_tutor (
+  id bigint generated always as identity primary key,
+  pareja_id uuid not null references public.parejas (id) on delete cascade,
+  tutor_anterior uuid references public.perfiles (user_id) on delete set null,
+  tutor_nuevo uuid references public.perfiles (user_id) on delete set null,
+  created_at timestamptz not null default now()
+);
+
 -- ---------------------------------------------------------------------------
 -- Consentimiento informado (versionado)
 -- ---------------------------------------------------------------------------
@@ -187,15 +207,19 @@ create table public.respuestas_estudiante (
   unique (pareja_id, semana)
 );
 
+-- Cada tutor (principal o cotutor) responde por separado.
 create table public.respuestas_tutor (
   id uuid primary key default gen_random_uuid(),
   pareja_id uuid not null references public.parejas (id) on delete cascade,
+  tutor_id uuid not null references public.perfiles (user_id) on delete cascade,
+  -- ¿Era el tutor principal cuando respondió?
+  principal boolean not null default true,
   semana smallint not null check (semana between 1 and 52),
   avance smallint not null check (avance between 1 and 5),
   siguiente_paso smallint check (siguiente_paso between 1 and 5),
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now(),
-  unique (pareja_id, semana)
+  unique (pareja_id, semana, tutor_id)
 );
 
 -- Bienestar: dato posiblemente de categoría especial (RGPD, art. 9).
@@ -226,6 +250,8 @@ create table public.auditoria (
 create index on public.respuestas_estudiante (semana);
 create index on public.respuestas_tutor (semana);
 create index on public.parejas (tutor_id);
+create index on public.cotutores (tutor_id);
+create index on public.respuestas_tutor (tutor_id);
 create index on public.codigos_acceso (master_id);
 create index on public.auditoria (created_at);
 
@@ -276,6 +302,7 @@ as $$
   select pa.id from public.parejas pa
   join public.perfiles p on p.user_id = auth.uid() and p.retirado_at is null
   where pa.estudiante_id = auth.uid() or pa.tutor_id = auth.uid()
+     or exists (select 1 from public.cotutores c where c.pareja_id = pa.id and c.tutor_id = auth.uid() and c.finalizada_at is null)
 $$;
 
 create or replace function private.parejas_como_estudiante()
@@ -287,13 +314,24 @@ as $$
   where pa.estudiante_id = auth.uid()
 $$;
 
+-- Parejas en las que la persona conectada es tutor principal o cotutor.
 create or replace function private.parejas_como_tutor()
 returns setof uuid
 language sql stable security definer set search_path = ''
 as $$
   select pa.id from public.parejas pa
-  join public.perfiles p on p.user_id = pa.tutor_id and p.retirado_at is null
+  join public.perfiles p on p.user_id = auth.uid() and p.retirado_at is null
   where pa.tutor_id = auth.uid()
+     or exists (select 1 from public.cotutores c where c.pareja_id = pa.id and c.tutor_id = auth.uid() and c.finalizada_at is null)
+$$;
+
+-- ¿Es esta persona tutor (principal o cotutor activo) de la pareja?
+create or replace function private.es_tutor_de(p_pareja_id uuid, p_user_id uuid)
+returns boolean
+language sql stable security definer set search_path = ''
+as $$
+  select exists (select 1 from public.parejas pa where pa.id = p_pareja_id and pa.tutor_id = p_user_id)
+      or exists (select 1 from public.cotutores c where c.pareja_id = p_pareja_id and c.tutor_id = p_user_id and c.finalizada_at is null)
 $$;
 
 -- Registro de auditoría. Solo se llama desde otras funciones.
@@ -311,6 +349,7 @@ grant execute on function
   private.rol_actual(), private.master_actual(), private.es_investigador(),
   private.mis_parejas(), private.parejas_como_estudiante(), private.parejas_como_tutor()
   to authenticated;
+-- es_tutor_de se usa solo dentro de otras funciones.
 revoke all on all tables in schema private from public, anon, authenticated;
 
 -- ---------------------------------------------------------------------------
@@ -324,7 +363,7 @@ grant select on
   public.identidades, public.codigos_acceso, public.parejas,
   public.consentimiento_textos, public.consentimientos, public.items,
   public.respuestas_estudiante, public.respuestas_tutor, public.bienestar,
-  public.auditoria
+  public.auditoria, public.cotutores, public.cambios_tutor
 to authenticated;
 
 alter table public.configuracion enable row level security;
@@ -341,6 +380,8 @@ alter table public.respuestas_estudiante enable row level security;
 alter table public.respuestas_tutor enable row level security;
 alter table public.bienestar enable row level security;
 alter table public.auditoria enable row level security;
+alter table public.cotutores enable row level security;
+alter table public.cambios_tutor enable row level security;
 
 -- ---------------------------------------------------------------------------
 -- Políticas de lectura
@@ -401,11 +442,19 @@ create policy "estudiante o investigador" on public.respuestas_estudiante
   for select to authenticated
   using (pareja_id in (select private.parejas_como_estudiante()) or private.es_investigador());
 
--- Respuestas del tutor: el propio tutor y el investigador.
--- El estudiante y la dirección NO.
+-- Respuestas del tutor: cada tutor, solo las suyas (un cotutor no ve las
+-- del otro); y el investigador. El estudiante y la dirección NO.
 create policy "tutor o investigador" on public.respuestas_tutor
   for select to authenticated
-  using (pareja_id in (select private.parejas_como_tutor()) or private.es_investigador());
+  using ((tutor_id = auth.uid() and private.rol_actual() = 'tutor') or private.es_investigador());
+
+-- Cotutorías: el propio tutor y el investigador. Historial de cambios: el investigador.
+create policy "propias o investigador" on public.cotutores
+  for select to authenticated
+  using (tutor_id = auth.uid() or private.es_investigador());
+create policy "solo investigador" on public.cambios_tutor
+  for select to authenticated
+  using (private.es_investigador());
 
 -- Bienestar: SOLO el propio estudiante. Nadie más, ni siquiera el
 -- investigador, puede leer esta tabla. El investigador solo lo recibe dentro
@@ -627,6 +676,25 @@ create trigger sintonia_alta_usuario
   after insert on auth.users
   for each row execute function private.alta_usuario();
 
+-- Si una respuesta de tutor se guarda sin indicar quién responde (por ejemplo,
+-- en los datos de prueba), se asigna al tutor principal de la pareja.
+create or replace function private.completar_respuesta_tutor()
+returns trigger
+language plpgsql security definer set search_path = ''
+as $$
+begin
+  if new.tutor_id is null then
+    select tutor_id into new.tutor_id from public.parejas where id = new.pareja_id;
+    new.principal := true;
+  end if;
+  return new;
+end
+$$;
+
+create trigger sintonia_completar_respuesta_tutor
+  before insert on public.respuestas_tutor
+  for each row execute function private.completar_respuesta_tutor();
+
 -- ---------------------------------------------------------------------------
 -- Funciones públicas: cualquier visitante
 -- ---------------------------------------------------------------------------
@@ -767,11 +835,12 @@ begin
     perform private.error('SIN_PERMISO', 'No tienes permiso para hacer esto.');
   end if;
   return coalesce((
-    select jsonb_agg(jsonb_build_object('pareja_id', pa.id, 'nombre', i.nombre) order by i.nombre)
+    select jsonb_agg(jsonb_build_object('pareja_id', pa.id, 'nombre', i.nombre, 'cotutor', pa.tutor_id is distinct from auth.uid())
+                     order by i.nombre)
     from public.parejas pa
     join public.perfiles pe on pe.user_id = pa.estudiante_id and pe.retirado_at is null
     join public.identidades i on i.user_id = pa.estudiante_id
-    where pa.tutor_id = auth.uid() and pa.finalizada_at is null
+    where pa.id in (select private.parejas_como_tutor()) and pa.finalizada_at is null
   ), '[]'::jsonb);
 end
 $$;
@@ -934,7 +1003,8 @@ begin
       'user_id', p.user_id,
       'seudonimo', p.seudonimo,
       'etiqueta', (select c.etiqueta from public.codigos_acceso c where c.usado_por = p.user_id limit 1),
-      'estudiantes', (select count(*) from public.parejas pa where pa.tutor_id = p.user_id)
+      'estudiantes', (select count(*) from public.parejas pa where pa.tutor_id = p.user_id),
+      'cotutorias', (select count(*) from public.cotutores c where c.tutor_id = p.user_id and c.finalizada_at is null)
     ) order by p.created_at)
     from public.perfiles p
     where p.master_id = p_master_id and p.rol = 'tutor' and p.retirado_at is null
@@ -1368,13 +1438,15 @@ begin
     'estudiantes', coalesce((
       select jsonb_agg(jsonb_build_object(
         'pareja_id', pa.id, 'nombre', i.nombre,
+        'cotutor', pa.tutor_id is distinct from auth.uid(),
         'avance', rt.avance, 'siguiente_paso', rt.siguiente_paso
       ) order by i.nombre)
       from public.parejas pa
       join public.perfiles pe on pe.user_id = pa.estudiante_id and pe.retirado_at is null
       join public.identidades i on i.user_id = pa.estudiante_id
-      left join public.respuestas_tutor rt on rt.pareja_id = pa.id and rt.semana = v_semana
-      where pa.tutor_id = auth.uid() and pa.finalizada_at is null
+      -- Solo las respuestas propias (un cotutor no ve las del otro).
+      left join public.respuestas_tutor rt on rt.pareja_id = pa.id and rt.semana = v_semana and rt.tutor_id = auth.uid()
+      where pa.id in (select private.parejas_como_tutor()) and pa.finalizada_at is null
     ), '[]'::jsonb)
   );
 end
@@ -1406,17 +1478,18 @@ begin
     if not exists (
       select 1 from public.parejas pa
       join public.perfiles pe on pe.user_id = pa.estudiante_id and pe.retirado_at is null
-      where pa.id = v_pareja and pa.tutor_id = auth.uid() and pa.finalizada_at is null
+      where pa.id = v_pareja and private.es_tutor_de(pa.id, auth.uid()) and pa.finalizada_at is null
     ) then
       perform private.error('PAREJA_NO_VALIDA', 'Uno de los estudiantes no está en tu lista. Recarga la página.');
     end if;
     perform private.validar_escala((fila ->> 'avance')::integer);
     perform private.validar_escala((fila ->> 'siguiente_paso')::integer, false);
 
-    insert into public.respuestas_tutor (pareja_id, semana, avance, siguiente_paso)
-    values (v_pareja, v_semana, (fila ->> 'avance')::integer, (fila ->> 'siguiente_paso')::integer)
-    on conflict (pareja_id, semana) do update
-      set avance = excluded.avance, siguiente_paso = excluded.siguiente_paso, updated_at = now();
+    insert into public.respuestas_tutor (pareja_id, tutor_id, principal, semana, avance, siguiente_paso)
+    values (v_pareja, auth.uid(), exists (select 1 from public.parejas where id = v_pareja and tutor_id = auth.uid()),
+            v_semana, (fila ->> 'avance')::integer, (fila ->> 'siguiente_paso')::integer)
+    on conflict (pareja_id, semana, tutor_id) do update
+      set avance = excluded.avance, siguiente_paso = excluded.siguiente_paso, principal = excluded.principal, updated_at = now();
     n := n + 1;
   end loop;
 
@@ -1555,7 +1628,8 @@ begin
         'pareja', pa.seudonimo, 'semana', rt.semana, 'avance', rt.avance, 'siguiente_paso', rt.siguiente_paso,
         'creado_at', rt.created_at, 'actualizado_at', rt.updated_at) order by rt.semana), '[]')
       from public.respuestas_tutor rt
-      join public.parejas pa on pa.id = rt.pareja_id and pa.tutor_id = p.user_id
+      join public.parejas pa on pa.id = rt.pareja_id
+      where rt.tutor_id = p.user_id
     ),
     'avisos_apoyo', (
       select coalesce(jsonb_agg(jsonb_build_object('created_at', a.created_at, 'nombre_compartido', a.nombre_autorizado is not null)), '[]')
@@ -1594,8 +1668,9 @@ begin
 
   -- Borrado completo. Las respuestas del tutor sobre este estudiante son datos
   -- sobre el estudiante: también se borran (en cascada con la pareja).
-  -- Si es un tutor, se borran sus respuestas; las parejas quedan sin tutor.
-  delete from public.respuestas_tutor where pareja_id in (select id from public.parejas where tutor_id = v_uid);
+  -- Si es un tutor, se borran sus respuestas y sus cotutorías; las parejas de
+  -- las que era tutor principal quedan sin tutor principal.
+  delete from public.respuestas_tutor where tutor_id = v_uid;
   delete from public.perfiles where user_id = v_uid; -- borra en cascada pareja, respuestas, bienestar, avisos y códigos
   delete from public.identidades where user_id = v_uid;
   delete from public.consentimientos where user_id = v_uid;
@@ -1705,8 +1780,10 @@ create table public.cierres_semana (
 -- Desajustes calculados
 -- ---------------------------------------------------------------------------
 
+-- Uno por pareja, semana, ítem y tutor (con cotutoría, se calcula con cada uno).
 create table public.desajustes (
   pareja_id uuid not null references public.parejas (id) on delete cascade,
+  tutor_id uuid not null references public.perfiles (user_id) on delete cascade,
   semana smallint not null,
   item text not null check (item in ('avance', 'siguiente_paso')),
   valor_estudiante smallint not null,
@@ -1717,7 +1794,7 @@ create table public.desajustes (
   motivo text check (motivo in ('absoluto', 'persistente')),
   regla_version text not null references public.reglas_desajuste (version),
   calculado_at timestamptz not null default now(),
-  primary key (pareja_id, semana, item)
+  primary key (pareja_id, semana, item, tutor_id)
 );
 
 -- ---------------------------------------------------------------------------
@@ -1889,16 +1966,27 @@ begin
     'parejas', coalesce((
       select jsonb_agg(jsonb_build_object(
         'pareja_id', pa.id,
-        'sin_tutor', pa.tutor_id is null,
-        'retirado', pe.retirado_at is not null or coalesce(pt.retirado_at is not null, false),
+        -- Sin ningún tutor activo (ni principal ni cotutor).
+        'sin_tutor', not exists (
+          select 1 from public.perfiles t
+          where t.retirado_at is null
+            and (t.user_id = pa.tutor_id
+                 or t.user_id in (select c.tutor_id from public.cotutores c where c.pareja_id = pa.id and c.finalizada_at is null))
+        ),
+        'retirado', pe.retirado_at is not null,
         'tiene_agenda', exists (select 1 from public.agendas a where a.pareja_id = pa.id and a.semana = p_semana),
         'semanas', (
           select coalesce(jsonb_agg(jsonb_build_object(
             'semana', s,
             'estudiante', (select jsonb_build_object('avance', re.avance, 'siguiente_paso', re.siguiente_paso)
                            from public.respuestas_estudiante re where re.pareja_id = pa.id and re.semana = s),
-            'tutor', (select jsonb_build_object('avance', rt.avance, 'siguiente_paso', rt.siguiente_paso)
-                      from public.respuestas_tutor rt where rt.pareja_id = pa.id and rt.semana = s)
+            -- Una respuesta por tutor (principal y cotutores), solo de tutores no retirados.
+            'tutores', (select coalesce(jsonb_agg(jsonb_build_object(
+                          'tutor_id', rt.tutor_id, 'principal', rt.principal,
+                          'avance', rt.avance, 'siguiente_paso', rt.siguiente_paso) order by rt.principal desc, rt.created_at), '[]'::jsonb)
+                        from public.respuestas_tutor rt
+                        join public.perfiles t on t.user_id = rt.tutor_id and t.retirado_at is null
+                        where rt.pareja_id = pa.id and rt.semana = s)
           ) order by s), '[]'::jsonb)
           from generate_series(greatest(1, p_semana - r.semanas_persistencia + 1), p_semana) s
         ),
@@ -1911,7 +1999,6 @@ begin
       from public.parejas pa
       join public.masters m on m.id = pa.master_id and m.estudio_id = p_estudio_id
       join public.perfiles pe on pe.user_id = pa.estudiante_id
-      left join public.perfiles pt on pt.user_id = pa.tutor_id
       where pa.finalizada_at is null and pa.created_at < (select v.cierra from private.ventana((select e from public.estudios e where e.id = p_estudio_id), p_semana) v)
     ), '[]'::jsonb),
     'banco', (select coalesce(jsonb_agg(jsonb_build_object('id', id, 'tipo', tipo, 'texto', texto) order by id), '[]'::jsonb)
@@ -1930,8 +2017,8 @@ begin
   perform private.exigir_servidor();
   insert into public.cierres_semana (estudio_id, semana) values (p_estudio_id, p_semana) on conflict do nothing;
 
-  insert into public.desajustes (pareja_id, semana, item, valor_estudiante, valor_tutor, diferencia, relevante, motivo, regla_version)
-  select (d ->> 'pareja_id')::uuid, p_semana, d ->> 'item', (d ->> 'valor_estudiante')::smallint, (d ->> 'valor_tutor')::smallint,
+  insert into public.desajustes (pareja_id, tutor_id, semana, item, valor_estudiante, valor_tutor, diferencia, relevante, motivo, regla_version)
+  select (d ->> 'pareja_id')::uuid, (d ->> 'tutor_id')::uuid, p_semana, d ->> 'item', (d ->> 'valor_estudiante')::smallint, (d ->> 'valor_tutor')::smallint,
          (d ->> 'diferencia')::smallint, (d ->> 'relevante')::boolean, d ->> 'motivo', d ->> 'regla_version'
   from jsonb_array_elements(coalesce(p_desajustes, '[]'::jsonb)) d
   on conflict do nothing;
@@ -2050,11 +2137,12 @@ as $$
 begin
   perform private.exigir_participante('tutor');
   return coalesce((
-    select jsonb_agg(jsonb_build_object('pareja_id', pa.id, 'nombre', i.nombre, 'agenda', private.agenda_de(pa.id, 'tutor')) order by i.nombre)
+    select jsonb_agg(jsonb_build_object('pareja_id', pa.id, 'nombre', i.nombre, 'cotutor', pa.tutor_id is distinct from auth.uid(),
+                                     'agenda', private.agenda_de(pa.id, 'tutor')) order by i.nombre)
     from public.parejas pa
     join public.perfiles pe on pe.user_id = pa.estudiante_id and pe.retirado_at is null
     join public.identidades i on i.user_id = pa.estudiante_id
-    where pa.tutor_id = auth.uid() and pa.finalizada_at is null
+    where pa.id in (select private.parejas_como_tutor()) and pa.finalizada_at is null
   ), '[]'::jsonb);
 end
 $$;
@@ -2139,7 +2227,29 @@ insert into public.convocatorias (nombre, organismo) values
   ('Ayudas para contratos predoctorales para la formación de doctores (FPI)', '[PENDIENTE]'),
   ('Contratos predoctorales de la Universidad de Salamanca', 'Universidad de Salamanca'),
   ('Contratos predoctorales de la Junta de Castilla y León', 'Junta de Castilla y León'),
-  ('Admisión al doctorado', '[PENDIENTE]');
+  ('Admisión al doctorado', 'Universidad de Salamanca (Escuela de Doctorado «Studii Salamantini»)');
+
+-- Normativa oficial del doctorado que se muestra en Puente al doctorado.
+-- Enlaces facilitados por Fernando a partir de la web de la USAL (13/11/2026).
+create table public.enlaces_normativa (
+  id serial primary key,
+  ambito text not null default 'doctorado',
+  titulo text not null,
+  descripcion text,
+  url text not null,
+  orden smallint not null default 0,
+  activo boolean not null default true
+);
+
+insert into public.enlaces_normativa (titulo, descripcion, url, orden) values
+  ('Reglamento de Doctorado de la Universidad de Salamanca', 'Aprobado por Consejo de Gobierno el 18 de julio de 2025 (BOCyL de 15 de diciembre de 2025).',
+   'https://bocyl.jcyl.es/boletines/2025/12/15/pdf/BOCYL-D-15122025-31.pdf', 1),
+  ('Reglamento de Régimen Interno de la Escuela de Doctorado «Studii Salamantini»', 'Aprobado por Consejo de Gobierno el 18 de julio de 2025 (BOCyL de 15 de diciembre de 2025).',
+   'https://bocyl.jcyl.es/boletines/2025/12/15/pdf/BOCYL-D-15122025-32.pdf', 2),
+  ('Real Decreto 99/2011, de 28 de enero, por el que se regulan las enseñanzas oficiales de doctorado', 'Texto consolidado del BOE, con las modificaciones del Real Decreto 576/2023.',
+   'https://www.boe.es/buscar/pdf/2011/BOE-A-2011-2541-consolidado.pdf', 3),
+  ('Guía de Buenas Prácticas para la Gestión Académica de los Programas de Doctorado', 'Aprobada por Consejo de Gobierno el 25 de julio de 2019.',
+   'http://posgrado.usal.es/DOCTORADO%2099/GuiaBuenasPracticas.pdf', 4);
 
 -- Lo que se decidió cada semana para cada pareja: si Puente estaba activado
 -- y, en su caso, la línea que se añadió a la agenda. Se registra aunque esa
@@ -2237,6 +2347,11 @@ alter table public.avisos_apoyo add column notificado_at timestamptz;
 -- Permisos de tabla
 -- ---------------------------------------------------------------------------
 
+alter table public.enlaces_normativa enable row level security;
+revoke all on public.enlaces_normativa from public, anon, authenticated;
+grant select on public.enlaces_normativa to authenticated;
+create policy "lectura general" on public.enlaces_normativa for select to authenticated using (activo or private.es_investigador());
+
 alter table public.puente_cambios enable row level security;
 alter table public.convocatorias enable row level security;
 alter table public.puente_semanal enable row level security;
@@ -2278,6 +2393,10 @@ begin
         'fecha_cierre', fecha_cierre, 'enlace', enlace, 'estado', estado
       ) order by coalesce(fecha_cierre, fecha_apertura, '9999-12-31'::date), id)
       from public.convocatorias where activa
+    ), '[]'::jsonb),
+    'normativa', coalesce((
+      select jsonb_agg(jsonb_build_object('titulo', titulo, 'descripcion', descripcion, 'url', url) order by orden)
+      from public.enlaces_normativa where activo and ambito = 'doctorado'
     ), '[]'::jsonb)
   );
 end
@@ -2597,11 +2716,13 @@ as $$
     when 'estudiante' then exists (
       select 1 from public.respuestas_estudiante r join public.parejas pa on pa.id = r.pareja_id
       where pa.estudiante_id = p_user_id and r.semana = p_semana)
+    -- El tutor ha respondido si lo ha hecho sobre todas sus parejas (como
+    -- principal o como cotutor).
     when 'tutor' then not exists (
       select 1 from public.parejas pa
       join public.perfiles pe on pe.user_id = pa.estudiante_id and pe.retirado_at is null
-      where pa.tutor_id = p_user_id and pa.finalizada_at is null
-        and not exists (select 1 from public.respuestas_tutor r where r.pareja_id = pa.id and r.semana = p_semana))
+      where private.es_tutor_de(pa.id, p_user_id) and pa.finalizada_at is null
+        and not exists (select 1 from public.respuestas_tutor r where r.pareja_id = pa.id and r.semana = p_semana and r.tutor_id = p_user_id))
     else true
   end
 $$;
@@ -2635,7 +2756,7 @@ begin
     resultado := resultado || coalesce((
       select jsonb_agg(jsonb_build_object(
         'user_id', p.user_id, 'email', i.email, 'nombre', i.nombre, 'rol', p.rol,
-        'tipo', v_tipo, 'semana', v_semana, 'cierra', v_cierra
+        'tipo', v_tipo, 'semana', v_semana, 'cierra', v_cierra, 'tipo_trabajo', m.tipo_trabajo
       ))
       from public.perfiles p
       join public.masters m on m.id = p.master_id and m.estudio_id = e.id
@@ -2646,7 +2767,7 @@ begin
         and not exists (select 1 from public.correos_enviados ce where ce.user_id = p.user_id and ce.tipo = v_tipo and ce.semana = v_semana)
         and not private.ha_respondido(p.user_id, p.rol, v_semana)
         -- Un tutor sin estudiantes no recibe recordatorios.
-        and (p.rol = 'estudiante' or exists (select 1 from public.parejas pa where pa.tutor_id = p.user_id))
+        and (p.rol = 'estudiante' or exists (select 1 from public.parejas pa where private.es_tutor_de(pa.id, p.user_id)))
     ), '[]'::jsonb);
   end loop;
   return resultado;
@@ -2798,20 +2919,34 @@ begin
       select count(*), avg(r.avance) into n_resp_est, avance_e
       from pg_temp.parejas_semana p join public.respuestas_estudiante r on r.pareja_id = p.pareja_id and r.semana = w;
 
-      select count(distinct tutor_id) into n_tut from pg_temp.parejas_semana where tutor_id is not null;
-      select count(*) into n_resp_tut from (
-        select p.tutor_id from pg_temp.parejas_semana p
-        left join public.respuestas_tutor rt on rt.pareja_id = p.pareja_id and rt.semana = w
-        where p.tutor_id is not null
-        group by p.tutor_id having bool_and(rt.pareja_id is not null)
-      ) t;
-      select count(distinct p.tutor_id), avg(rt.avance) into n_tut_avance, avance_t
-      from pg_temp.parejas_semana p join public.respuestas_tutor rt on rt.pareja_id = p.pareja_id and rt.semana = w;
+      -- Tutores de esas parejas esa semana: principal y cotutores activos.
+      create temporary table if not exists pg_temp.tutores_semana (pareja_id uuid, tutor_id uuid) on commit drop;
+      truncate pg_temp.tutores_semana;
+      insert into pg_temp.tutores_semana
+      select p.pareja_id, p.tutor_id from pg_temp.parejas_semana p where p.tutor_id is not null
+      union
+      select c.pareja_id, c.tutor_id from public.cotutores c
+      join pg_temp.parejas_semana p on p.pareja_id = c.pareja_id
+      where c.created_at < v.cierra and (c.finalizada_at is null or c.finalizada_at > v.cierra);
 
-      select count(*), avg(abs(re.avance - rt.avance)) into n_ambos, desajuste
+      select count(distinct tutor_id) into n_tut from pg_temp.tutores_semana;
+      -- Tutores que respondieron sobre todas sus parejas.
+      select count(*) into n_resp_tut from (
+        select t.tutor_id from pg_temp.tutores_semana t
+        left join public.respuestas_tutor rt on rt.pareja_id = t.pareja_id and rt.semana = w and rt.tutor_id = t.tutor_id
+        group by t.tutor_id having bool_and(rt.id is not null)
+      ) x;
+      select count(distinct rt.tutor_id), avg(rt.avance) into n_tut_avance, avance_t
+      from pg_temp.tutores_semana t
+      join public.respuestas_tutor rt on rt.pareja_id = t.pareja_id and rt.semana = w and rt.tutor_id = t.tutor_id;
+
+      -- Desajuste medio: cada combinación de estudiante y tutor que respondió.
+      -- Se cuenta sobre el número de estudiantes (parejas) con datos.
+      select count(distinct p.pareja_id), avg(abs(re.avance - rt.avance)) into n_ambos, desajuste
       from pg_temp.parejas_semana p
       join public.respuestas_estudiante re on re.pareja_id = p.pareja_id and re.semana = w
-      join public.respuestas_tutor rt on rt.pareja_id = p.pareja_id and rt.semana = w;
+      join pg_temp.tutores_semana t on t.pareja_id = p.pareja_id
+      join public.respuestas_tutor rt on rt.pareja_id = p.pareja_id and rt.semana = w and rt.tutor_id = t.tutor_id;
 
       select count(*) filter (where s.elegible), count(a.pareja_id) into n_elegibles, agendas
       from pg_temp.parejas_semana p
@@ -2879,7 +3014,9 @@ begin
     select jsonb_build_object(
       'id_pareja', pa.seudonimo,
       'id_estudiante', pe.seudonimo,
-      'id_tutor', pt.seudonimo,
+      -- Tutor principal: quien respondió como principal esa semana o, si no
+      -- respondió nadie, el tutor principal actual.
+      'id_tutor', coalesce((select t.seudonimo from public.perfiles t where t.user_id = rt.tutor_id), pt.seudonimo),
       'master', m.nombre,
       'tipo_trabajo', m.tipo_trabajo,
       'semana', w,
@@ -2891,6 +3028,9 @@ begin
       'tut_avance', rt.avance,
       'tut_siguiente_paso', rt.siguiente_paso,
       'tut_respondido_at', rt.updated_at,
+      'n_cotutores', (select count(*) from public.cotutores c where c.pareja_id = pa.id
+                      and c.created_at < coalesce(so.realizado_at, now()) and (c.finalizada_at is null or c.finalizada_at > coalesce(so.realizado_at, now()))),
+      'cotutores_respondieron', (select count(*) from public.respuestas_tutor r2 where r2.pareja_id = pa.id and r2.semana = w and not r2.principal),
       'dif_avance', da.diferencia,
       'dif_siguiente_paso', ds.diferencia,
       'relevante_avance', case when da.relevante is null then null when da.relevante then 1 else 0 end,
@@ -2927,9 +3067,13 @@ begin
     cross join lateral generate_series(1, private.ultima_semana_iniciada(es.id)) w
     left join public.respuestas_estudiante re on re.pareja_id = pa.id and re.semana = w
     left join public.bienestar b on b.estudiante_id = pa.estudiante_id and b.semana = w
-    left join public.respuestas_tutor rt on rt.pareja_id = pa.id and rt.semana = w
-    left join public.desajustes da on da.pareja_id = pa.id and da.semana = w and da.item = 'avance'
-    left join public.desajustes ds on ds.pareja_id = pa.id and ds.semana = w and ds.item = 'siguiente_paso'
+    left join lateral (
+      select r.* from public.respuestas_tutor r
+      where r.pareja_id = pa.id and r.semana = w
+      order by r.principal desc, r.updated_at desc limit 1
+    ) rt on true
+    left join public.desajustes da on da.pareja_id = pa.id and da.semana = w and da.item = 'avance' and da.tutor_id = rt.tutor_id
+    left join public.desajustes ds on ds.pareja_id = pa.id and ds.semana = w and ds.item = 'siguiente_paso' and ds.tutor_id = rt.tutor_id
     left join public.sorteos so on so.pareja_id = pa.id and so.semana = w
     left join public.agendas a on a.pareja_id = pa.id and a.semana = w
     left join public.puente_semanal ps on ps.pareja_id = pa.id and ps.semana = w
@@ -2937,6 +3081,67 @@ begin
 
   perform private.auditar('exportacion_investigacion', jsonb_build_object('filas', jsonb_array_length(filas), 'incluye_bienestar', true));
   return filas;
+end
+$$;
+
+-- Respuestas de TODOS los tutores (principales y cotutores), en formato
+-- largo: una fila por pareja, semana y tutor, con su desajuste.
+create or replace function public.exportar_tutores()
+returns jsonb
+language plpgsql volatile security definer set search_path = ''
+as $$
+declare
+  filas jsonb;
+begin
+  perform private.exigir_investigador();
+  select coalesce(jsonb_agg(jsonb_build_object(
+    'id_pareja', pa.seudonimo,
+    'id_estudiante', pe.seudonimo,
+    'id_tutor', t.seudonimo,
+    'master', m.nombre,
+    'semana', rt.semana,
+    'tutor_principal', case when rt.principal then 1 else 0 end,
+    'tut_avance', rt.avance,
+    'tut_siguiente_paso', rt.siguiente_paso,
+    'dif_avance', da.diferencia,
+    'dif_siguiente_paso', ds.diferencia,
+    'relevante_avance', case when da.relevante is null then null when da.relevante then 1 else 0 end,
+    'relevante_siguiente_paso', case when ds.relevante is null then null when ds.relevante then 1 else 0 end,
+    'motivo_avance', da.motivo,
+    'motivo_siguiente_paso', ds.motivo,
+    'regla_version', coalesce(da.regla_version, ds.regla_version),
+    'tut_respondido_at', rt.updated_at
+  ) order by m.nombre, pa.seudonimo, rt.semana, rt.principal desc, t.seudonimo), '[]'::jsonb) into filas
+  from public.respuestas_tutor rt
+  join public.parejas pa on pa.id = rt.pareja_id
+  join public.perfiles pe on pe.user_id = pa.estudiante_id
+  join public.perfiles t on t.user_id = rt.tutor_id
+  join public.masters m on m.id = pa.master_id
+  left join public.desajustes da on da.pareja_id = rt.pareja_id and da.semana = rt.semana and da.tutor_id = rt.tutor_id and da.item = 'avance'
+  left join public.desajustes ds on ds.pareja_id = rt.pareja_id and ds.semana = rt.semana and ds.tutor_id = rt.tutor_id and ds.item = 'siguiente_paso';
+
+  perform private.auditar('exportacion_tutores', jsonb_build_object('filas', jsonb_array_length(filas)));
+  return filas;
+end
+$$;
+
+-- Cambios de tutor principal (con seudónimos), para el análisis.
+create or replace function public.exportar_cambios_tutor()
+returns jsonb
+language plpgsql volatile security definer set search_path = ''
+as $$
+begin
+  perform private.exigir_investigador();
+  perform private.auditar('exportacion_cambios_tutor');
+  return coalesce((
+    select jsonb_agg(jsonb_build_object(
+      'id_pareja', pa.seudonimo, 'id_tutor_anterior', ta.seudonimo, 'id_tutor_nuevo', tn.seudonimo, 'cambiado_at', c.created_at
+    ) order by c.created_at)
+    from public.cambios_tutor c
+    join public.parejas pa on pa.id = c.pareja_id
+    left join public.perfiles ta on ta.user_id = c.tutor_anterior
+    left join public.perfiles tn on tn.user_id = c.tutor_nuevo
+  ), '[]'::jsonb);
 end
 $$;
 
@@ -3007,11 +3212,11 @@ $$;
 
 revoke all on function
   public.resumen_direccion(), public.exportar_investigacion(), public.exportar_cuestionarios(),
-  public.variables_cuestionarios(), public.auditoria_reciente(integer)
+  public.variables_cuestionarios(), public.auditoria_reciente(integer), public.exportar_tutores(), public.exportar_cambios_tutor()
 from public, anon, authenticated;
 grant execute on function
   public.resumen_direccion(), public.exportar_investigacion(), public.exportar_cuestionarios(),
-  public.variables_cuestionarios(), public.auditoria_reciente(integer)
+  public.variables_cuestionarios(), public.auditoria_reciente(integer), public.exportar_tutores(), public.exportar_cambios_tutor()
 to authenticated;
 
 -- ===========================================================================
@@ -3093,3 +3298,147 @@ $$;
 
 revoke all on function public.servicio_borrados_pendientes(), public.servicio_borrado_completado(uuid) from public, anon, authenticated;
 grant execute on function public.servicio_borrados_pendientes(), public.servicio_borrado_completado(uuid) to service_role;
+
+-- ===========================================================================
+-- 20261117000300_gestion_tutores.sql
+-- ===========================================================================
+
+-- SINTONÍA · Migración 11: gestión de tutores de cada pareja
+--
+-- Normativa de la USAL (ver NORMATIVA.md):
+--   * Cotutoría: un segundo tutor y, excepcionalmente, un tercero
+--     (Reglamento de TFM, art. 4.3 y 4.7; Reglamento de TFG, art. 4.3).
+--   * Cambio de tutor a petición motivada del estudiante
+--     (Reglamento de TFM, art. 4.9; Reglamento de TFG, art. 7.3).
+-- Las decisiones las toma la comisión correspondiente; en SINTONÍA las
+-- refleja el investigador. Todo queda en la auditoría y las respuestas
+-- anteriores se conservan.
+
+create or replace function private.exigir_tutor_del_master(p_tutor_id uuid, p_master_id uuid)
+returns void
+language plpgsql stable security definer set search_path = ''
+as $$
+begin
+  if not exists (
+    select 1 from public.perfiles
+    where user_id = p_tutor_id and rol = 'tutor' and master_id = p_master_id and retirado_at is null
+  ) then
+    perform private.error('TUTOR_NO_VALIDO', 'Elige un tutor/a de este máster.');
+  end if;
+end
+$$;
+
+-- Parejas de un máster con su tutor principal y sus cotutores (seudónimos y
+-- etiquetas; el investigador no ve nombres).
+create or replace function public.listar_parejas(p_master_id uuid)
+returns jsonb
+language plpgsql stable security definer set search_path = ''
+as $$
+begin
+  perform private.exigir_investigador();
+  return coalesce((
+    select jsonb_agg(jsonb_build_object(
+      'pareja_id', pa.id,
+      'pareja', pa.seudonimo,
+      'estudiante', pe.seudonimo,
+      'estudiante_retirado', pe.retirado_at is not null,
+      'tutor', case when t.user_id is null then null else jsonb_build_object(
+        'user_id', t.user_id, 'seudonimo', t.seudonimo,
+        'etiqueta', (select c.etiqueta from public.codigos_acceso c where c.usado_por = t.user_id limit 1)) end,
+      'cotutores', coalesce((
+        select jsonb_agg(jsonb_build_object(
+          'user_id', ct.user_id, 'seudonimo', ct.seudonimo,
+          'etiqueta', (select c.etiqueta from public.codigos_acceso c where c.usado_por = ct.user_id limit 1)
+        ) order by co.created_at)
+        from public.cotutores co join public.perfiles ct on ct.user_id = co.tutor_id
+        where co.pareja_id = pa.id and co.finalizada_at is null
+      ), '[]'::jsonb),
+      'cambios', (select count(*) from public.cambios_tutor ch where ch.pareja_id = pa.id)
+    ) order by pa.created_at)
+    from public.parejas pa
+    join public.perfiles pe on pe.user_id = pa.estudiante_id
+    left join public.perfiles t on t.user_id = pa.tutor_id
+    where pa.master_id = p_master_id and pa.finalizada_at is null
+  ), '[]'::jsonb);
+end
+$$;
+
+-- Cambia el tutor principal. Si el nuevo era cotutor de la pareja, deja de
+-- serlo. Las respuestas del tutor anterior se conservan (con su código).
+create or replace function public.cambiar_tutor(p_pareja_id uuid, p_tutor_id uuid)
+returns jsonb
+language plpgsql security definer set search_path = ''
+as $$
+declare
+  pa public.parejas;
+begin
+  perform private.exigir_investigador();
+  select * into pa from public.parejas where id = p_pareja_id;
+  if not found then
+    perform private.error('PAREJA_NO_VALIDA', 'Esa pareja no existe.');
+  end if;
+  perform private.exigir_tutor_del_master(p_tutor_id, pa.master_id);
+  if pa.tutor_id = p_tutor_id then
+    perform private.error('SIN_CAMBIOS', 'Ese tutor/a ya es el tutor principal de la pareja.');
+  end if;
+  update public.cotutores set finalizada_at = now()
+  where pareja_id = p_pareja_id and tutor_id = p_tutor_id and finalizada_at is null;
+  update public.parejas set tutor_id = p_tutor_id where id = p_pareja_id;
+  insert into public.cambios_tutor (pareja_id, tutor_anterior, tutor_nuevo) values (p_pareja_id, pa.tutor_id, p_tutor_id);
+  perform private.auditar('tutor_cambiado', jsonb_build_object('pareja_id', p_pareja_id));
+  return jsonb_build_object('ok', true);
+end
+$$;
+
+-- Añade un cotutor (como máximo dos activos además del principal).
+create or replace function public.asignar_cotutor(p_pareja_id uuid, p_tutor_id uuid)
+returns jsonb
+language plpgsql security definer set search_path = ''
+as $$
+declare
+  pa public.parejas;
+begin
+  perform private.exigir_investigador();
+  select * into pa from public.parejas where id = p_pareja_id;
+  if not found then
+    perform private.error('PAREJA_NO_VALIDA', 'Esa pareja no existe.');
+  end if;
+  perform private.exigir_tutor_del_master(p_tutor_id, pa.master_id);
+  if pa.tutor_id = p_tutor_id then
+    perform private.error('YA_ES_TUTOR', 'Ese tutor/a ya es el tutor principal de la pareja.');
+  end if;
+  if exists (select 1 from public.cotutores where pareja_id = p_pareja_id and tutor_id = p_tutor_id and finalizada_at is null) then
+    perform private.error('YA_ES_TUTOR', 'Ese tutor/a ya es cotutor de la pareja.');
+  end if;
+  if (select count(*) from public.cotutores where pareja_id = p_pareja_id and finalizada_at is null) >= 2 then
+    perform private.error('DEMASIADOS_COTUTORES', 'Una pareja puede tener como máximo dos cotutores, además del tutor principal.');
+  end if;
+  insert into public.cotutores (pareja_id, tutor_id) values (p_pareja_id, p_tutor_id)
+  on conflict (pareja_id, tutor_id) do update set created_at = now(), finalizada_at = null;
+  perform private.auditar('cotutor_asignado', jsonb_build_object('pareja_id', p_pareja_id));
+  return jsonb_build_object('ok', true);
+end
+$$;
+
+create or replace function public.quitar_cotutor(p_pareja_id uuid, p_tutor_id uuid)
+returns jsonb
+language plpgsql security definer set search_path = ''
+as $$
+begin
+  perform private.exigir_investigador();
+  update public.cotutores set finalizada_at = now()
+  where pareja_id = p_pareja_id and tutor_id = p_tutor_id and finalizada_at is null;
+  if not found then
+    perform private.error('NO_ES_COTUTOR', 'Ese tutor/a no es cotutor de la pareja.');
+  end if;
+  perform private.auditar('cotutor_quitado', jsonb_build_object('pareja_id', p_pareja_id));
+  return jsonb_build_object('ok', true);
+end
+$$;
+
+revoke all on function
+  public.listar_parejas(uuid), public.cambiar_tutor(uuid, uuid), public.asignar_cotutor(uuid, uuid), public.quitar_cotutor(uuid, uuid)
+from public, anon, authenticated;
+grant execute on function
+  public.listar_parejas(uuid), public.cambiar_tutor(uuid, uuid), public.asignar_cotutor(uuid, uuid), public.quitar_cotutor(uuid, uuid)
+to authenticated;

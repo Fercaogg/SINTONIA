@@ -70,20 +70,34 @@ begin
       select count(*), avg(r.avance) into n_resp_est, avance_e
       from pg_temp.parejas_semana p join public.respuestas_estudiante r on r.pareja_id = p.pareja_id and r.semana = w;
 
-      select count(distinct tutor_id) into n_tut from pg_temp.parejas_semana where tutor_id is not null;
-      select count(*) into n_resp_tut from (
-        select p.tutor_id from pg_temp.parejas_semana p
-        left join public.respuestas_tutor rt on rt.pareja_id = p.pareja_id and rt.semana = w
-        where p.tutor_id is not null
-        group by p.tutor_id having bool_and(rt.pareja_id is not null)
-      ) t;
-      select count(distinct p.tutor_id), avg(rt.avance) into n_tut_avance, avance_t
-      from pg_temp.parejas_semana p join public.respuestas_tutor rt on rt.pareja_id = p.pareja_id and rt.semana = w;
+      -- Tutores de esas parejas esa semana: principal y cotutores activos.
+      create temporary table if not exists pg_temp.tutores_semana (pareja_id uuid, tutor_id uuid) on commit drop;
+      truncate pg_temp.tutores_semana;
+      insert into pg_temp.tutores_semana
+      select p.pareja_id, p.tutor_id from pg_temp.parejas_semana p where p.tutor_id is not null
+      union
+      select c.pareja_id, c.tutor_id from public.cotutores c
+      join pg_temp.parejas_semana p on p.pareja_id = c.pareja_id
+      where c.created_at < v.cierra and (c.finalizada_at is null or c.finalizada_at > v.cierra);
 
-      select count(*), avg(abs(re.avance - rt.avance)) into n_ambos, desajuste
+      select count(distinct tutor_id) into n_tut from pg_temp.tutores_semana;
+      -- Tutores que respondieron sobre todas sus parejas.
+      select count(*) into n_resp_tut from (
+        select t.tutor_id from pg_temp.tutores_semana t
+        left join public.respuestas_tutor rt on rt.pareja_id = t.pareja_id and rt.semana = w and rt.tutor_id = t.tutor_id
+        group by t.tutor_id having bool_and(rt.id is not null)
+      ) x;
+      select count(distinct rt.tutor_id), avg(rt.avance) into n_tut_avance, avance_t
+      from pg_temp.tutores_semana t
+      join public.respuestas_tutor rt on rt.pareja_id = t.pareja_id and rt.semana = w and rt.tutor_id = t.tutor_id;
+
+      -- Desajuste medio: cada combinación de estudiante y tutor que respondió.
+      -- Se cuenta sobre el número de estudiantes (parejas) con datos.
+      select count(distinct p.pareja_id), avg(abs(re.avance - rt.avance)) into n_ambos, desajuste
       from pg_temp.parejas_semana p
       join public.respuestas_estudiante re on re.pareja_id = p.pareja_id and re.semana = w
-      join public.respuestas_tutor rt on rt.pareja_id = p.pareja_id and rt.semana = w;
+      join pg_temp.tutores_semana t on t.pareja_id = p.pareja_id
+      join public.respuestas_tutor rt on rt.pareja_id = p.pareja_id and rt.semana = w and rt.tutor_id = t.tutor_id;
 
       select count(*) filter (where s.elegible), count(a.pareja_id) into n_elegibles, agendas
       from pg_temp.parejas_semana p
@@ -151,7 +165,9 @@ begin
     select jsonb_build_object(
       'id_pareja', pa.seudonimo,
       'id_estudiante', pe.seudonimo,
-      'id_tutor', pt.seudonimo,
+      -- Tutor principal: quien respondió como principal esa semana o, si no
+      -- respondió nadie, el tutor principal actual.
+      'id_tutor', coalesce((select t.seudonimo from public.perfiles t where t.user_id = rt.tutor_id), pt.seudonimo),
       'master', m.nombre,
       'tipo_trabajo', m.tipo_trabajo,
       'semana', w,
@@ -163,6 +179,9 @@ begin
       'tut_avance', rt.avance,
       'tut_siguiente_paso', rt.siguiente_paso,
       'tut_respondido_at', rt.updated_at,
+      'n_cotutores', (select count(*) from public.cotutores c where c.pareja_id = pa.id
+                      and c.created_at < coalesce(so.realizado_at, now()) and (c.finalizada_at is null or c.finalizada_at > coalesce(so.realizado_at, now()))),
+      'cotutores_respondieron', (select count(*) from public.respuestas_tutor r2 where r2.pareja_id = pa.id and r2.semana = w and not r2.principal),
       'dif_avance', da.diferencia,
       'dif_siguiente_paso', ds.diferencia,
       'relevante_avance', case when da.relevante is null then null when da.relevante then 1 else 0 end,
@@ -199,9 +218,13 @@ begin
     cross join lateral generate_series(1, private.ultima_semana_iniciada(es.id)) w
     left join public.respuestas_estudiante re on re.pareja_id = pa.id and re.semana = w
     left join public.bienestar b on b.estudiante_id = pa.estudiante_id and b.semana = w
-    left join public.respuestas_tutor rt on rt.pareja_id = pa.id and rt.semana = w
-    left join public.desajustes da on da.pareja_id = pa.id and da.semana = w and da.item = 'avance'
-    left join public.desajustes ds on ds.pareja_id = pa.id and ds.semana = w and ds.item = 'siguiente_paso'
+    left join lateral (
+      select r.* from public.respuestas_tutor r
+      where r.pareja_id = pa.id and r.semana = w
+      order by r.principal desc, r.updated_at desc limit 1
+    ) rt on true
+    left join public.desajustes da on da.pareja_id = pa.id and da.semana = w and da.item = 'avance' and da.tutor_id = rt.tutor_id
+    left join public.desajustes ds on ds.pareja_id = pa.id and ds.semana = w and ds.item = 'siguiente_paso' and ds.tutor_id = rt.tutor_id
     left join public.sorteos so on so.pareja_id = pa.id and so.semana = w
     left join public.agendas a on a.pareja_id = pa.id and a.semana = w
     left join public.puente_semanal ps on ps.pareja_id = pa.id and ps.semana = w
@@ -209,6 +232,67 @@ begin
 
   perform private.auditar('exportacion_investigacion', jsonb_build_object('filas', jsonb_array_length(filas), 'incluye_bienestar', true));
   return filas;
+end
+$$;
+
+-- Respuestas de TODOS los tutores (principales y cotutores), en formato
+-- largo: una fila por pareja, semana y tutor, con su desajuste.
+create or replace function public.exportar_tutores()
+returns jsonb
+language plpgsql volatile security definer set search_path = ''
+as $$
+declare
+  filas jsonb;
+begin
+  perform private.exigir_investigador();
+  select coalesce(jsonb_agg(jsonb_build_object(
+    'id_pareja', pa.seudonimo,
+    'id_estudiante', pe.seudonimo,
+    'id_tutor', t.seudonimo,
+    'master', m.nombre,
+    'semana', rt.semana,
+    'tutor_principal', case when rt.principal then 1 else 0 end,
+    'tut_avance', rt.avance,
+    'tut_siguiente_paso', rt.siguiente_paso,
+    'dif_avance', da.diferencia,
+    'dif_siguiente_paso', ds.diferencia,
+    'relevante_avance', case when da.relevante is null then null when da.relevante then 1 else 0 end,
+    'relevante_siguiente_paso', case when ds.relevante is null then null when ds.relevante then 1 else 0 end,
+    'motivo_avance', da.motivo,
+    'motivo_siguiente_paso', ds.motivo,
+    'regla_version', coalesce(da.regla_version, ds.regla_version),
+    'tut_respondido_at', rt.updated_at
+  ) order by m.nombre, pa.seudonimo, rt.semana, rt.principal desc, t.seudonimo), '[]'::jsonb) into filas
+  from public.respuestas_tutor rt
+  join public.parejas pa on pa.id = rt.pareja_id
+  join public.perfiles pe on pe.user_id = pa.estudiante_id
+  join public.perfiles t on t.user_id = rt.tutor_id
+  join public.masters m on m.id = pa.master_id
+  left join public.desajustes da on da.pareja_id = rt.pareja_id and da.semana = rt.semana and da.tutor_id = rt.tutor_id and da.item = 'avance'
+  left join public.desajustes ds on ds.pareja_id = rt.pareja_id and ds.semana = rt.semana and ds.tutor_id = rt.tutor_id and ds.item = 'siguiente_paso';
+
+  perform private.auditar('exportacion_tutores', jsonb_build_object('filas', jsonb_array_length(filas)));
+  return filas;
+end
+$$;
+
+-- Cambios de tutor principal (con seudónimos), para el análisis.
+create or replace function public.exportar_cambios_tutor()
+returns jsonb
+language plpgsql volatile security definer set search_path = ''
+as $$
+begin
+  perform private.exigir_investigador();
+  perform private.auditar('exportacion_cambios_tutor');
+  return coalesce((
+    select jsonb_agg(jsonb_build_object(
+      'id_pareja', pa.seudonimo, 'id_tutor_anterior', ta.seudonimo, 'id_tutor_nuevo', tn.seudonimo, 'cambiado_at', c.created_at
+    ) order by c.created_at)
+    from public.cambios_tutor c
+    join public.parejas pa on pa.id = c.pareja_id
+    left join public.perfiles ta on ta.user_id = c.tutor_anterior
+    left join public.perfiles tn on tn.user_id = c.tutor_nuevo
+  ), '[]'::jsonb);
 end
 $$;
 
@@ -279,9 +363,9 @@ $$;
 
 revoke all on function
   public.resumen_direccion(), public.exportar_investigacion(), public.exportar_cuestionarios(),
-  public.variables_cuestionarios(), public.auditoria_reciente(integer)
+  public.variables_cuestionarios(), public.auditoria_reciente(integer), public.exportar_tutores(), public.exportar_cambios_tutor()
 from public, anon, authenticated;
 grant execute on function
   public.resumen_direccion(), public.exportar_investigacion(), public.exportar_cuestionarios(),
-  public.variables_cuestionarios(), public.auditoria_reciente(integer)
+  public.variables_cuestionarios(), public.auditoria_reciente(integer), public.exportar_tutores(), public.exportar_cambios_tutor()
 to authenticated;

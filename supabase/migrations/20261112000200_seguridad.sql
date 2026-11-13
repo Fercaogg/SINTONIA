@@ -41,6 +41,7 @@ as $$
   select pa.id from public.parejas pa
   join public.perfiles p on p.user_id = auth.uid() and p.retirado_at is null
   where pa.estudiante_id = auth.uid() or pa.tutor_id = auth.uid()
+     or exists (select 1 from public.cotutores c where c.pareja_id = pa.id and c.tutor_id = auth.uid() and c.finalizada_at is null)
 $$;
 
 create or replace function private.parejas_como_estudiante()
@@ -52,13 +53,24 @@ as $$
   where pa.estudiante_id = auth.uid()
 $$;
 
+-- Parejas en las que la persona conectada es tutor principal o cotutor.
 create or replace function private.parejas_como_tutor()
 returns setof uuid
 language sql stable security definer set search_path = ''
 as $$
   select pa.id from public.parejas pa
-  join public.perfiles p on p.user_id = pa.tutor_id and p.retirado_at is null
+  join public.perfiles p on p.user_id = auth.uid() and p.retirado_at is null
   where pa.tutor_id = auth.uid()
+     or exists (select 1 from public.cotutores c where c.pareja_id = pa.id and c.tutor_id = auth.uid() and c.finalizada_at is null)
+$$;
+
+-- ¿Es esta persona tutor (principal o cotutor activo) de la pareja?
+create or replace function private.es_tutor_de(p_pareja_id uuid, p_user_id uuid)
+returns boolean
+language sql stable security definer set search_path = ''
+as $$
+  select exists (select 1 from public.parejas pa where pa.id = p_pareja_id and pa.tutor_id = p_user_id)
+      or exists (select 1 from public.cotutores c where c.pareja_id = p_pareja_id and c.tutor_id = p_user_id and c.finalizada_at is null)
 $$;
 
 -- Registro de auditoría. Solo se llama desde otras funciones.
@@ -76,6 +88,7 @@ grant execute on function
   private.rol_actual(), private.master_actual(), private.es_investigador(),
   private.mis_parejas(), private.parejas_como_estudiante(), private.parejas_como_tutor()
   to authenticated;
+-- es_tutor_de se usa solo dentro de otras funciones.
 revoke all on all tables in schema private from public, anon, authenticated;
 
 -- ---------------------------------------------------------------------------
@@ -89,7 +102,7 @@ grant select on
   public.identidades, public.codigos_acceso, public.parejas,
   public.consentimiento_textos, public.consentimientos, public.items,
   public.respuestas_estudiante, public.respuestas_tutor, public.bienestar,
-  public.auditoria
+  public.auditoria, public.cotutores, public.cambios_tutor
 to authenticated;
 
 alter table public.configuracion enable row level security;
@@ -106,6 +119,8 @@ alter table public.respuestas_estudiante enable row level security;
 alter table public.respuestas_tutor enable row level security;
 alter table public.bienestar enable row level security;
 alter table public.auditoria enable row level security;
+alter table public.cotutores enable row level security;
+alter table public.cambios_tutor enable row level security;
 
 -- ---------------------------------------------------------------------------
 -- Políticas de lectura
@@ -166,11 +181,19 @@ create policy "estudiante o investigador" on public.respuestas_estudiante
   for select to authenticated
   using (pareja_id in (select private.parejas_como_estudiante()) or private.es_investigador());
 
--- Respuestas del tutor: el propio tutor y el investigador.
--- El estudiante y la dirección NO.
+-- Respuestas del tutor: cada tutor, solo las suyas (un cotutor no ve las
+-- del otro); y el investigador. El estudiante y la dirección NO.
 create policy "tutor o investigador" on public.respuestas_tutor
   for select to authenticated
-  using (pareja_id in (select private.parejas_como_tutor()) or private.es_investigador());
+  using ((tutor_id = auth.uid() and private.rol_actual() = 'tutor') or private.es_investigador());
+
+-- Cotutorías: el propio tutor y el investigador. Historial de cambios: el investigador.
+create policy "propias o investigador" on public.cotutores
+  for select to authenticated
+  using (tutor_id = auth.uid() or private.es_investigador());
+create policy "solo investigador" on public.cambios_tutor
+  for select to authenticated
+  using (private.es_investigador());
 
 -- Bienestar: SOLO el propio estudiante. Nadie más, ni siquiera el
 -- investigador, puede leer esta tabla. El investigador solo lo recibe dentro

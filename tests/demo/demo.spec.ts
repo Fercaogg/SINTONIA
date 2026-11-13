@@ -17,7 +17,7 @@ const RUTAS: Record<Perfil, { inicio: RegExp; rutas: string[] }> = {
   'Dirección del máster': { inicio: /\/direccion$/, rutas: ['/direccion', '/direccion/avisos', '/cuenta'] },
   Investigación: {
     inicio: /\/investigacion$/,
-    rutas: ['/investigacion', '/investigacion/calendario', '/investigacion/convocatorias', '/investigacion/cuestionarios', '/investigacion/datos', '/cuenta'],
+    rutas: ['/investigacion', '/investigacion/parejas', '/investigacion/calendario', '/investigacion/convocatorias', '/investigacion/cuestionarios', '/investigacion/datos', '/cuenta'],
   },
 }
 
@@ -81,4 +81,30 @@ test('el menú del móvil se abre, se recorre y se cierra con Escape', async ({ 
   await expect(page.getByRole('link', { name: 'Check-in semanal' })).toBeVisible()
   await page.getByRole('link', { name: 'Check-in semanal' }).click()
   await expect(page).toHaveURL(/\/tutor\/checkin$/)
+})
+
+test('cotutoría: la tutora 2 ve a su estudiante en cotutoría y hace su propio check-in', async ({ page }) => {
+  await page.goto('/acceso')
+  await page.getByRole('button', { name: /Entrar con contraseña/ }).click()
+  await page.getByLabel('Correo institucional').fill('tutor2@sintonia.example')
+  await page.getByLabel('Contraseña').fill('demo-sintonia')
+  await page.getByRole('button', { name: 'Entrar', exact: true }).click()
+  await page.waitForURL(/\/tutor$/)
+  await expect(page.getByRole('heading', { name: 'Irene Montes (cotutoría)' })).toBeVisible()
+  await page.goto('/tutor/checkin')
+  await expect(page.locator('form li').filter({ hasText: 'Irene Montes' }).getByText('Cotutoría')).toBeVisible()
+})
+
+test('el investigador gestiona los tutores de las parejas', async ({ page }, info) => {
+  await entrarComo(page, 'Investigación')
+  await page.goto('/investigacion/parejas')
+  await expect(page.getByRole('heading', { name: 'Parejas y tutores' })).toBeVisible()
+  await expect(page.getByText('12 parejas · 1 con cotutoría')).toBeVisible()
+  // Añadir un cotutor a la segunda pareja y quitarlo después.
+  const segunda = page.locator('main li.card').nth(info.project.name === 'movil' ? 1 : 2)
+  await segunda.getByLabel(/Añadir cotutor a/).selectOption({ index: 1 })
+  await segunda.getByRole('button', { name: 'Añadir' }).click()
+  await expect(page.getByRole('status')).toContainText('Cotutor añadido')
+  await segunda.getByRole('button', { name: /Quitar a/ }).click()
+  await expect(page.getByRole('status')).toContainText('Cotutor quitado')
 })

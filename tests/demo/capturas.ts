@@ -152,3 +152,20 @@ test('investigación', async ({ page }, info) => {
   await foto(page, '25-investigacion-datos-y-auditoria', p)
   await salir(page)
 })
+
+test('cotutoría y gestión de tutores', async ({ page }, info) => {
+  const p = info.project.name
+  await entrarComo(page, 'Investigación')
+  await page.goto('/investigacion/parejas')
+  await page.getByRole('heading', { name: 'Parejas y tutores' }).waitFor()
+  await foto(page, '26-investigacion-parejas-y-tutores', p)
+  await salir(page)
+
+  await page.goto('/acceso')
+  await page.getByRole('button', { name: /Entrar con contraseña/ }).click()
+  await page.getByLabel('Correo institucional').fill('tutor2@sintonia.example')
+  await page.getByLabel('Contraseña').fill('demo-sintonia')
+  await page.getByRole('button', { name: 'Entrar', exact: true }).click()
+  await page.getByRole('heading', { name: 'Agendas para las tutorías' }).waitFor()
+  await foto(page, '27-cotutora-inicio-y-agendas', p)
+})

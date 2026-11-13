@@ -6,6 +6,7 @@ import { computed, ref, watch } from 'vue'
 import { RouterLink, RouterView, useRoute, useRouter } from 'vue-router'
 import { useSesion } from '@/stores/sesion'
 import { NOMBRE_ROL, type Rol } from '@/lib/tipos'
+import { useTerminos } from '@/lib/terminos'
 import AppIcon from '@/components/comun/AppIcon.vue'
 import AppLogo from '@/components/comun/AppLogo.vue'
 import BandaEntorno from '@/components/comun/BandaEntorno.vue'
@@ -40,6 +41,7 @@ const MENUS: Record<Rol, Enlace[]> = {
   ],
   investigador: [
     { to: '/investigacion', label: 'Másteres y códigos', icon: 'building', exact: true },
+    { to: '/investigacion/parejas', label: 'Parejas y tutores', icon: 'team' },
     { to: '/investigacion/calendario', label: 'Calendario del estudio', icon: 'calendar' },
     { to: '/investigacion/convocatorias', label: 'Convocatorias', icon: 'graduation' },
     { to: '/investigacion/cuestionarios', label: 'Cuestionarios', icon: 'document' },
@@ -50,13 +52,16 @@ const MENUS: Record<Rol, Enlace[]> = {
 }
 
 const sesion = useSesion()
+const { t } = useTerminos()
 const route = useRoute()
 const router = useRouter()
 const menuAbierto = ref(false)
 
 const rol = computed(() => sesion.perfil?.rol ?? 'estudiante')
 const oscuro = computed(() => rol.value === 'direccion' || rol.value === 'investigador')
-const enlaces = computed(() => (sesion.perfil?.retirado ? [CUENTA, COMO] : MENUS[rol.value]))
+const enlaces = computed(() =>
+  (sesion.perfil?.retirado ? [CUENTA, COMO] : MENUS[rol.value]).map((e) => ({ ...e, label: t(e.label) })),
+)
 
 const iniciales = computed(() => {
   const n = sesion.perfil?.nombre || 'S'
@@ -98,7 +103,7 @@ async function salir() {
             <AppLogo :variante="oscuro ? 'claro' : 'oscuro'" />
           </RouterLink>
           <p class="mt-2 text-xs font-medium" :class="oscuro ? 'text-white/80' : 'texto-suave'">
-            {{ NOMBRE_ROL[rol] }}<template v-if="sesion.perfil?.master"> · {{ sesion.perfil.master.nombre }}</template>
+            {{ t(NOMBRE_ROL[rol]) }}<template v-if="sesion.perfil?.master"> · {{ sesion.perfil.master.nombre }}</template>
           </p>
         </div>
 

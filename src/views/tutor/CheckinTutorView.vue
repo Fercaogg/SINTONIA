@@ -12,6 +12,7 @@ import EstadoCarga from '@/components/comun/EstadoCarga.vue'
 import EstadoVacio from '@/components/comun/EstadoVacio.vue'
 import EscalaTactil from '@/components/checkin/EscalaTactil.vue'
 import EstadoCalendario from '@/components/checkin/EstadoCalendario.vue'
+import { useTerminos } from '@/lib/terminos'
 
 const datos = ref<CheckinTutor | null>(null)
 const respuestas = ref<Record<string, { avance: number | null; siguiente_paso: number | null }>>({})
@@ -57,6 +58,8 @@ async function enviar() {
     enviando.value = false
   }
 }
+
+const { t } = useTerminos()
 </script>
 
 <template>
@@ -67,7 +70,7 @@ async function enviar() {
       <h1 class="titulo-pagina mb-6">Check-in semanal</h1>
       <EstadoCalendario :calendario="datos.calendario" />
     </template>
-    <EstadoVacio v-else-if="!estudiantes.length" icono="users" titulo="Aún no hay estudiantes contigo" texto="Dale a cada estudiante uno de tus códigos para que se registre.">
+    <EstadoVacio v-else-if="!estudiantes.length" icono="users" :titulo="t('Aún no hay estudiantes contigo')" :texto="t('Dale a cada estudiante uno de tus códigos para que se registre.')">
       <RouterLink to="/tutor/codigos" class="btn-primary mt-6">Ver mis códigos</RouterLink>
     </EstadoVacio>
 
@@ -86,7 +89,7 @@ async function enviar() {
     <form v-else novalidate @submit.prevent="enviar">
       <h1 class="titulo-pagina">Check-in de la semana {{ datos.calendario.semana }}</h1>
       <p class="texto-suave mt-1 text-sm mb-6">
-        Una respuesta por estudiante.
+        {{ t('Una respuesta por estudiante.') }}
         <template v-if="yaRespondido">Ya has respondido: puedes cambiarlo</template><template v-else>Tienes</template>
         hasta el {{ hastaCierre(datos.calendario.cierra!) }}.
       </p>
@@ -95,8 +98,11 @@ async function enviar() {
 
       <ul class="space-y-4">
         <li v-for="e in estudiantes" :key="e.pareja_id" class="card p-5">
-          <h2 class="font-display text-lg font-semibold text-surface-900 mb-3">{{ e.nombre }}</h2>
-          <p :id="`av-${e.pareja_id}`" class="text-sm font-medium text-surface-800 mb-2">{{ itemAvance?.texto }}</p>
+          <h2 class="font-display text-lg font-semibold text-surface-900 mb-3 flex flex-wrap items-center gap-2">
+            {{ e.nombre }}
+            <span v-if="e.cotutor" class="badge badge-sky">{{ t('Cotutoría') }}</span>
+          </h2>
+          <p :id="`av-${e.pareja_id}`" class="text-sm font-medium text-surface-800 mb-2">{{ t(itemAvance?.texto ?? '') }}</p>
           <EscalaTactil
             v-model="respuestas[e.pareja_id].avance"
             :etiqueta-id="`av-${e.pareja_id}`"
@@ -106,7 +112,7 @@ async function enviar() {
           />
           <template v-if="itemSiguiente">
             <p :id="`sp-${e.pareja_id}`" class="text-sm font-medium text-surface-800 mt-5 mb-2">
-              {{ itemSiguiente.texto }} <span class="texto-suave font-normal">(opcional)</span>
+              {{ t(itemSiguiente.texto) }} <span class="texto-suave font-normal">(opcional)</span>
             </p>
             <EscalaTactil
               v-model="respuestas[e.pareja_id].siguiente_paso"
@@ -125,7 +131,7 @@ async function enviar() {
           <template v-else>{{ yaRespondido ? 'Guardar cambios' : 'Enviar todo' }}</template>
         </button>
         <p class="text-sm texto-suave text-center mt-2" aria-live="polite">
-          {{ respondidos }} de {{ estudiantes.length }} estudiantes
+          {{ respondidos }} de {{ estudiantes.length }} {{ t('estudiantes') }}
         </p>
       </div>
     </form>

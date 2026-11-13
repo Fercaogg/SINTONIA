@@ -52,7 +52,7 @@ Las respuestas solo llevan el código de la pareja. El nombre está en otra tabl
 | Perfiles seudónimos | El suyo | El suyo | El suyo | Todos (sin nombres) |
 | Parejas | La suya | Las suyas | No | Todas (seudónimas) |
 | Respuestas del estudiante | Las suyas | **No** | **No** | Todas (seudónimas) |
-| Respuestas del tutor | **No** | Las suyas | **No** | Todas (seudónimas) |
+| Respuestas del tutor | **No** | Las suyas (un cotutor no ve las del otro) | **No** | Todas (seudónimas) |
 | Bienestar | Solo el suyo | **No** | **No** | **No** en la tabla. Solo dentro de la exportación seudonimizada, que queda registrada (Fase 6) |
 | Códigos de acceso | No | Los suyos sin usar, para repartirlos | No | Todos |
 | Consentimientos | Los suyos | Los suyos | Los suyos | Todos |
@@ -178,3 +178,12 @@ sequenceDiagram
 | Páginas de la aplicación (Vercel) | Red de distribución de Vercel: solo archivos públicos, sin datos |
 | Modelo de lenguaje (opcional) | Anthropic; solo recibe datos no personales |
 | Correo (Resend) | Proveedor de correo; recibe la dirección y el texto del recordatorio |
+
+## 14. Cotutoría y cambio de tutor
+
+Siguiendo los reglamentos de TFG y TFM de la USAL (ver [NORMATIVA.md](NORMATIVA.md)):
+
+- Cada pareja tiene un tutor principal y hasta dos cotutores. Todos hacen su propio check-in y ven la misma agenda; **ninguno ve las respuestas de los demás** ni las del estudiante.
+- El desajuste se calcula entre el estudiante y cada tutor. El sorteo es uno por estudiante, y hay desajuste relevante si lo hay con cualquiera de sus tutores.
+- El investigador refleja los cambios de tutor y las cotutorías que decide la comisión académica. Quedan en la auditoría y en la exportación, y las respuestas anteriores se conservan con el código de quien las dio.
+- En tesis doctorales, la interfaz habla de director/a, doctorando/a y codirección.

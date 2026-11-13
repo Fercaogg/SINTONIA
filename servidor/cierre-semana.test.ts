@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { cerrarSemanas, type Agenda, type Almacen, type DatosPareja, type FilaSorteo } from './cierre-semana'
+import { cerrarSemanas, combinarPorItem, type Agenda, type Almacen, type DatosPareja, type FilaSorteo } from './cierre-semana'
 import { REGLA_V1 } from './logica/desajuste'
 import type { Redactor } from './logica/modelo'
 
@@ -22,7 +22,7 @@ const pareja = (id: string, e: number | null, t: number | null, extra: Partial<D
   semanas: [{
     semana: 2,
     estudiante: e === null ? null : { avance: e, siguiente_paso: 3 },
-    tutor: t === null ? null : { avance: t, siguiente_paso: 3 },
+    tutores: t === null ? [] : [{ tutor_id: `tutor-${id}`, principal: true, avance: t, siguiente_paso: 3 }],
   }],
   ...extra,
 })
@@ -31,13 +31,15 @@ const pareja = (id: string, e: number | null, t: number | null, extra: Partial<D
 function almacenFalso(parejas: DatosPareja[], opciones: { guardados?: Record<string, boolean | null>; fallaAgenda?: boolean } = {}) {
   const registro: string[] = []
   const sorteos: FilaSorteo[] = []
+  const desajustes: any[] = []
   const agendas = new Map<string, Agenda>()
   let completado = false
   const almacen: Almacen = {
     semanasPorCerrar: async () => (completado ? [] : [{ estudio_id: 'E', semana: 2, semanas: 10, probabilidad: 0.5 }]),
     datosSemana: async () => ({ regla: REGLA_V1, parejas, banco }),
-    registrarSorteos: async (_e, _s, _d, filas) => {
+    registrarSorteos: async (_e, _s, d, filas) => {
       registro.push('sorteos')
+      desajustes.push(...d)
       sorteos.push(...filas)
       return filas.map((f) => ({ pareja_id: f.pareja_id, resultado: opciones.guardados?.[f.pareja_id] ?? f.resultado }))
     },
@@ -55,7 +57,7 @@ function almacenFalso(parejas: DatosPareja[], opciones: { guardados?: Record<str
       completado = true
     },
   }
-  return { almacen, registro, sorteos, agendas }
+  return { almacen, registro, sorteos, agendas, desajustes }
 }
 
 const SEMILLA = () => 'semilla-de-prueba'
@@ -152,5 +154,47 @@ describe('Agenda: modelo o banco', () => {
       semilla: SEMILLA,
     })
     expect(f.agendas.get('p1')).toMatchObject({ origen: 'banco', motivo_banco: 'error_modelo' })
+  })
+})
+
+describe('Cotutoría: el desajuste se calcula con cada tutor', () => {
+  const conCotutor = (avancePrincipal: number | null, avanceCotutor: number | null): DatosPareja => ({
+    pareja_id: 'p1', sin_tutor: false, retirado: false, tiene_agenda: false, preguntas_previas: [],
+    semanas: [{
+      semana: 2,
+      estudiante: { avance: 4, siguiente_paso: 3 },
+      tutores: [
+        ...(avancePrincipal === null ? [] : [{ tutor_id: 'principal', principal: true, avance: avancePrincipal, siguiente_paso: null }]),
+        ...(avanceCotutor === null ? [] : [{ tutor_id: 'cotutor', principal: false, avance: avanceCotutor, siguiente_paso: null }]),
+      ],
+    }],
+  })
+
+  it('guarda un desajuste por tutor, con su identificador', async () => {
+    const f = almacenFalso([conCotutor(4, 1)])
+    await cerrarSemanas({ almacen: f.almacen, redactor: null, semilla: SEMILLA })
+    expect(f.desajustes.map((d) => [d.tutor_id, d.diferencia, d.relevante])).toEqual([['principal', 0, false], ['cotutor', 3, true]])
+  })
+
+  it('basta con un desajuste relevante con cualquiera de los tutores', async () => {
+    const f = almacenFalso([conCotutor(4, 1)])
+    await cerrarSemanas({ almacen: f.almacen, redactor: null, semilla: SEMILLA })
+    expect(f.sorteos[0].desajuste_relevante).toBe(true)
+  })
+
+  it('es elegible si respondió el estudiante y al menos uno de sus tutores', async () => {
+    const f = almacenFalso([conCotutor(null, 3)])
+    await cerrarSemanas({ almacen: f.almacen, redactor: null, semilla: SEMILLA })
+    expect(f.sorteos[0].elegible).toBe(true)
+  })
+
+  it('para la agenda, por ítem cuenta el desajuste relevante de mayor magnitud', () => {
+    const d = (item: 'avance' | 'siguiente_paso', diferencia: number, relevante: boolean) => ({
+      item, semana: 2, valorEstudiante: 3, valorTutor: 3 - diferencia, diferencia, magnitud: Math.abs(diferencia),
+      signo: (diferencia > 0 ? 'estudiante_mayor' : diferencia < 0 ? 'tutor_mayor' : 'coinciden') as any,
+      relevante, motivo: relevante ? ('absoluto' as const) : null, reglaVersion: 'v1',
+    })
+    const r = combinarPorItem([[d('avance', 1, false), d('siguiente_paso', 2, true)], [d('avance', -3, true)]])
+    expect(r.map((x) => [x.item, x.diferencia])).toEqual([['avance', -3], ['siguiente_paso', 2]])
   })
 })

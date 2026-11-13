@@ -358,13 +358,15 @@ begin
     'estudiantes', coalesce((
       select jsonb_agg(jsonb_build_object(
         'pareja_id', pa.id, 'nombre', i.nombre,
+        'cotutor', pa.tutor_id is distinct from auth.uid(),
         'avance', rt.avance, 'siguiente_paso', rt.siguiente_paso
       ) order by i.nombre)
       from public.parejas pa
       join public.perfiles pe on pe.user_id = pa.estudiante_id and pe.retirado_at is null
       join public.identidades i on i.user_id = pa.estudiante_id
-      left join public.respuestas_tutor rt on rt.pareja_id = pa.id and rt.semana = v_semana
-      where pa.tutor_id = auth.uid() and pa.finalizada_at is null
+      -- Solo las respuestas propias (un cotutor no ve las del otro).
+      left join public.respuestas_tutor rt on rt.pareja_id = pa.id and rt.semana = v_semana and rt.tutor_id = auth.uid()
+      where pa.id in (select private.parejas_como_tutor()) and pa.finalizada_at is null
     ), '[]'::jsonb)
   );
 end
@@ -396,17 +398,18 @@ begin
     if not exists (
       select 1 from public.parejas pa
       join public.perfiles pe on pe.user_id = pa.estudiante_id and pe.retirado_at is null
-      where pa.id = v_pareja and pa.tutor_id = auth.uid() and pa.finalizada_at is null
+      where pa.id = v_pareja and private.es_tutor_de(pa.id, auth.uid()) and pa.finalizada_at is null
     ) then
       perform private.error('PAREJA_NO_VALIDA', 'Uno de los estudiantes no está en tu lista. Recarga la página.');
     end if;
     perform private.validar_escala((fila ->> 'avance')::integer);
     perform private.validar_escala((fila ->> 'siguiente_paso')::integer, false);
 
-    insert into public.respuestas_tutor (pareja_id, semana, avance, siguiente_paso)
-    values (v_pareja, v_semana, (fila ->> 'avance')::integer, (fila ->> 'siguiente_paso')::integer)
-    on conflict (pareja_id, semana) do update
-      set avance = excluded.avance, siguiente_paso = excluded.siguiente_paso, updated_at = now();
+    insert into public.respuestas_tutor (pareja_id, tutor_id, principal, semana, avance, siguiente_paso)
+    values (v_pareja, auth.uid(), exists (select 1 from public.parejas where id = v_pareja and tutor_id = auth.uid()),
+            v_semana, (fila ->> 'avance')::integer, (fila ->> 'siguiente_paso')::integer)
+    on conflict (pareja_id, semana, tutor_id) do update
+      set avance = excluded.avance, siguiente_paso = excluded.siguiente_paso, principal = excluded.principal, updated_at = now();
     n := n + 1;
   end loop;
 
@@ -545,7 +548,8 @@ begin
         'pareja', pa.seudonimo, 'semana', rt.semana, 'avance', rt.avance, 'siguiente_paso', rt.siguiente_paso,
         'creado_at', rt.created_at, 'actualizado_at', rt.updated_at) order by rt.semana), '[]')
       from public.respuestas_tutor rt
-      join public.parejas pa on pa.id = rt.pareja_id and pa.tutor_id = p.user_id
+      join public.parejas pa on pa.id = rt.pareja_id
+      where rt.tutor_id = p.user_id
     ),
     'avisos_apoyo', (
       select coalesce(jsonb_agg(jsonb_build_object('created_at', a.created_at, 'nombre_compartido', a.nombre_autorizado is not null)), '[]')
@@ -584,8 +588,9 @@ begin
 
   -- Borrado completo. Las respuestas del tutor sobre este estudiante son datos
   -- sobre el estudiante: también se borran (en cascada con la pareja).
-  -- Si es un tutor, se borran sus respuestas; las parejas quedan sin tutor.
-  delete from public.respuestas_tutor where pareja_id in (select id from public.parejas where tutor_id = v_uid);
+  -- Si es un tutor, se borran sus respuestas y sus cotutorías; las parejas de
+  -- las que era tutor principal quedan sin tutor principal.
+  delete from public.respuestas_tutor where tutor_id = v_uid;
   delete from public.perfiles where user_id = v_uid; -- borra en cascada pareja, respuestas, bienestar, avisos y códigos
   delete from public.identidades where user_id = v_uid;
   delete from public.consentimientos where user_id = v_uid;

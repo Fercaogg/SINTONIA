@@ -1,14 +1,14 @@
 # Verificación
 
-Cómo se comprueba cada criterio de aceptación del encargo y qué resultado dio la última ejecución (13 de noviembre de 2026, rama `fase-7-demo-entrega`).
+Cómo se comprueba cada criterio de aceptación del encargo y qué resultado dio la última ejecución (13 de noviembre de 2026, rama `normativa-cotutoria`, unida después a `main`).
 
 ## Resumen de las comprobaciones automáticas
 
 | Orden | Resultado |
 |---|---|
-| `npm test` (lógica, base de datos y R) | 260 tests superados, 0 fallidos |
+| `npm test` (lógica, base de datos y R) | 287 tests superados, 0 fallidos |
 | `npm run test:e2e` (navegador, móvil y escritorio) | 52 recorridos superados, 0 fallidos |
-| `npm run test:demo` (demostración, accesibilidad de todas las pantallas) | 18 comprobaciones superadas, 0 fallidas |
+| `npm run test:demo` (demostración, accesibilidad de todas las pantallas) | 22 comprobaciones superadas, 0 fallidas |
 | `npm run rendimiento` | Check-in listo en 1,9 s en un móvil con conexión 3G y procesador lento |
 | `npm run typecheck` y `npm run build` | Sin errores |
 
@@ -22,7 +22,7 @@ Cómo se comprueba cada criterio de aceptación del encargo y qué resultado dio
 | 2 | Un tutor con 8 estudiantes completa el suyo en menos de 60 segundos | `tests/e2e/checkin.spec.ts`: 8 toques y 1 botón | Cumple (8 toques + 1 envío). Falta cronometrarlo con personas reales |
 | 3 | La respuesta de bienestar no es accesible para el tutor ni para la dirección (tests de RLS) | `tests/bd/permisos.test.ts` (y una prueba que desactiva la regla a propósito y comprueba que los tests fallan) | Cumple |
 | 4 | La dirección nunca ve una cifra calculada sobre menos de 5 personas | `tests/bd/fase6.test.ts`: la base de datos suprime la cifra y no envía ni el número de personas; `tests/demo/demo.spec.ts` en pantalla | Cumple |
-| 5 | El sorteo queda registrado antes de mostrar la agenda y su proporción global es cercana a 0,5 en la simulación | `servidor/cierre-semana.test.ts` y `tests/bd/cierre.test.ts` (orden y clave foránea agenda → sorteo); `tests/r/analisis.test.ts` (simulación) | Cumple: 29 de 54 sorteos con agenda (0,54) en la demostración |
+| 5 | El sorteo queda registrado antes de mostrar la agenda y su proporción global es cercana a 0,5 en la simulación | `servidor/cierre-semana.test.ts` y `tests/bd/cierre.test.ts` (orden y clave foránea agenda → sorteo); `tests/r/analisis.test.ts` (simulación) | Cumple: 25 de 57 sorteos con agenda (0,44) en la demostración; la simulación grande de R da una proporción cercana a 0,5 |
 | 6 | La agenda funciona sin modelo de lenguaje | Modo `banco` por defecto; todos los recorridos y la demostración usan el banco | Cumple |
 | 7 | Ningún dato personal se envía al modelo de lenguaje | `servidor/logica/agenda.test.ts` (lista cerrada de campos) y `servidor/logica/modelo.test.ts` (la petición) | Cumple |
 | 8 | El CSV de investigación se carga en R con el script de ejemplo sin errores | `tests/r/analisis.test.ts`: genera la demostración, exporta y ejecuta `Rscript analisis/analisis_ejemplo.R` | Cumple |

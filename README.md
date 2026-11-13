@@ -33,6 +33,7 @@ Cada semana, estudiante y tutor/a responden por separado unas pocas preguntas so
 | [PLAN.md](PLAN.md) | Tecnología elegida y fases de trabajo |
 | [DISENO.md](DISENO.md) | Sistema visual heredado de WORKWELL360 |
 | [ARQUITECTURA.md](ARQUITECTURA.md) | Quién ve qué dato y cómo se protege (para el apartado CTS del TFM) |
+| [NORMATIVA.md](NORMATIVA.md) | Reglamentos de TFG, TFM y doctorado de la USAL y cómo los refleja SINTONÍA |
 | [DATOS.md](DATOS.md) | Diccionario de datos de las exportaciones |
 | [DECISIONES.md](DECISIONES.md) | Registro de decisiones |
 | [PENDIENTES.md](PENDIENTES.md) | Datos que faltan y no se pueden inventar |
@@ -181,8 +182,9 @@ En el menú **Investigación**:
 2. **Másteres y códigos**: crea los dos másteres y genera:
    - un código por cada persona de **dirección** y cada **tutor/a** (con una etiqueta, por ejemplo "Tutor 3", nunca un nombre);
    - cuando los tutores se hayan registrado, los **códigos de pareja** para sus estudiantes (cada tutor/a los ve también en su panel para repartirlos).
-3. **Convocatorias**: rellena las fechas, el organismo, el enlace oficial y el estado de cada convocatoria de Puente al doctorado.
-4. Revisa [PENDIENTES.md](PENDIENTES.md): consentimiento, política de privacidad, enlace del servicio de atención psicológica, ítems de los cuestionarios... (ver el apartado 6).
+3. **Parejas y tutores**: refleja las decisiones de la comisión académica, como un cambio de tutor/a o una cotutoría (hasta dos cotutores además del principal). Cada cotutor hace su propio check-in y ve la misma agenda.
+4. **Convocatorias**: rellena las fechas, el organismo, el enlace oficial y el estado de cada convocatoria de Puente al doctorado.
+5. Revisa [PENDIENTES.md](PENDIENTES.md): consentimiento, política de privacidad, enlace del servicio de atención psicológica, ítems de los cuestionarios... (ver el apartado 6).
 
 ### 4.3. Durante el piloto
 
@@ -232,6 +234,8 @@ La mayoría de los textos se cambian en Supabase, en **Table Editor**, como en u
 | Preguntas y opciones del pretest y del postest | `cuestionario_items` | `texto`, `opciones`, `ancla_min`, `ancla_max` (y `pendiente` = false cuando esté listo) |
 | Instrucciones y fechas del pretest y del postest | `cuestionarios` | `instrucciones`, `desde_semana`, `hasta_semana` |
 | Banco de preguntas de la agenda | `banco_preguntas` | `texto`, `activo` |
+| Enlaces a la normativa del doctorado (pantalla de Puente) | `enlaces_normativa` | `titulo`, `url`, `activo` |
+| Tipo de trabajo de cada máster o programa (cambia los textos: en tesis, "director/a" y "doctorando/a") | `masters` | `tipo_trabajo` (`TFG`, `TFM` o `TESIS`) |
 | Probabilidad del sorteo (0,5 por defecto) | `estudios` | `probabilidad_agenda` |
 | Umbrales del desajuste | `reglas_desajuste` | añade una versión nueva y márcala `vigente` (la anterior queda registrada) |
 

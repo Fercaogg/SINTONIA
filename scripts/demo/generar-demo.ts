@@ -82,9 +82,11 @@ export async function generarDemo(opciones: { bd: pg.Client; almacen: Almacen; s
   await cuenta(CUENTAS_DEMO.direccion, { codigo: await codigo('direccion', null, 'Dirección'), nombre: 'Dirección del máster (demo)' })
 
   const parejas: { id: string; estudiante: string; tutorIdx: number; progreso: number; sesgo: number; respondeE: number; respondeT: number }[] = []
+  const tutoresIds: string[] = []
   for (const [t, nombreT] of TUTORES.entries()) {
     const tutor = await cuenta(`tutor${t + 1}@${DOMINIO_DEMO}`, { codigo: await codigo('tutor', null, `Tutor/a ${t + 1}`), nombre: nombreT })
     await consentir(tutor)
+    tutoresIds.push(tutor)
     for (let k = 0; k < 3; k++) {
       const i = t * 3 + k
       const est = await cuenta(`estudiante${String(i + 1).padStart(2, '0')}@${DOMINIO_DEMO}`, { codigo: await codigo('estudiante', tutor, ''), nombre: ESTUDIANTES[i] })
@@ -100,6 +102,11 @@ export async function generarDemo(opciones: { bd: pg.Client; almacen: Almacen; s
       })
     }
   }
+
+  // Cotutoría: la tutora 2 es cotutora de la primera pareja (Reglamento de
+  // TFM, art. 4.3). Responde por su cuenta cada semana.
+  const cotutora = tutoresIds[1]
+  await q(`insert into public.cotutores (pareja_id, tutor_id, created_at) values ($1, $2, now() - interval '${7 * (SEMANAS_SIMULADAS + 2)} days')`, [parejas[0].id, cotutora])
 
   // Puente al doctorado: la mitad lo activa (siempre la cuenta de acceso rápido). Una convocatoria ficticia con plazo
   // dentro de la simulación (en la demostración, nunca convocatorias reales).
@@ -151,6 +158,11 @@ export async function generarDemo(opciones: { bd: pg.Client; almacen: Almacen; s
         await q(`insert into public.respuestas_tutor (pareja_id, semana, avance, siguiente_paso, created_at, updated_at)
                  values ($1, $2, $3, $4, ${momento}, ${momento})`,
           [p.id, semana, escala(base - sesgo / 2), r() < 0.7 ? escala(base + (r() - 0.5)) : null])
+      }
+      if (p === parejas[0] && r() < 0.85) {
+        await q(`insert into public.respuestas_tutor (pareja_id, tutor_id, principal, semana, avance, siguiente_paso, created_at, updated_at)
+                 values ($1, $2, false, $3, $4, null, ${momento}, ${momento})`,
+          [p.id, cotutora, semana, escala(base - 1 + (r() - 0.5))])
       }
     }
     // En la última semana, la semilla se elige para que la cuenta de acceso

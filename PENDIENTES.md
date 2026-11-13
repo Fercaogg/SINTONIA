@@ -6,7 +6,7 @@ Todo lo que SINTONÍA necesita y que no se puede inventar. En la aplicación, ca
 
 | Dato | Dónde se usa | Dónde se cambia | Quién lo aporta |
 |---|---|---|---|
-| Consentimiento informado (versión 1) | Registro de estudiantes y tutores | tabla `consentimiento_textos` | Comité de Ética de la USAL |
+| Consentimiento informado (versión 1). **Recomendación:** que diga que los datos de SINTONÍA no forman parte de la evaluación del trabajo ni de ningún informe del tutor (ver NORMATIVA.md, apartado 1) | Registro de estudiantes y tutores | tabla `consentimiento_textos` | Comité de Ética de la USAL |
 | Política de privacidad | "Cómo funciona y tus datos" | `configuracion > texto_politica_privacidad` | Comité de Ética de la USAL |
 | Responsable del tratamiento y datos de contacto (RGPD) | "Cómo funciona y tus datos" | `configuracion > responsable_tratamiento` | Fernando y la USAL |
 
@@ -31,6 +31,7 @@ Todo lo que SINTONÍA necesita y que no se puede inventar. En la aplicación, ca
 | Nombres de los dos másteres del piloto | Alta de másteres | Investigación > Másteres y códigos | Fernando |
 | Dominios de correo admitidos (ahora solo `usal.es`; ¿hay otro para estudiantes?) | Registro | `configuracion > dominios_permitidos` | Fernando |
 | Correo de la persona investigadora que administrará SINTONÍA | Alta inicial | README, apartado 4.1 | Fernando |
+| Revisar la normativa de doctorado antes de usar SINTONÍA con tesis (en especial, la figura del tutor frente a la del director) | Uso con tesis doctorales | NORMATIVA.md, apartado 4 | Fernando |
 
 ## Servicios y despliegue
 
