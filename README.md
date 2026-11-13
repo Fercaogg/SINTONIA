@@ -52,6 +52,7 @@ Y las carpetas de código:
 | `api/` | Las tareas automáticas que ejecuta Vercel cada día |
 | `scripts/` | Utilidades: datos de prueba, demostración, medición de rendimiento |
 | `tests/` | Comprobaciones automáticas |
+| `.claude/skills/` | Instrucciones para Claude sobre diseño de interfaces y animaciones (de Emil Kowalski, licencia MIT). No forman parte de la aplicación |
 
 ---
 
