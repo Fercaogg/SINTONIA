@@ -31,6 +31,8 @@ async function como(uid, sql, params = []) {
 }
 
 async function cuenta(email, datos) {
+  // Como haría el servidor (api/registro) antes de crear la cuenta.
+  if (datos.codigo) await c.query(`insert into private.registros_autorizados (email, codigo, expira_at) values (lower($1), upper($2), now() + interval '15 minutes') on conflict (email) do update set codigo = excluded.codigo, expira_at = excluded.expira_at`, [email, datos.codigo])
   const { rows } = await c.query(
     `insert into auth.users (email, raw_user_meta_data, encrypted_password, email_confirmed_at)
      values ($1, $2, extensions.crypt($3, extensions.gen_salt('bf')), now()) returning id`,

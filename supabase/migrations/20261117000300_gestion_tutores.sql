@@ -39,11 +39,11 @@ begin
       'estudiante_retirado', pe.retirado_at is not null,
       'tutor', case when t.user_id is null then null else jsonb_build_object(
         'user_id', t.user_id, 'seudonimo', t.seudonimo,
-        'etiqueta', (select c.etiqueta from public.codigos_acceso c where c.usado_por = t.user_id limit 1)) end,
+        'etiqueta', (select c.etiqueta from public.codigos_usos u join public.codigos_acceso c on c.codigo = u.codigo where u.user_id = t.user_id limit 1)) end,
       'cotutores', coalesce((
         select jsonb_agg(jsonb_build_object(
           'user_id', ct.user_id, 'seudonimo', ct.seudonimo,
-          'etiqueta', (select c.etiqueta from public.codigos_acceso c where c.usado_por = ct.user_id limit 1)
+          'etiqueta', (select c.etiqueta from public.codigos_usos u join public.codigos_acceso c on c.codigo = u.codigo where u.user_id = ct.user_id limit 1)
         ) order by co.created_at)
         from public.cotutores co join public.perfiles ct on ct.user_id = co.tutor_id
         where co.pareja_id = pa.id and co.finalizada_at is null

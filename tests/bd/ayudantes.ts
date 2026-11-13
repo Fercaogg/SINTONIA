@@ -73,8 +73,17 @@ export async function nuevaBd(prefijo: string): Promise<Bd> {
   return bd
 }
 
-/** Crea una cuenta igual que lo haría Supabase al registrarse. */
-export async function registrar(bd: Bd, email: string, datos: Record<string, string> = {}): Promise<string> {
+/** Autoriza un registro como lo haría el servidor (api/registro) tras comprobar el código. */
+export async function autorizarRegistro(bd: Bd, email: string, codigo: string) {
+  await bd.admin(`insert into private.registros_autorizados (email, codigo, expira_at) values (lower($1), upper($2), now() + interval '15 minutes') on conflict (email) do update set codigo = excluded.codigo, expira_at = excluded.expira_at`, [email, codigo])
+}
+
+/**
+ * Crea una cuenta igual que lo haría Supabase al registrarse. Si lleva código,
+ * antes la autoriza como lo haría el servidor (salvo autorizar: false).
+ */
+export async function registrar(bd: Bd, email: string, datos: Record<string, string> = {}, autorizar = true): Promise<string> {
+  if (datos.codigo && autorizar) await autorizarRegistro(bd, email, datos.codigo)
   const filas = await bd.admin<{ id: string }>(
     `insert into auth.users (email, raw_user_meta_data) values ($1, $2) returning id`,
     [email, JSON.stringify(datos)],

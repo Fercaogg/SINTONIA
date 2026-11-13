@@ -2,7 +2,11 @@
 // y redirecciones por perfil.
 
 import { expect, test } from '@playwright/test'
-import { abrirMenuSiMovil, sinErroresDeAccesibilidad, codigosLibres, entrarConContrasena, porProyecto, sinRayasLargas, ultimoEnlace } from './ayudantes'
+import { abrirMenuSiMovil, sinErroresDeAccesibilidad, codigosLibres, entrarConContrasena, ipNueva, porProyecto, sinRayasLargas, ultimoEnlace } from './ayudantes'
+
+test.beforeEach(async ({ page }) => {
+  await ipNueva(page)
+})
 
 test('un estudiante se registra con su código, acepta el consentimiento y llega a su panel', async ({ page }, info) => {
   const codigo = porProyecto(info, codigosLibres())
@@ -33,23 +37,50 @@ test('un estudiante se registra con su código, acepta el consentimiento y llega
   await sinRayasLargas(page)
 })
 
-test('un código inventado muestra un mensaje claro', async ({ page }) => {
+const MENSAJE_REGISTRO = 'No hemos podido completar el registro. Revisa el código y que el correo sea el institucional de la Universidad.'
+
+test('un código inventado y un correo no institucional dan el mismo mensaje', async ({ page }, info) => {
   await page.goto('/registro')
-  await page.getByLabel('Código de acceso').fill('ZZZZZZZZ')
+  await page.getByLabel('Código de acceso').fill('ZZZZZZZZZZZZ')
   await page.getByLabel('Tu nombre').fill('Alguien')
   await page.getByLabel('Correo institucional').fill('alguien@usal.es')
   await page.getByRole('button', { name: 'Continuar' }).click()
-  await expect(page.getByRole('alert')).toContainText('El código no es válido')
-})
+  await expect(page.getByRole('alert')).toHaveText(MENSAJE_REGISTRO)
 
-test('un correo no institucional se rechaza', async ({ page }, info) => {
-  const codigo = codigosLibres()[2]
-  await page.goto('/registro')
-  await page.getByLabel('Código de acceso').fill(codigo)
-  await page.getByLabel('Tu nombre').fill('Alguien')
+  await page.getByLabel('Código de acceso').fill(codigosLibres()[2])
   await page.getByLabel('Correo institucional').fill(porProyecto(info, ['a@gmail.com', 'b@gmail.com']))
   await page.getByRole('button', { name: 'Continuar' }).click()
-  await expect(page.getByRole('alert')).toContainText('correo institucional')
+  await expect(page.getByRole('alert')).toHaveText(MENSAJE_REGISTRO)
+})
+
+test('al pedir el enlace, la respuesta es la misma exista o no la cuenta', async ({ page }) => {
+  const textos: string[] = []
+  for (const email of ['ana@usal.es', 'nadie.registrado@usal.es']) {
+    await page.goto('/acceso')
+    await page.getByLabel('Correo institucional').fill(email)
+    await page.getByRole('button', { name: 'Enviarme el enlace' }).click()
+    const estado = page.getByRole('status')
+    await expect(estado).toContainText('Si hay una cuenta con')
+    textos.push((await estado.innerText()).replace(email, 'CORREO'))
+  }
+  expect(textos[0]).toBe(textos[1])
+})
+
+test('tras muchos intentos con el mismo correo, el registro se detiene un rato', async ({ page }, info) => {
+  const email = porProyecto(info, ['insistente.m@usal.es', 'insistente.e@usal.es'])
+  await page.goto('/registro')
+  await page.getByLabel('Tu nombre').fill('Alguien')
+  await page.getByLabel('Correo institucional').fill(email)
+  for (let i = 0; i < 5; i++) {
+    await ipNueva(page)
+    await page.getByLabel('Código de acceso').fill(`ZZZZZZZZZZZ${i}`)
+    await page.getByRole('button', { name: 'Continuar' }).click()
+    await expect(page.getByRole('alert')).toHaveText(MENSAJE_REGISTRO)
+  }
+  await ipNueva(page)
+  await page.getByLabel('Código de acceso').fill('ZZZZZZZZZZZ9')
+  await page.getByRole('button', { name: 'Continuar' }).click()
+  await expect(page.getByRole('alert')).toContainText('demasiados intentos')
 })
 
 test('sin sesión, las páginas privadas llevan a iniciar sesión', async ({ page }) => {

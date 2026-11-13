@@ -5,13 +5,19 @@
 //   * /rest/v1/rpc/<funcion>  : llamadas a funciones de la base de datos,
 //                               con el mismo mecanismo de permisos (RLS).
 //   * /auth/v1/...            : acceso por enlace al correo y por contraseña.
+//   * /api/<funcion>          : las funciones de Vercel de la carpeta api/
+//                               (registro, acceso, contacto...), compiladas
+//                               igual que en Vercel.
 // Los "correos" no se envían: el enlace se muestra en la consola.
 
 import http from 'node:http'
 import crypto from 'node:crypto'
 import jwt from 'jsonwebtoken'
 import pg from 'pg'
+import { join } from 'node:path'
+import { pathToFileURL } from 'node:url'
 import { urlDe } from './bd.mjs'
+import { compilarFunciones } from '../comprobar-funciones.mjs'
 
 export const SECRETO_LOCAL = 'secreto-local-de-desarrollo-sintonia-no-usar-en-produccion'
 export const CLAVE_ANON_LOCAL = jwt.sign({ role: 'anon', iss: 'sintonia-local' }, SECRETO_LOCAL)
@@ -190,6 +196,34 @@ export function crearServidor({ baseDeDatos = 'sintonia_local', urlApp = 'http:/
     return errorAuth(res, 404, 'No disponible en el servidor local', 'not_found')
   }
 
+  // Funciones de Vercel (api/). Se compilan la primera vez que se usan.
+  let funciones = null
+  async function api(req, res, ruta) {
+    funciones ??= compilarFunciones()
+    const carpeta = await funciones
+    const puerto = servidor.address().port
+    process.env.SUPABASE_URL = `http://localhost:${puerto}`
+    process.env.SUPABASE_SERVICE_ROLE_KEY = CLAVE_SERVIDOR_LOCAL
+    process.env.CORREO_PROVEEDOR ??= 'consola'
+    process.env.APP_URL ??= urlApp
+    const nombre = ruta.slice('/api/'.length).replace(/[^a-z-]/g, '')
+    let modulo
+    try {
+      modulo = await import(pathToFileURL(join(carpeta, 'api', `${nombre}.js`)).href)
+    } catch {
+      return responder(res, 404, { message: 'Función no encontrada' })
+    }
+    const manejador = modulo[req.method]
+    if (!manejador) return responder(res, 405, { message: 'Método no permitido' })
+    const cuerpo = req.method === 'GET' ? undefined : JSON.stringify(await leerCuerpo(req))
+    const cabeceras = new Headers()
+    for (const [k, v] of Object.entries(req.headers)) if (typeof v === 'string') cabeceras.set(k, v)
+    if (!cabeceras.has('x-forwarded-for')) cabeceras.set('x-forwarded-for', req.socket.remoteAddress || '127.0.0.1')
+    const r = await manejador(new Request(`http://localhost${req.url}`, { method: req.method, headers: cabeceras, body: cuerpo }))
+    res.writeHead(r.status, { 'Content-Type': r.headers.get('content-type') || 'application/json' })
+    res.end(await r.text())
+  }
+
   const servidor = http.createServer(async (req, res) => {
     res.setHeader('Access-Control-Allow-Origin', req.headers.origin || '*')
     res.setHeader('Access-Control-Allow-Headers', req.headers['access-control-request-headers'] || '*')
@@ -203,6 +237,7 @@ export function crearServidor({ baseDeDatos = 'sintonia_local', urlApp = 'http:/
     try {
       if (ruta.startsWith('/rest/v1/rpc/') && req.method === 'POST') return await rpc(req, res, ruta.slice('/rest/v1/rpc/'.length))
       if (ruta.startsWith('/auth/v1/')) return await auth(req, res, ruta, url)
+      if (ruta.startsWith('/api/')) return await api(req, res, ruta)
       if (ruta === '/__local/ultimo-enlace') return responder(res, 200, { enlace: ultimos.get((url.searchParams.get('email') || '').toLowerCase()) ?? null })
       responder(res, 404, { message: 'El servidor local solo admite llamadas a funciones (rpc) y acceso.' })
     } catch (e) {

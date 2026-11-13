@@ -21,22 +21,71 @@ describe('Registro con código', () => {
     await expect(registrar(bd, 'sin.codigo@usal.es', { nombre: 'X' })).rejects.toThrow(/código de acceso/)
   })
 
-  it('con un código inventado tampoco', async () => {
-    await expect(registrar(bd, 'x@usal.es', { codigo: 'ZZZZZZZZ', nombre: 'X' })).rejects.toThrow(/no es válido/)
+  it('con un código inventado tampoco, y el error no dice qué ha fallado', async () => {
+    await expect(registrar(bd, 'x@usal.es', { codigo: 'ZZZZZZZZZZZZ', nombre: 'X' })).rejects.toThrow(/No hemos podido completar el registro/)
   })
 
-  it('exige el correo institucional', async () => {
+  it('exige el correo institucional, con el mismo mensaje', async () => {
     const [codigo] = await bd.rpc(e.investigador, 'crear_codigos', { p_master_id: e.master, p_rol: 'estudiante', p_tutor_id: e.tutor })
-    await expect(registrar(bd, 'alguien@gmail.com', { codigo, nombre: 'X' })).rejects.toThrow(/correo institucional/)
-    const comprobacion = await bd.rpc(null, 'comprobar_codigo', { p_codigo: codigo, p_email: 'alguien@gmail.com' })
-    expect(comprobacion).toEqual({ valido: false, motivo: 'DOMINIO_NO_PERMITIDO' })
+    await expect(registrar(bd, 'alguien@gmail.com', { codigo, nombre: 'X' })).rejects.toThrow(/No hemos podido completar el registro/)
+    expect(await bd.servidor('servicio_autorizar_registro', { p_codigo: codigo, p_email: 'alguien@gmail.com' })).toEqual({ ok: false })
+    expect(await bd.servidor('servicio_autorizar_registro', { p_codigo: 'NOEXISTE1234', p_email: 'alguien@usal.es' })).toEqual({ ok: false })
   })
 
-  it('un código solo se puede usar una vez', async () => {
+  it('los códigos tienen 12 caracteres y caducan a los 30 días por defecto', async () => {
+    const [codigo] = await bd.rpc(e.investigador, 'crear_codigos', { p_master_id: e.master, p_rol: 'tutor' })
+    expect(codigo).toMatch(/^[A-HJ-NP-Z2-9]{12}$/)
+    const [c] = await bd.admin(`select usos_max, extract(day from caduca_at - created_at)::int as dias from public.codigos_acceso where codigo = $1`, [codigo])
+    expect(c).toEqual({ usos_max: 1, dias: 30 })
+  })
+
+  it('un código solo se puede usar las veces indicadas', async () => {
     const [codigo] = await bd.rpc(e.investigador, 'crear_codigos', { p_master_id: e.master, p_rol: 'estudiante', p_tutor_id: e.tutor })
-    expect((await bd.rpc(null, 'comprobar_codigo', { p_codigo: codigo.toLowerCase() })).valido).toBe(true)
-    await registrar(bd, 'diego@usal.es', { codigo, nombre: 'Diego' })
-    await expect(registrar(bd, 'elena@usal.es', { codigo, nombre: 'Elena' })).rejects.toThrow(/no es válido/)
+    // Con guiones y en minúsculas también vale.
+    expect((await bd.servidor('servicio_autorizar_registro', { p_codigo: `${codigo.slice(0, 4)}-${codigo.slice(4)}`.toLowerCase(), p_email: 'diego@usal.es' })).ok).toBe(true)
+    await registrar(bd, 'diego@usal.es', { codigo, nombre: 'Diego' }, false)
+    expect(await bd.servidor('servicio_autorizar_registro', { p_codigo: codigo, p_email: 'elena@usal.es' })).toEqual({ ok: false })
+    await expect(registrar(bd, 'elena@usal.es', { codigo, nombre: 'Elena' })).rejects.toThrow(/No hemos podido completar el registro/)
+
+    const [doble] = await bd.rpc(e.investigador, 'crear_codigos', { p_master_id: e.master, p_rol: 'estudiante', p_tutor_id: e.tutor, p_usos_max: 2 })
+    await registrar(bd, 'fran@usal.es', { codigo: doble, nombre: 'Fran' })
+    await registrar(bd, 'gala@usal.es', { codigo: doble, nombre: 'Gala' })
+    await expect(registrar(bd, 'hugo@usal.es', { codigo: doble, nombre: 'Hugo' })).rejects.toThrow(/No hemos podido/)
+  })
+
+  it('un código caducado o anulado no sirve', async () => {
+    const [caducado, anulado] = await bd.rpc(e.investigador, 'crear_codigos', { p_master_id: e.master, p_rol: 'estudiante', p_tutor_id: e.tutor, p_cantidad: 2 })
+    await bd.admin(`update public.codigos_acceso set caduca_at = now() - interval '1 minute' where codigo = $1`, [caducado])
+    await expect(registrar(bd, 'ines@usal.es', { codigo: caducado, nombre: 'Inés' })).rejects.toThrow(/No hemos podido/)
+    await expect(bd.rpc(e.tutorB, 'revocar_codigo', { p_codigo: anulado })).rejects.toThrow(/No tienes permiso/)
+    await bd.rpc(e.tutor, 'revocar_codigo', { p_codigo: anulado })
+    await expect(registrar(bd, 'juan@usal.es', { codigo: anulado, nombre: 'Juan' })).rejects.toThrow(/No hemos podido/)
+    const lista = await bd.rpc(e.investigador, 'listar_codigos', { p_master_id: e.master })
+    expect(lista.find((c: any) => c.codigo === anulado)).toMatchObject({ revocado: true, disponible: false })
+    expect(lista.find((c: any) => c.codigo === caducado)).toMatchObject({ caducado: true, disponible: false })
+  })
+
+  it('sin la autorización del servidor no se crea la cuenta, aunque el código sea bueno', async () => {
+    const [codigo] = await bd.rpc(e.investigador, 'crear_codigos', { p_master_id: e.master, p_rol: 'estudiante', p_tutor_id: e.tutor })
+    await expect(registrar(bd, 'directo@usal.es', { codigo, nombre: 'Directo' }, false)).rejects.toThrow(/No hemos podido/)
+    // La autorización caduca a los 15 minutos.
+    await bd.servidor('servicio_autorizar_registro', { p_codigo: codigo, p_email: 'tarde@usal.es' })
+    await bd.admin(`update private.registros_autorizados set expira_at = now() - interval '1 second' where email = 'tarde@usal.es'`)
+    await expect(registrar(bd, 'tarde@usal.es', { codigo, nombre: 'Tarde' }, false)).rejects.toThrow(/No hemos podido/)
+    // Y solo el servidor puede autorizar.
+    await expect(bd.rpc(null, 'servicio_autorizar_registro', { p_codigo: codigo, p_email: 'x@usal.es' })).rejects.toThrow(/permission denied/)
+    await expect(bd.rpc(e.estudianteA, 'servicio_autorizar_registro', { p_codigo: codigo, p_email: 'x@usal.es' })).rejects.toThrow(/permission denied/)
+  })
+
+  it('el límite de intentos corta al llegar al máximo, por IP o por correo', async () => {
+    const intento = (claves: string[]) => bd.servidor('servicio_limitar', { p_tipo: 'prueba', p_claves: JSON.stringify(claves), p_limite: 3, p_minutos: 15 })
+    for (let i = 0; i < 3; i++) expect(await intento(['ip:1.2.3.4', 'correo:a@usal.es'])).toBe(true)
+    expect(await intento(['ip:1.2.3.4', 'correo:otro@usal.es'])).toBe(false)
+    expect(await intento(['ip:5.6.7.8', 'correo:a@usal.es'])).toBe(false)
+    expect(await intento(['ip:5.6.7.8', 'correo:b@usal.es'])).toBe(true)
+    // No se guarda la IP ni el correo, solo una huella.
+    const filas = await bd.admin(`select huella from private.intentos`)
+    expect(JSON.stringify(filas)).not.toMatch(/1\.2\.3\.4|usal\.es/)
   })
 
   it('el código de pareja empareja al estudiante con su tutor', async () => {

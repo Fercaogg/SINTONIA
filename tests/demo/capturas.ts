@@ -42,7 +42,7 @@ test('pantallas públicas', async ({ page }, info) => {
   await page.getByRole('heading', { name: 'Entrar en la demostración' }).waitFor()
   await foto(page, '03-acceso-demostracion', p)
   await page.goto('/registro')
-  await page.getByLabel('Código de acceso').fill('ZZZZZZZZ')
+  await page.getByLabel('Código de acceso').fill('ZZZZZZZZZZZZ')
   await page.getByLabel('Tu nombre').fill('Nombre de ejemplo')
   await page.getByLabel('Correo institucional').fill('ejemplo@sintonia.example')
   await page.getByRole('button', { name: 'Continuar' }).click()

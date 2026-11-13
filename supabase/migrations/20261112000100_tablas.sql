@@ -104,10 +104,20 @@ create table public.codigos_acceso (
   etiqueta text,
   creado_por uuid references auth.users (id) on delete set null,
   created_at timestamptz not null default now(),
+  -- Caducidad, usos máximos y anulación (AUDITORIA.md, A5).
   caduca_at timestamptz,
-  usado_por uuid references auth.users (id) on delete set null,
-  usado_at timestamptz,
+  usos_max integer not null default 1 check (usos_max between 1 and 500),
+  usos integer not null default 0 check (usos >= 0),
+  revocado_at timestamptz,
   check ((rol = 'estudiante') = (tutor_id is not null))
+);
+
+-- Cada uso de un código: quién se registró con él y cuándo.
+create table public.codigos_usos (
+  codigo text not null references public.codigos_acceso (codigo) on delete cascade,
+  user_id uuid not null references auth.users (id) on delete cascade,
+  usado_at timestamptz not null default now(),
+  primary key (codigo, user_id)
 );
 
 create table public.parejas (

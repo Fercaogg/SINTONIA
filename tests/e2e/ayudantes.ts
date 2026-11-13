@@ -40,8 +40,19 @@ export async function sinRayasLargas(page: Page) {
   expect(texto).not.toContain('\u2014')
 }
 
+/**
+ * Simula que las peticiones llegan desde una IP distinta. El servidor limita
+ * los intentos de registro y acceso por IP, y todos los tests salen de la
+ * misma máquina.
+ */
+export async function ipNueva(page: Page) {
+  const n = () => Math.floor(Math.random() * 250) + 1
+  await page.setExtraHTTPHeaders({ 'x-forwarded-for': `10.${n()}.${n()}.${n()}` })
+}
+
 /** Registra un estudiante con un código y acepta el consentimiento. */
 export async function registrarEstudiante(page: Page, codigo: string, email: string, nombre: string) {
+  await ipNueva(page)
   await page.goto('/registro')
   await page.getByLabel('Código de acceso').fill(codigo)
   await page.getByLabel('Tu nombre').fill(nombre)

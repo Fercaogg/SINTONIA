@@ -21,7 +21,8 @@ function archivosTs(carpeta) {
   })
 }
 
-export async function comprobarFunciones() {
+/** Convierte api/, servidor/ y src/lib/ a JavaScript, archivo por archivo, como Vercel. */
+export async function compilarFunciones() {
   rmSync(salida, { recursive: true, force: true })
   mkdirSync(salida, { recursive: true })
   const entradas = [...archivosTs(join(raiz, 'api')), ...archivosTs(join(raiz, 'servidor')), ...archivosTs(join(raiz, 'src', 'lib'))]
@@ -35,6 +36,11 @@ export async function comprobarFunciones() {
     target: 'node20',
     logLevel: 'silent',
   })
+  return salida
+}
+
+export async function comprobarFunciones() {
+  await compilarFunciones()
   const resultados = {}
   for (const api of archivosTs(join(raiz, 'api'))) {
     const nombre = relative(raiz, api).replace(/\.ts$/, '')
