@@ -1,9 +1,10 @@
 // Función de Vercel que envía los recordatorios semanales y los avisos de
-// apoyo pendientes. La llama Vercel Cron una vez al día (ver vercel.json).
+// apoyo pendientes, y termina los borrados de cuenta pendientes. La llama Vercel Cron una vez al día (ver vercel.json).
 
 import { clienteServidor, crearAlmacenSupabase } from '../servidor/almacen-supabase'
 import { enviadorDesdeEntorno } from '../servidor/correo'
 import { enviarRecordatorios, notificarAvisosApoyo } from '../servidor/recordatorios'
+import { terminarBorrados } from '../servidor/borrados'
 
 export async function GET(request: Request): Promise<Response> {
   const secreto = process.env.CRON_SECRET
@@ -17,11 +18,13 @@ export async function GET(request: Request): Promise<Response> {
     return Response.json({ error: 'Faltan SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY o APP_URL' }, { status: 500 })
   }
   try {
-    const almacen = crearAlmacenSupabase(clienteServidor(url, clave))
+    const cliente = clienteServidor(url, clave)
+    const almacen = crearAlmacenSupabase(cliente)
     const enviador = enviadorDesdeEntorno()
     const recordatorios = await enviarRecordatorios(almacen, enviador, urlApp)
     const avisos = await notificarAvisosApoyo(almacen, enviador, urlApp)
-    return Response.json({ ok: true, recordatorios, avisos })
+    const borrados = await terminarBorrados(cliente)
+    return Response.json({ ok: true, recordatorios, avisos, borrados })
   } catch (e) {
     console.error('[recordatorios]', e)
     return Response.json({ ok: false, error: 'Error al enviar los correos. Se reintentará en la próxima ejecución.' }, { status: 500 })
