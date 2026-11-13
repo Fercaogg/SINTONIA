@@ -213,3 +213,29 @@ Al final de cada fase: tests, revisión en el navegador (360 px y escritorio) y 
 - **Web publicada:** cabeceras con `curl`; código del navegador descargado y analizado; accesibilidad con axe (WCAG 2.1 AA) a 360 px; Lighthouse 12 en modo móvil; registros de las funciones con la herramienta de Vercel.
 - **Repositorio:** búsqueda de patrones de claves en las 19 versiones de todas las ramas; consulta de RLS, permisos y reglas en una instalación local con las 12 migraciones; `npm audit`.
 - **securityheaders.com** rechaza las consultas automáticas desde aquí. La nota se comprobará al terminar la Fase 2, a mano o desde tu navegador.
+
+---
+
+## 12. Estado tras la Fase 2 (13 de noviembre de 2026)
+
+| Hallazgo | Estado |
+|---|---|
+| C1. Sin base de datos | **Pendiente de ti** (crear el proyecto de Supabase) |
+| C2. Afirmación de la UE | Frase cambiada a "está preparada para..."; se confirmará con C1 |
+| A1. Funciones que no arrancan | Resuelto, con test |
+| A2. Cabeceras de seguridad | Resuelto, con tests (falta la nota de securityheaders.com al publicar) |
+| A3. Región de las funciones | Resuelto: el proyecto de Vercel usa Fráncfort (fra1) desde la próxima publicación |
+| A4. "[PENDIENTE]" públicos | Resuelto, con test |
+| A5. Códigos | Resuelto: 12 caracteres, caducidad, usos máximos y anulación |
+| A6. Enumeración de cuentas | Resuelto |
+| A7. Páginas legales | Resuelto: estructura completa; el contenido que falta, "En elaboración" |
+| M1, M2. RLS y permisos | Resuelto, con tests |
+| M3. Dependencias | Resuelto: 0 altas y 0 críticas |
+| M4. robots, sitemap, noindex | Resuelto (la imagen Open Graph, en la Fase 4) |
+| M5. Zod | Resuelto en las funciones nuevas (registro, acceso y contacto) |
+| M6. Límite de intentos | Resuelto (el formulario de contacto visible llega en la Fase 3) |
+| M7, M8. Copias y duración del enlace | Documentado en el README; lo ajustas en el panel de Supabase |
+| M9. Proyectos de Vercel | Resuelto: borrados los tres sobrantes |
+| M10. Demostración en /demo | Fase 5 |
+| B1. Contraste del logotipo | Fase 4 |
+| B2. "Check-in" | Se mantiene (DECISIONES.md) |

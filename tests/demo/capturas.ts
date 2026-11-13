@@ -194,3 +194,17 @@ test('calendario', async ({ page }, info) => {
   await page.getByRole('heading', { name: 'Próximas fechas' }).waitFor()
   await foto(page, '31-direccion-calendario-del-master', p)
 })
+
+test('páginas legales y registro seguro', async ({ page }, info) => {
+  const p = info.project.name
+  for (const [ruta, nombre, titulo] of [
+    ['/privacidad', '32-privacidad', 'Política de privacidad'],
+    ['/aviso-legal', '33-aviso-legal', 'Aviso legal'],
+    ['/cookies', '34-cookies', 'Cookies'],
+    ['/consentimiento', '35-consentimiento-publico', 'Consentimiento informado'],
+  ]) {
+    await page.goto(ruta)
+    await page.getByRole('heading', { name: titulo, level: 1 }).waitFor()
+    await foto(page, nombre, p)
+  }
+})

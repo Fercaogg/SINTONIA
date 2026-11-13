@@ -197,3 +197,12 @@ Siguiendo los reglamentos de TFG y TFM de la USAL (ver [NORMATIVA.md](NORMATIVA.
 - Se lee con `mi_calendario(desde, hasta)` y se escribe con `guardar_evento` y `borrar_evento`. Las tres comprueban el perfil y, en estudiantes y tutores, el consentimiento.
 - **No es un dato de investigación**: no entra en ninguna exportación, y la dirección y el investigador no ven las anotaciones privadas ni las de las parejas. Las reglas están en `tests/bd/calendario.test.ts`.
 - Los plazos de las convocatorias de Puente al doctorado se muestran en el calendario, solo para consultarlos.
+
+## 16. Registro, acceso y contacto seguros
+
+- **Por el servidor.** El registro, el enlace de acceso y el formulario de contacto pasan por funciones de Vercel (`api/registro`, `api/acceso`, `api/contacto`), que validan cada petición con un esquema (Zod) y limitan los intentos por IP y por correo. Solo se guarda una huella de la IP o del correo, que se borra a las 24 horas.
+- **La base de datos solo crea cuentas autorizadas.** El servidor comprueba el código y el correo y autoriza la cuenta durante 15 minutos; si alguien intenta registrarse llamando directamente a Supabase, la base de datos lo rechaza.
+- **Sin pistas.** Un código o un correo no válidos dan el mismo mensaje, y pedir un enlace de acceso responde igual exista o no la cuenta.
+- **Códigos:** 12 caracteres al azar, caducidad (30 días por defecto), número máximo de usos y anulación.
+- **Cabeceras de seguridad** (`vercel.json`): CSP estricta, X-Frame-Options, X-Content-Type-Options, Referrer-Policy, Permissions-Policy y HSTS. Los tests del navegador usan la aplicación compilada con esas mismas cabeceras.
+- **Permisos:** RLS en todas las tablas y funciones cerradas por defecto. Lo comprueba `tests/bd/blindaje.test.ts`, con los cinco casos del encargo.
