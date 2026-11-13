@@ -70,6 +70,11 @@ const routes: RouteRecordRaw[] = [
     ],
   },
   {
+    path: '/calendario',
+    component: LayoutPanel,
+    children: [{ path: '', component: () => import('@/views/CalendarioView.vue'), meta: { titulo: 'Calendario' } }],
+  },
+  {
     path: '/cuenta',
     component: LayoutPanel,
     children: [{ path: '', component: () => import('@/views/CuentaView.vue'), meta: { titulo: 'Mi cuenta' } }],

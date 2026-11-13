@@ -169,3 +169,28 @@ test('cotutoría y gestión de tutores', async ({ page }, info) => {
   await page.getByRole('heading', { name: 'Agendas para las tutorías' }).waitFor()
   await foto(page, '27-cotutora-inicio-y-agendas', p)
 })
+
+test('calendario', async ({ page }, info) => {
+  const p = info.project.name
+  await entrarComo(page, 'Estudiante')
+  await page.goto('/calendario')
+  await page.getByRole('heading', { name: 'Próximas fechas' }).waitFor()
+  await foto(page, '28-estudiante-calendario', p)
+  await page.getByRole('button', { name: 'Añadir fecha' }).click()
+  await page.getByRole('heading', { name: 'Nueva anotación' }).waitFor()
+  await page.getByLabel('Título').fill('Tutoría para revisar el marco teórico')
+  await page.getByLabel('Hora de inicio').fill('10:00')
+  await foto(page, '29-estudiante-calendario-nueva-anotacion', p)
+  await salir(page)
+
+  await entrarComo(page, 'Tutor/a')
+  await page.goto('/calendario')
+  await page.getByRole('heading', { name: 'Próximas fechas' }).waitFor()
+  await foto(page, '30-tutor-calendario', p)
+  await salir(page)
+
+  await entrarComo(page, 'Dirección del máster')
+  await page.goto('/calendario')
+  await page.getByRole('heading', { name: 'Próximas fechas' }).waitFor()
+  await foto(page, '31-direccion-calendario-del-master', p)
+})

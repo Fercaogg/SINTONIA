@@ -150,4 +150,5 @@ Formato largo: **una fila por pareja, semana y tutor que respondió** (tutor pri
 - **Resultado proximal sugerido:** el desajuste de la semana siguiente (por ejemplo, `abs(dif_avance)` en `semana + 1`), como hace el script de ejemplo.
 - **Moderador disponible:** `relevante_avance` / `relevante_siguiente_paso` de la semana del sorteo.
 - **Hipótesis 3:** `puente_activado`, `puente_linea` y `puente_vista_*` en el archivo semanal; `h3_orientacion_doctorado` en el pretest y el postest.
+- **Calendario:** las anotaciones del calendario no se exportan ni forman parte de los datos del estudio.
 - **Bienestar:** úsalo solo para los análisis previstos en el protocolo aprobado por el Comité de Ética, y guarda el archivo cifrado.

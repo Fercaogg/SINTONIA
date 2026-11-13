@@ -183,13 +183,15 @@ En el menú **Investigación**:
    - un código por cada persona de **dirección** y cada **tutor/a** (con una etiqueta, por ejemplo "Tutor 3", nunca un nombre);
    - cuando los tutores se hayan registrado, los **códigos de pareja** para sus estudiantes (cada tutor/a los ve también en su panel para repartirlos).
 3. **Parejas y tutores**: refleja las decisiones de la comisión académica, como un cambio de tutor/a o una cotutoría (hasta dos cotutores además del principal). Cada cotutor hace su propio check-in y ve la misma agenda.
-4. **Convocatorias**: rellena las fechas, el organismo, el enlace oficial y el estado de cada convocatoria de Puente al doctorado.
-5. Revisa [PENDIENTES.md](PENDIENTES.md): consentimiento, política de privacidad, enlace del servicio de atención psicológica, ítems de los cuestionarios... (ver el apartado 6).
+4. **Eventos del máster** (opcional): publica congresos, seminarios o plazos que verán todos los estudiantes y tutores de ese máster. La dirección del máster puede hacerlo también desde su menú ("Calendario del máster").
+5. **Convocatorias**: rellena las fechas, el organismo, el enlace oficial y el estado de cada convocatoria de Puente al doctorado.
+6. Revisa [PENDIENTES.md](PENDIENTES.md): consentimiento, política de privacidad, enlace del servicio de atención psicológica, ítems de los cuestionarios... (ver el apartado 6).
 
 ### 4.3. Durante el piloto
 
 - **Datos y auditoría**: descarga los CSV (semanal, pretest y postest). Cada descarga queda registrada. Las variables están en [DATOS.md](DATOS.md).
 - **Calendario del estudio** muestra, semana a semana, cuántas parejas entraron en el sorteo y cuántas recibieron agenda.
+- Estudiantes y tutores tienen un **Calendario** en su menú para anotar tutorías, entregas, congresos y otras fechas, y deciden si lo ve solo quien lo anota o también la otra parte de la pareja. Las próximas fechas salen en su pantalla de inicio. El calendario no forma parte de los datos del estudio: no se exporta.
 - Para analizar: abre el CSV semanal con [analisis/analisis_ejemplo.R](analisis/analisis_ejemplo.R) en RStudio.
 
 ---

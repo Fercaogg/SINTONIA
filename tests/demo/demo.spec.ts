@@ -12,12 +12,12 @@ test('la demostración está marcada como tal y no ofrece registrarse', async ({
 })
 
 const RUTAS: Record<Perfil, { inicio: RegExp; rutas: string[] }> = {
-  Estudiante: { inicio: /\/estudiante$/, rutas: ['/estudiante', '/estudiante/checkin', '/estudiante/historial', '/estudiante/puente', '/estudiante/apoyo', '/estudiante/cuestionario/pretest', '/cuenta'] },
-  'Tutor/a': { inicio: /\/tutor$/, rutas: ['/tutor', '/tutor/checkin', '/tutor/codigos', '/cuenta'] },
-  'Dirección del máster': { inicio: /\/direccion$/, rutas: ['/direccion', '/direccion/avisos', '/cuenta'] },
+  Estudiante: { inicio: /\/estudiante$/, rutas: ['/estudiante', '/estudiante/checkin', '/estudiante/historial', '/estudiante/puente', '/estudiante/apoyo', '/estudiante/cuestionario/pretest', '/calendario', '/cuenta'] },
+  'Tutor/a': { inicio: /\/tutor$/, rutas: ['/tutor', '/tutor/checkin', '/tutor/codigos', '/calendario', '/cuenta'] },
+  'Dirección del máster': { inicio: /\/direccion$/, rutas: ['/direccion', '/direccion/avisos', '/calendario', '/cuenta'] },
   Investigación: {
     inicio: /\/investigacion$/,
-    rutas: ['/investigacion', '/investigacion/parejas', '/investigacion/calendario', '/investigacion/convocatorias', '/investigacion/cuestionarios', '/investigacion/datos', '/cuenta'],
+    rutas: ['/investigacion', '/investigacion/parejas', '/investigacion/calendario', '/investigacion/convocatorias', '/investigacion/cuestionarios', '/investigacion/datos', '/calendario', '/cuenta'],
   },
 }
 
@@ -107,4 +107,62 @@ test('el investigador gestiona los tutores de las parejas', async ({ page }, inf
   await expect(page.getByRole('status')).toContainText('Cotutor añadido')
   await segunda.getByRole('button', { name: /Quitar a/ }).click()
   await expect(page.getByRole('status')).toContainText('Cotutor quitado')
+})
+
+test('calendario: el estudiante anota una tutoría para su tutora y ella la ve; la dirección no', async ({ page }, info) => {
+  const titulo = `Tutoría sobre el método (${info.project.name})`
+  await entrarComo(page, 'Estudiante')
+  await expect(page.getByRole('heading', { name: 'Próximas fechas' })).toBeVisible()
+  await page.goto('/calendario')
+  await page.getByRole('button', { name: 'Añadir fecha' }).click()
+  await expect(page.getByRole('heading', { name: 'Nueva anotación' })).toBeFocused()
+  await page.locator('form').getByText('Tutoría', { exact: true }).click()
+  await page.getByLabel('Título').fill(titulo)
+  await page.getByLabel('Hora de inicio').fill('09:30')
+  await page.getByRole('radio', { name: /Mi tutor\/a y yo/ }).check()
+  await page.getByRole('button', { name: 'Anotar' }).click()
+  await expect(page.getByRole('status')).toHaveText('Anotado en el calendario.')
+  await expect(page.getByRole('heading', { name: titulo }).first()).toBeVisible()
+  await sinErroresDeAccesibilidad(page)
+
+  // Los filtros de arriba ocultan un tipo.
+  await page.getByRole('button', { name: 'Tutoría', exact: true }).click()
+  await expect(page.getByRole('heading', { name: titulo })).toHaveCount(0)
+  await page.getByRole('button', { name: 'Tutoría', exact: true }).click()
+
+  await page.evaluate(() => localStorage.clear())
+  await entrarComo(page, 'Tutor/a')
+  await page.goto('/calendario')
+  const propia = page.getByRole('article', { name: `Tutoría: ${titulo}` }).first()
+  await expect(propia).toBeVisible()
+  await expect(propia).toContainText('Con Irene Montes')
+  await expect(propia).toContainText('Lo anotó: Irene Montes')
+  await expect(propia.getByRole('button', { name: /Editar/ })).toHaveCount(0)
+  // La nota privada del estudiante no aparece.
+  await expect(page.getByText('Repasar la bibliografía')).toHaveCount(0)
+
+  await page.evaluate(() => localStorage.clear())
+  await entrarComo(page, 'Dirección del máster')
+  await page.goto('/calendario')
+  await expect(page.getByRole('heading', { name: 'Próximas fechas' })).toBeVisible()
+  await expect(page.getByText(titulo)).toHaveCount(0)
+  await expect(page.getByRole('heading', { name: 'Congreso de demostración (ficticio)' }).first()).toBeVisible()
+})
+
+test('calendario: la dirección publica un evento para todo el máster', async ({ page }, info) => {
+  const titulo = `Charla de orientación (${info.project.name})`
+  await entrarComo(page, 'Dirección del máster')
+  await page.goto('/calendario')
+  await page.getByRole('button', { name: 'Añadir fecha' }).click()
+  await page.getByLabel('Título').fill(titulo)
+  await expect(page.getByRole('radio', { name: /Todo el máster/ })).toBeChecked()
+  await page.getByRole('button', { name: 'Anotar' }).click()
+  await expect(page.getByRole('status')).toHaveText('Anotado en el calendario.')
+
+  await page.evaluate(() => localStorage.clear())
+  await entrarComo(page, 'Estudiante')
+  await page.goto('/calendario')
+  const ev = page.getByRole('article', { name: `Seminario o evento: ${titulo}` }).first()
+  await expect(ev).toContainText('Todo el máster')
+  await expect(ev).toContainText('Lo anotó: Dirección del máster')
 })
