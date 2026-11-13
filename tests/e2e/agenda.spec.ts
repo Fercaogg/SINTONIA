@@ -22,7 +22,7 @@ test('estudiante y tutora ven las mismas tres preguntas', async ({ page }) => {
 
   await salir(page)
   await entrarConContrasena(page, 'tutora@usal.es')
-  if (page.url().endsWith('/consentimiento')) {
+  if (page.url().endsWith('/consentimiento/aceptar')) {
     await page.getByLabel(/He leído el texto/).check()
     await page.getByRole('button', { name: 'Aceptar y continuar' }).click()
   }

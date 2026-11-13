@@ -2,14 +2,10 @@
 // "Cómo funciona y tus datos": explicación en lenguaje claro de qué se
 // calcula y quién ve qué. Los textos legales quedan pendientes del Comité.
 import { onMounted, ref } from 'vue'
-import { RouterLink, useRouter } from 'vue-router'
+import { RouterLink } from 'vue-router'
 import { llamar } from '@/lib/api'
-import AppLogo from '@/components/comun/AppLogo.vue'
-import AppIcon from '@/components/comun/AppIcon.vue'
-import BandaEntorno from '@/components/comun/BandaEntorno.vue'
+import LayoutPublico from '@/components/layout/LayoutPublico.vue'
 import Pendiente from '@/components/comun/Pendiente.vue'
-
-const router = useRouter()
 const config = ref<Record<string, { valor: string }>>({})
 
 onMounted(async () => {
@@ -31,18 +27,7 @@ const quienVe = [
 </script>
 
 <template>
-  <div class="min-h-screen flex flex-col">
-    <BandaEntorno />
-    <header class="bg-white border-b border-surface-200">
-      <div class="max-w-3xl mx-auto px-4 py-4 flex items-center justify-between gap-3">
-        <RouterLink to="/" class="text-xl" aria-label="SINTONÍA, inicio"><AppLogo /></RouterLink>
-        <button type="button" class="btn-secondary text-sm" @click="router.back()">
-          <AppIcon name="back" :size="16" /> Volver
-        </button>
-      </div>
-    </header>
-
-    <main id="contenido" class="flex-1 w-full min-w-0 max-w-3xl mx-auto px-4 py-10 fade-in">
+  <LayoutPublico>
       <h1 class="titulo-pagina mb-2">Cómo funciona y tus datos</h1>
       <p class="texto-suave mb-10">Lo que hace SINTONÍA, explicado sin letra pequeña.</p>
 
@@ -111,16 +96,16 @@ const quienVe = [
       <section class="mb-10" aria-labelledby="derechos">
         <h2 id="derechos" class="font-display text-xl font-semibold mb-3">Tus derechos</h2>
         <p class="text-base leading-relaxed">
-          Puedes consultar tus datos, corregir tu nombre, retirarte del estudio y pedir que se borren tus datos cuando quieras, desde tu panel.
-          Tus datos se guardan en servidores de la Unión Europea.
+          Puedes descargar tus datos, corregir tu nombre, retirarte del estudio y borrar tu cuenta cuando quieras, desde tu panel.
+          SINTONÍA está preparada para guardar los datos en servidores de la Unión Europea (Fráncfort); lo confirmaremos aquí cuando la instalación definitiva esté en marcha.
         </p>
       </section>
 
       <section class="mb-10" aria-labelledby="legal">
         <h2 id="legal" class="font-display text-xl font-semibold mb-3">Política de privacidad</h2>
-        <p class="mb-2"><Pendiente :texto="config.texto_politica_privacidad?.valor" /></p>
-        <p><Pendiente :texto="config.responsable_tratamiento?.valor" /></p>
+        <p class="mb-2"><Pendiente publico :texto="config.texto_politica_privacidad?.valor" /></p>
+        <p class="mb-2">Responsable del tratamiento: <Pendiente publico :texto="config.responsable_tratamiento?.valor" /></p>
+        <p>Toda la estructura, en la <RouterLink to="/privacidad" class="enlace">política de privacidad</RouterLink>.</p>
       </section>
-    </main>
-  </div>
+  </LayoutPublico>
 </template>

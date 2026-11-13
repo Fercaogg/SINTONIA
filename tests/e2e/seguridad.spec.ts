@@ -21,7 +21,7 @@ async function vigilarCsp(page: Page) {
 }
 
 const RECORRIDOS: { cuenta: string | null; rutas: string[] }[] = [
-  { cuenta: null, rutas: ['/', '/como-funciona', '/acceso', '/registro', '/no-existe'] },
+  { cuenta: null, rutas: ['/', '/como-funciona', '/acceso', '/registro', '/privacidad', '/aviso-legal', '/cookies', '/consentimiento', '/no-existe'] },
   { cuenta: 'ana@usal.es', rutas: ['/estudiante', '/estudiante/checkin', '/estudiante/historial', '/estudiante/puente', '/calendario', '/cuenta'] },
   { cuenta: 'tutora@usal.es', rutas: ['/tutor', '/tutor/checkin', '/calendario'] },
   { cuenta: 'direccion@usal.es', rutas: ['/direccion', '/direccion/avisos'] },
@@ -52,4 +52,13 @@ test('las cabeceras de seguridad están presentes', async ({ request }) => {
   expect(h['x-content-type-options']).toBe('nosniff')
   expect(h['referrer-policy']).toBe('strict-origin-when-cross-origin')
   expect(h['permissions-policy']).toContain('camera=()')
+})
+
+test('robots.txt y sitemap.xml existen y solo nombran páginas públicas', async ({ request }) => {
+  const robots = await request.get('/robots.txt')
+  expect(robots.headers()['content-type']).toContain('text/plain')
+  expect(await robots.text()).toContain('Disallow: /')
+  const mapa = await (await request.get('/sitemap.xml')).text()
+  expect(mapa).toContain('<urlset')
+  expect(mapa).not.toMatch(/estudiante|tutor|direccion|investigacion|cuenta/)
 })

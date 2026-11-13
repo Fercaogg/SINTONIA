@@ -31,6 +31,9 @@ export default defineConfig(({ mode }) => {
   const proxy = supabaseLocal ? { '/api': { target: supabaseLocal, changeOrigin: true, xfwd: true } } : undefined
   return {
     plugins: [vue()],
+    define: {
+      __VERSION_SINTONIA__: JSON.stringify(JSON.parse(readFileSync(new URL('./package.json', import.meta.url), 'utf8')).version),
+    },
     resolve: {
       alias: { '@': fileURLToPath(new URL('./src', import.meta.url)) },
     },

@@ -6,6 +6,7 @@ import { INICIO_ROL } from '@/lib/tipos'
 import AppLogo from '@/components/comun/AppLogo.vue'
 import AppIcon from '@/components/comun/AppIcon.vue'
 import BandaEntorno from '@/components/comun/BandaEntorno.vue'
+import PiePublico from '@/components/layout/PiePublico.vue'
 import AccesosDemo from '@/components/comun/AccesosDemo.vue'
 import { modoDemo } from '@/lib/supabase'
 
@@ -75,9 +76,6 @@ const pasos = [
       </section>
     </main>
 
-    <footer class="border-t border-surface-200 py-6 px-4 text-center text-sm texto-suave">
-      Prototipo del Trabajo Fin de Máster de Fernando Martín Vaquero · Universidad de Salamanca ·
-      <RouterLink to="/como-funciona" class="enlace">Privacidad</RouterLink>
-    </footer>
+    <PiePublico />
   </div>
 </template>

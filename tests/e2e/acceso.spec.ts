@@ -101,8 +101,8 @@ test('la dirección no puede abrir las pantallas de investigación', async ({ pa
 test('la tutora ve a sus estudiantes y los códigos que puede repartir', async ({ page }) => {
   await entrarConContrasena(page, 'tutora@usal.es')
   // La primera vez hay que aceptar el consentimiento.
-  await expect(page).toHaveURL(/\/(consentimiento|tutor)$/)
-  if (page.url().endsWith('/consentimiento')) {
+  await expect(page).toHaveURL(/\/(consentimiento\/aceptar|tutor)$/)
+  if (page.url().endsWith('/consentimiento/aceptar')) {
     await page.getByLabel(/He leído el texto y acepto participar/).check()
     await page.getByRole('button', { name: 'Aceptar y continuar' }).click()
   }
@@ -131,11 +131,37 @@ test('el investigador crea un máster y códigos', async ({ page }, info) => {
 })
 
 test('las pantallas públicas no se salen por los lados y pasan la revisión de accesibilidad', async ({ page }) => {
-  for (const ruta of ['/', '/como-funciona', '/acceso', '/registro', '/no-existe']) {
+  for (const ruta of ['/', '/como-funciona', '/acceso', '/registro', '/privacidad', '/aviso-legal', '/cookies', '/consentimiento', '/no-existe']) {
     await page.goto(ruta)
     await page.waitForLoadState('networkidle')
     const desborde = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)
     expect(desborde, `La página ${ruta} es más ancha que la pantalla`).toBeLessThanOrEqual(0)
     await sinErroresDeAccesibilidad(page)
   }
+})
+
+test('las páginas públicas nunca muestran "[PENDIENTE]" y enlazan las páginas legales', async ({ page }) => {
+  for (const ruta of ['/', '/como-funciona', '/privacidad', '/aviso-legal', '/cookies', '/consentimiento', '/acceso', '/registro']) {
+    await page.goto(ruta)
+    await page.waitForLoadState('networkidle')
+    const texto = await page.locator('body').innerText()
+    expect(texto, ruta).not.toContain('[PENDIENTE')
+    expect(texto, ruta).not.toContain('PENDIENTE:')
+  }
+  await page.goto('/como-funciona')
+  await expect(page.getByText('En elaboración. Pendiente de revisión por el Comité de Ética de la Universidad de Salamanca.').first()).toBeVisible()
+  const pie = page.getByRole('navigation', { name: 'Información legal' })
+  for (const enlace of ['Privacidad', 'Aviso legal', 'Cookies', 'Consentimiento']) {
+    await expect(pie.getByRole('link', { name: enlace })).toBeVisible()
+  }
+  await expect(page.getByText('Prototipo del Trabajo Fin de Máster de Fernando Martín Vaquero · Universidad de Salamanca')).toBeVisible()
+})
+
+test('las páginas privadas piden no aparecer en buscadores', async ({ page }) => {
+  await page.goto('/privacidad')
+  await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', 'index, follow')
+  await page.goto('/estudiante')
+  await expect(page).toHaveURL(/\/acceso/)
+  await page.goto('/no-existe')
+  await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', 'noindex, nofollow')
 })

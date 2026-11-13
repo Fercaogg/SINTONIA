@@ -16,3 +16,6 @@ declare module '*.vue' {
   const component: DefineComponent<object, object, unknown>
   export default component
 }
+
+/** Versión de package.json, la pone Vite al compilar (vite.config.ts). */
+declare const __VERSION_SINTONIA__: string
