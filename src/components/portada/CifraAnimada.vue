@@ -5,13 +5,13 @@
 import { ref, watch } from 'vue'
 import { prefiereMenosMovimiento, useVisibleUnaVez } from '@/lib/movimiento'
 
-const props = defineProps<{ valor: number; unidad: string; texto: string }>()
+const props = withDefaults(defineProps<{ valor: number; unidad: string; texto: string; contar?: boolean }>(), { contar: true })
 const raiz = ref<HTMLElement | null>(null)
 const visible = useVisibleUnaVez(raiz)
-const mostrado = ref(prefiereMenosMovimiento() ? props.valor : 0)
+const mostrado = ref(prefiereMenosMovimiento() || !props.contar ? props.valor : 0)
 
 watch(visible, (v) => {
-  if (!v || prefiereMenosMovimiento()) {
+  if (!v || prefiereMenosMovimiento() || !props.contar) {
     mostrado.value = props.valor
     return
   }

@@ -15,12 +15,7 @@ import { ANTECEDENTE, AUTOR, DATOS_CLAVE, DIRECCION, PARA_QUIEN, REFERENCIAS } f
 import AppLogo from '@/components/comun/AppLogo.vue'
 import AppIcon from '@/components/comun/AppIcon.vue'
 import BandaEntorno from '@/components/comun/BandaEntorno.vue'
-import AccesosDemo from '@/components/comun/AccesosDemo.vue'
 import PiePublico from '@/components/layout/PiePublico.vue'
-import DemoSintonia from '@/components/portada/DemoSintonia.vue'
-import CifraAnimada from '@/components/portada/CifraAnimada.vue'
-// El efecto del fondo se carga aparte, sin retrasar la primera pantalla.
-const CampoSintonia = defineAsyncComponent(() => import('@/components/portada/CampoSintonia.vue'))
 import ComoFuncionaOndas from '@/components/portada/ComoFuncionaOndas.vue'
 import OndasSintonia from '@/components/portada/OndasSintonia.vue'
 import TituloEnSintonia from '@/components/portada/TituloEnSintonia.vue'
@@ -28,10 +23,16 @@ import PestanasPerfiles from '@/components/portada/PestanasPerfiles.vue'
 import TarjetaDireccion from '@/components/portada/TarjetaDireccion.vue'
 import PreguntasFrecuentes from '@/components/portada/PreguntasFrecuentes.vue'
 import FormularioContacto from '@/components/portada/FormularioContacto.vue'
+import FondoCine from '@/components/cine/FondoCine.vue'
+import EscenaInicio from '@/components/cine/EscenaInicio.vue'
+import EscenaCifras from '@/components/cine/EscenaCifras.vue'
+import { prefiereMenosMovimiento } from '@/lib/cine'
 
 const sesion = useSesion()
 const route = useRoute()
 const menuAbierto = ref(false)
+// Portada cinematográfica salvo con "reducir movimiento" (versión estática).
+const cine = typeof window !== 'undefined' && !prefiereMenosMovimiento()
 // Cierre: las ondas se juntan la primera vez que se ve.
 const cierre = ref<HTMLElement | null>(null)
 const cierreVisto = useVisibleUnaVez(cierre)
@@ -57,8 +58,9 @@ const PUENTE = [
 
 <template>
   <div class="min-h-screen flex flex-col">
+    <FondoCine v-if="cine" />
     <BandaEntorno />
-    <header class="sticky top-0 z-30 bg-surface-50/95 backdrop-blur-md border-b border-surface-200">
+    <header data-cabecera-portada class="sticky top-0 z-30 bg-surface-50/95 backdrop-blur-md border-b border-surface-200">
       <div class="max-w-[1180px] mx-auto px-4 sm:px-6 py-3 flex items-center justify-between gap-3">
         <RouterLink to="/" class="text-xl" aria-label="SINTONÍA, inicio"><AppLogo /></RouterLink>
         <nav aria-label="Secciones" class="hidden xl:block">
@@ -96,39 +98,10 @@ const PUENTE = [
         Hemos borrado tu cuenta y todos tus datos. Gracias por haber participado.
       </p>
 
-      <!-- 1. Inicio: titular grande a la izquierda, la demostración (el producto) a la derecha -->
-      <section class="relative overflow-hidden lg:min-h-[calc(100svh-4.5rem)] flex items-center pt-12 pb-20 sm:pt-16 sm:pb-24">
-        <CampoSintonia />
-        <div class="relative z-10 max-w-[1180px] w-full mx-auto px-4 sm:px-6 grid gap-12 lg:grid-cols-[7fr_5fr] items-center">
-          <div class="entrada">
-            <p class="text-xs font-semibold uppercase tracking-[0.18em] text-brand-900 mb-5">Tutoría de TFM, TFG y tesis</p>
-            <h1 class="font-display text-[2.75rem] leading-[1.02] sm:text-6xl lg:text-7xl font-bold tracking-tight text-surface-900">
-              Acompañar el trabajo académico,
-              <span class="block text-brand-900">sin vigilar</span>
-            </h1>
-            <p class="mt-7 text-lg sm:text-xl texto-suave max-w-xl">
-              Un registro semanal muy breve de estudiante y tutor/a para que las tutorías empiecen por lo que importa.
-            </p>
-            <p class="mt-4 text-base text-surface-900 font-medium">Unos 60 segundos a la semana. Sin notas, sin rankings.</p>
-            <AccesosDemo v-if="modoDemo" class="mt-8" />
-            <div class="mt-8 flex flex-col sm:flex-row gap-3">
-              <RouterLink v-if="!modoDemo" to="/registro" class="btn-primary px-6 py-3">Tengo un código</RouterLink>
-              <RouterLink v-if="hayDemostracion" to="/demo" class="btn-secondary px-6 py-3">Ver la demostración</RouterLink>
-              <a v-else href="#demostracion" class="btn-secondary px-6 py-3">Ver la demostración</a>
-            </div>
-          </div>
-          <div class="entrada entrada-2">
-            <DemoSintonia />
-          </div>
-        </div>
-      </section>
-
-      <!-- Cifras: banda azul marino a sangre, números grandes (solo datos del producto) -->
-      <section aria-label="SINTONÍA en cifras" class="bg-marino text-white">
-        <div class="max-w-[1180px] mx-auto px-4 sm:px-6 py-14 grid grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-10">
-          <CifraAnimada v-for="d in DATOS_CLAVE" :key="d.texto" :valor="Number(d.cifra)" :unidad="d.unidad" :texto="d.texto" />
-        </div>
-      </section>
+      <!-- Escenas 1 y 2 de la portada cinematográfica (docs/GUION-PORTADA.md).
+           Con "reducir movimiento", el mismo contenido sin escenas. -->
+      <EscenaInicio :cine="cine" />
+      <EscenaCifras :cine="cine" />
 
       <!-- 2. El problema: columnas desiguales, primer párrafo grande -->
       <section id="problema" class="scroll-mt-20 max-w-[1180px] mx-auto px-4 sm:px-6 py-20 sm:py-28 grid gap-8 lg:grid-cols-[4fr_8fr]" aria-labelledby="t-problema">
