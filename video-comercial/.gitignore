@@ -1,3 +1,5 @@
 .hyperframes/
 *.mp4
 *.zip
+work-*/
+.*.hf-transaction-*/
