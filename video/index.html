@@ -3,12 +3,11 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=1920, height=1080" />
-    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@hyperframes/core/dist/hyperframe.runtime.iife.js"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Fira+Sans:wght@400;600;700&display=swap" rel="stylesheet" />
+    <script src="assets/js/gsap.min.js"></script>
     <style>
+      @font-face { font-family: "Fira Sans"; font-weight: 400; font-style: normal; font-display: block; src: url("assets/fonts/fira-sans-400.woff2") format("woff2"); }
+      @font-face { font-family: "Fira Sans"; font-weight: 600; font-style: normal; font-display: block; src: url("assets/fonts/fira-sans-600.woff2") format("woff2"); }
+      @font-face { font-family: "Fira Sans"; font-weight: 700; font-style: normal; font-display: block; src: url("assets/fonts/fira-sans-700.woff2") format("woff2"); }
       :root {
         --bg: #f5f7f6;
         --ink: #0a4a6c;
@@ -108,7 +107,7 @@
       </div>
 
       <!-- SCENE 2 · PRESENTACIÓN (5–10s) -->
-      <div class="scene clip" id="s2" data-start="4.75" data-duration="5.5" data-track-index="1" style="visibility:hidden;">
+      <div class="scene clip" id="s2" data-start="4.75" data-duration="5.5" data-track-index="1">
         <div class="scene-content" id="c2" style="justify-content:flex-start;padding-top:250px;gap:40px;">
           <div id="s2-pill" class="pill">TUTORÍA DE TFM, TFG Y TESIS</div>
           <div id="s2-word" class="wordmark" style="font-size:180px;">SINTON<span class="i">Í</span>A</div>
@@ -117,7 +116,7 @@
       </div>
 
       <!-- SCENE 3 · CÓMO FUNCIONA (10–20s) -->
-      <div class="scene clip" id="s3" data-start="9.75" data-duration="10.5" data-track-index="0" style="visibility:hidden;">
+      <div class="scene clip" id="s3" data-start="9.75" data-duration="10.5" data-track-index="0">
         <div class="scene-content" id="c3">
           <div id="s3-student">
             <div class="display" style="font-size:52px;">Estudiante</div>
@@ -163,7 +162,7 @@
       </div>
 
       <!-- SCENE 4 · LA AGENDA (20–26s) -->
-      <div class="scene clip" id="s4" data-start="19.75" data-duration="6.5" data-track-index="1" style="visibility:hidden;">
+      <div class="scene clip" id="s4" data-start="19.75" data-duration="6.5" data-track-index="1">
         <div class="scene-content" id="c4" style="gap:72px;">
           <h2 id="s4-title" class="display" style="font-size:68px;">Las mismas tres preguntas neutras para los dos</h2>
           <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:40px;width:100%;">
@@ -175,7 +174,7 @@
       </div>
 
       <!-- SCENE 5 · PRIVACIDAD (26–32s) -->
-      <div class="scene clip" id="s5" data-start="25.75" data-duration="6.5" data-track-index="0" style="visibility:hidden;">
+      <div class="scene clip" id="s5" data-start="25.75" data-duration="6.5" data-track-index="0">
         <div class="scene-content" id="c5" style="gap:56px;">
           <h2 id="s5-title" class="display" style="font-size:96px;">Tu bienestar solo lo ves tú.</h2>
           <div id="s5-table" class="card" style="width:1240px;padding:12px 48px;">
@@ -191,7 +190,7 @@
       </div>
 
       <!-- SCENE 6 · PUENTE AL DOCTORADO (32–36s) -->
-      <div class="scene clip" id="s6" data-start="31.75" data-duration="4.5" data-track-index="1" style="visibility:hidden;">
+      <div class="scene clip" id="s6" data-start="31.75" data-duration="4.5" data-track-index="1">
         <div class="scene-content" id="c6" style="gap:100px;">
           <h2 id="s6-title" class="display" style="font-size:88px;">Puente al doctorado</h2>
           <div style="position:relative;display:flex;justify-content:space-between;width:1400px;">
@@ -206,7 +205,7 @@
       </div>
 
       <!-- SCENE 7 · CIERRE (36–40s) -->
-      <div class="scene clip" id="s7" data-start="35.75" data-duration="4.25" data-track-index="0" style="visibility:hidden;">
+      <div class="scene clip" id="s7" data-start="35.75" data-duration="4.25" data-track-index="0">
         <div class="scene-content" id="c7" style="justify-content:flex-start;padding-top:200px;gap:36px;">
           <h1 id="s7-title" class="display" style="font-size:156px;">En sintonía.</h1>
           <div id="s7-brand" style="display:flex;align-items:center;gap:36px;">
@@ -253,19 +252,7 @@
       }
       drawWaves();
 
-      // ---------- Scene container toggles (hard windows, overlap 0.5s for crossfades) ----------
-      tl.set("#s1", { autoAlpha: 0 }, 5.25);
-      tl.set("#s2", { autoAlpha: 1 }, 4.75);
-      tl.set("#s2", { autoAlpha: 0 }, 10.25);
-      tl.set("#s3", { autoAlpha: 1 }, 9.75);
-      tl.set("#s3", { autoAlpha: 0 }, 20.25);
-      tl.set("#s4", { autoAlpha: 1 }, 19.75);
-      tl.set("#s4", { autoAlpha: 0 }, 26.25);
-      tl.set("#s5", { autoAlpha: 1 }, 25.75);
-      tl.set("#s5", { autoAlpha: 0 }, 32.25);
-      tl.set("#s6", { autoAlpha: 1 }, 31.75);
-      tl.set("#s6", { autoAlpha: 0 }, 36.25);
-      tl.set("#s7", { autoAlpha: 1 }, 35.75);
+      // Scene windows (data-start/data-duration, 0.5s overlap) are managed by the runtime.
 
       // ---------- Crossfade 0.5s + 20px vertical drift at every boundary ----------
       [[5, "#c1", "#c2"], [10, "#c2", "#c3"], [20, "#c3", "#c4"], [26, "#c4", "#c5"], [32, "#c5", "#c6"], [36, "#c6", "#c7"]].forEach(function (b) {
@@ -344,7 +331,7 @@
       tl.from("#s7-title", { y: 30, scale: 0.96, autoAlpha: 0, duration: 0.9, ease: "power2.out" }, 36.2);
       tl.from("#s7-brand", { y: 20, autoAlpha: 0, duration: 0.7, ease: "power3.out" }, 36.9);
       tl.from("#s7-foot", { autoAlpha: 0, duration: 0.7, ease: "sine.inOut" }, 37.5);
-      tl.to("#s7-title", { scale: 1.02, duration: 3, ease: "sine.inOut" }, 37.0);
+      tl.to("#s7-title", { scale: 1.02, duration: 2.9, ease: "sine.inOut" }, 37.1);
 
       window.__timelines["main"] = tl;
     </script>
