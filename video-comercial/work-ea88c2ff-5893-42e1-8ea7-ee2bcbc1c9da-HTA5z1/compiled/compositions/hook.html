@@ -1,0 +1,84 @@
+<template>
+  <style>
+    #root { position: absolute; inset: 0; overflow: hidden; }
+    #hook-stage { position: absolute; inset: 0; background: #0a4a6c; overflow: hidden; }
+    #hook-waves { position: absolute; left: 0; top: 0; }
+    #hook-cam { position: absolute; inset: 0; }
+    .hook-half { position: absolute; top: 0; width: 960px; height: 1080px; }
+    #hook-L { left: 0; background: #34c6a3; }
+    #hook-R { left: 960px; background: #ffffff; }
+    #hook-cut { position: absolute; left: 958px; top: 0; width: 4px; height: 1080px; background: #ffffff; transform-origin: 50% 0%; }
+    .hook-line { position: absolute; left: 0; right: 0; text-align: center; font-weight: 800; line-height: 1.1; letter-spacing: -0.01em; }
+    #hook-t1 { top: 420px; font-size: 190px; color: #ffffff; }
+    #hook-t2 { top: 440px; font-size: 160px; color: #0a4a6c; }
+    #hook-t3 { top: 470px; font-size: 112px; color: #ffffff; }
+    #hook-t4 { top: 400px; font-size: 230px; color: #0a4a6c; }
+  </style>
+  <div id="root" data-composition-id="hook" data-width="1920" data-height="1080">
+    <div id="hook-stage">
+      <svg id="hook-waves" width="1920" height="1080" viewBox="0 0 1920 1080" style="overflow:visible;" data-layout-ignore>
+        <g id="hook-far" fill="none" stroke="#34C6A3" stroke-width="1" opacity="0.16"></g>
+        <g id="hook-near" fill="none" stroke="#34C6A3" stroke-width="1.6" opacity="0.26"></g>
+      </svg>
+      <div id="hook-cam">
+        <div id="hook-L" class="hook-half"></div>
+        <div id="hook-R" class="hook-half"></div>
+        <div id="hook-cut"></div>
+        <div id="hook-t1" class="hook-line">Mismo trabajo.</div>
+        <div id="hook-t2" class="hook-line">Dos miradas.</div>
+        <div id="hook-t3" class="hook-line">¿Quién tiene razón?</div>
+        <div id="hook-t4" class="hook-line">Nadie.</div>
+      </div>
+    </div>
+  </div>
+  <script>
+    (function () {
+      var D = 4.25;
+      SX.waves(document.getElementById("hook-far"), { n: 9, y0: 40, gap: 130, amp: 9, wl: 720, shift: 90, travel: D * 30 });
+      SX.waves(document.getElementById("hook-near"), { n: 7, y0: 110, gap: 150, amp: 18, wl: 480, shift: 70, travel: D * 66 });
+      var tl = gsap.timeline({ paused: true });
+      SX.driftLayers(tl, "#hook-far", "#hook-near", D);
+      SX.cam(tl, "#hook-cam", D);
+
+      var t1 = SX.split(document.getElementById("hook-t1"), "c");
+      var t2 = SX.split(document.getElementById("hook-t2"), "c");
+      var t3 = SX.split(document.getElementById("hook-t3"), "w");
+
+      // 0–1 s · "Mismo trabajo." golpe blanco enorme
+      SX.maskIn(tl, t1, 0.0, { d: 0.45, s: 0.04 });
+      tl.fromTo("#hook-t1", { scale: 1.06 }, { scale: 1, duration: 0.9, ease: "power3.out" }, 0.0);
+      SX.maskOut(tl, t1, 0.78, { d: 0.2, s: 0.01 });
+
+      // 1–2 s · corte vertical y la pantalla se parte en dos mitades
+      tl.fromTo("#hook-cut", { scaleY: 0, opacity: 1 }, { scaleY: 1, duration: 0.25, ease: "expo.inOut" }, 0.75);
+      tl.fromTo("#hook-L", { clipPath: "inset(0% 0% 0% 100%)" }, { clipPath: "inset(0% 0% 0% 0%)", duration: 0.35, ease: "expo.inOut" }, 0.9);
+      tl.fromTo("#hook-R", { clipPath: "inset(0% 100% 0% 0%)" }, { clipPath: "inset(0% 0% 0% 0%)", duration: 0.35, ease: "expo.inOut" }, 0.9);
+      tl.to("#hook-cut", { opacity: 0, duration: 0.15, ease: "power2.out" }, 1.15);
+      SX.maskIn(tl, t2, 1.0, { d: 0.45, s: 0.04 });
+      SX.maskOut(tl, t2, 1.8, { d: 0.2, s: 0.01 });
+
+      // 2–3.5 s · "¿Quién tiene razón?" palabra a palabra mientras las mitades se separan
+      tl.fromTo("#hook-L", { x: 0 }, { x: -700, duration: 1.35, ease: "expo.inOut", immediateRender: false }, 1.9);
+      tl.fromTo("#hook-R", { x: 0 }, { x: 700, duration: 1.35, ease: "expo.inOut", immediateRender: false }, 1.9);
+      SX.maskIn(tl, t3, 2.0, { d: 0.5, s: 0.06 });
+      tl.fromTo("#hook-t3", { scale: 0.97 }, { scale: 1.02, duration: 1.4, ease: "none" }, 2.0);
+      SX.maskOut(tl, t3, 3.3, { d: 0.15, s: 0.01 });
+
+      // 3.5–4 s · "Nadie." seco: las mitades chocan y se cierran
+      tl.to("#hook-L", { x: 0, duration: 0.15, ease: "power4.in" }, 3.35);
+      tl.to("#hook-R", { x: 0, duration: 0.15, ease: "power4.in" }, 3.35);
+      tl.fromTo("#hook-t4", { opacity: 0, scale: 1.14 }, { opacity: 1, scale: 1, duration: 0.18, ease: "power3.out" }, 3.5);
+      tl.fromTo("#hook-cam", { y: 0 }, { y: 10, duration: 0.05, ease: "none", yoyo: true, repeat: 3, immediateRender: false }, 3.5);
+
+      // Salida: wipe de máscara diagonal sobre el golpe de 4.0 s
+      tl.fromTo(
+        "#hook-stage",
+        { clipPath: "polygon(0% 0%, 200% 0%, 200% 100%, -30% 100%)" },
+        { clipPath: "polygon(160% 0%, 200% 0%, 200% 100%, 130% 100%)", duration: 0.45, ease: "expo.inOut", immediateRender: false },
+        3.78
+      );
+
+      window.__timelines["hook"] = tl;
+    })();
+  </script>
+</template>

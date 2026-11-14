@@ -1,0 +1,66 @@
+<template>
+  <style>
+    #root { position: absolute; inset: 0; overflow: hidden; }
+    #ci-cam { position: absolute; inset: 0; }
+    .ci-center { position: absolute; left: 0; right: 0; text-align: center; }
+    #ci-for { top: 400px; left: 220px; right: 220px; font-size: 84px; font-weight: 800; color: #0a4a6c; line-height: 1.12; }
+    #ci-svg { position: absolute; left: 0; top: 0; }
+    #ci-title { top: 410px; font-size: 230px; font-weight: 800; color: #0a4a6c; line-height: 1; letter-spacing: -0.015em; }
+    #ci-brand { top: 590px; display: flex; justify-content: center; align-items: center; gap: 40px; }
+    #ci-word { font-size: 88px; }
+    #ci-div { width: 3px; height: 70px; background: #e3eaea; }
+    #ci-url { font-size: 46px; font-weight: 700; color: #1d7060; }
+    #ci-foot { top: 730px; font-size: 28px; font-weight: 600; color: #5a6b75; }
+  </style>
+  <div id="root" data-composition-id="cierre" data-width="1920" data-height="1080">
+    <div id="ci-cam">
+      <div id="ci-for" class="ci-center">Para másteres, programas y escuelas de doctorado.</div>
+      <svg id="ci-svg" width="1920" height="1080" viewBox="0 0 1920 1080" data-layout-ignore>
+        <defs><clipPath id="ci-clip"><rect id="ci-clip-r" x="-40" y="0" width="0" height="1080"></rect></clipPath></defs>
+        <path id="ci-wave" clip-path="url(#ci-clip)" fill="none" stroke="#34C6A3" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"></path>
+      </svg>
+      <div id="ci-title" class="ci-center">En sintonía.</div>
+      <div id="ci-brand" class="ci-center">
+        <div id="ci-word" class="wordmark"><span class="sx-w"><span class="sx-k">SINTON<span class="i">Í</span>A</span></span></div>
+        <div id="ci-div"></div>
+        <div id="ci-url"><span class="sx-w"><span class="sx-k">sintonia360-ferca.vercel.app</span></span></div>
+      </div>
+      <div id="ci-foot" class="ci-center">Máster en Estudios de la Ciencia, la Tecnología y la Innovación · Universidad de Salamanca</div>
+    </div>
+  </div>
+  <script>
+    (function () {
+      var T0 = 39.75, D = 5.25;
+      function g(t) { return t - T0; }
+      var tl = gsap.timeline({ paused: true });
+      SX.cam(tl, "#ci-cam", D, -1);
+
+      // 40–42 · audiencia
+      var fk = SX.split(document.getElementById("ci-for"), "w");
+      SX.maskIn(tl, fk, g(40.0), { d: 0.4, s: 0.04 });
+      tl.to([fk[4], fk[5], fk[6]], { color: "#1D7060", duration: 0.3, ease: "power2.out" }, g(40.75));
+      SX.maskOut(tl, fk, g(41.75), { d: 0.22, s: 0.012 });
+
+      // 42–43.5 · la onda única atraviesa la pantalla y deja "En sintonía."
+      var W = { t: 0, c: 520, a: 64, w: 10 }, wave = document.getElementById("ci-wave");
+      function draw() {
+        wave.setAttribute("d", SX.wpath(W.c, W.a, 460, W.t * 300, -40, 1960, 10));
+        wave.setAttribute("stroke-width", W.w.toFixed(2));
+      }
+      draw();
+      tl.fromTo(W, { t: 0 }, { t: D, duration: D, ease: "none", onUpdate: draw }, 0);
+      tl.fromTo("#ci-clip-r", { attr: { width: 0 } }, { attr: { width: 2000 }, duration: 0.5, ease: "expo.inOut" }, g(42.0));
+      tl.fromTo("#ci-title", { clipPath: "inset(0% 100% 0% 0%)" }, { clipPath: "inset(0% 0% 0% 0%)", duration: 0.5, ease: "expo.inOut" }, g(42.0));
+      tl.fromTo("#ci-title", { scale: 1.04 }, { scale: 1, duration: 1.0, ease: "power3.out" }, g(42.25));
+      tl.fromTo(W, { c: 520, a: 64, w: 10 }, { c: 900, a: 42, w: 6, duration: 0.75, ease: "expo.inOut", onUpdate: draw, immediateRender: false }, g(42.5));
+
+      // 43.5–45 · marca, URL y créditos (la onda sigue moviéndose hasta el último frame)
+      tl.to("#ci-title", { y: -150, scale: 0.72, duration: 0.5, ease: "expo.inOut" }, g(43.25));
+      SX.maskIn(tl, ["#ci-word .sx-k", "#ci-url .sx-k"], g(43.5), { d: 0.45, s: 0.08 });
+      tl.fromTo("#ci-div", { scaleY: 0 }, { scaleY: 1, duration: 0.3, ease: "power3.out" }, g(43.55));
+      tl.fromTo("#ci-foot", { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.4, ease: "power3.out" }, g(43.75));
+
+      window.__timelines["cierre"] = tl;
+    })();
+  </script>
+</template>
