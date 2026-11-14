@@ -35,7 +35,9 @@ export function useAvanceScroll(elemento: Ref<HTMLElement | null>) {
       avance.value = 1
       return
     }
-    medir()
+    // Primera medida después del primer pintado: no fuerza el cálculo del
+    // diseño durante el montaje de la página.
+    window.setTimeout(medir, 150)
     window.addEventListener('scroll', alMover, { passive: true })
     window.addEventListener('resize', alMover, { passive: true })
   })

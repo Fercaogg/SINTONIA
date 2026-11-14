@@ -339,8 +339,8 @@ Componente: `src/components/portada/OndasSintonia.vue`. El desfase se dibuja mov
 |---|---|---|
 | Taste: fotografías reales o de archivo en cada pantalla | Ninguna fotografía | El encargo prohíbe fotos de stock; la "foto" es el propio producto |
 | Taste: una sección por pantalla, como mucho dos | Secciones de altura natural | Prima la lectura cómoda y el contenido real; en el móvil sería imposible |
-| Taste: efectos y escenas en páginas de tecnología | Ninguno | El encargo pide movimiento con propósito |
-| Taste: nada aparece al hacer scroll | Solo los números de las cifras cuentan hasta su valor la primera vez que se ven | Lo pide el encargo ("contadores animados con datos reales") |
+| Taste: efectos y escenas en páginas de tecnología | La portada se mueve con el scroll (apartado 11.10) | Petición expresa de Fernando |
+| Taste: nada aparece al hacer scroll | En la portada sí, siempre ligado al scroll y en su sitio en el centro de la pantalla (11.10); fuera de ella, solo los números de las cifras cuentan hasta su valor la primera vez que se ven | Lo pide el encargo ("contadores animados con datos reales") |
 | Emil: muelles y gestos | No se usan | No hay gestos en esta web |
 
 ### 11.6. Modo oscuro
@@ -384,3 +384,13 @@ Segunda pasada con las skills (14/11/2026), centrada en lo que verán estudiante
   - los números de la escala se hunden al tocarlos;
   - las tarjetas con enlace se elevan 2 px al pasar el ratón (Taste);
   - la navegación del menú, que se usa muchas veces, no se anima (Emil).
+
+### 11.10. La portada en movimiento
+
+Guion completo en `docs/GUION-PORTADA.md`. En resumen:
+
+- **Nada se fija ni bloquea la pantalla.** Cada sección se mueve según pasa por la pantalla y en el centro está siempre en su sitio.
+- **Efectos:** inercia, tipografía que se inclina según la velocidad, capas a distinta velocidad, palabras gigantes que cruzan en horizontal, un móvil que se monta pieza a pieza, un párrafo que se ilumina palabra a palabra, fondo que cambia de color sin cortes y las dos ondas que se juntan al final.
+- **Skills:** Emil (un protagonista por momento, solapar en vez de encolar, nunca bloquear la interacción, solo transform y opacity) y Taste (scroll nativo, tipografía gigante, estado limpio en reposo, nada de violeta).
+- **Accesibilidad:** botones y enlaces nunca se apagan; con el foco del teclado dentro, la sección vuelve a su sitio; las bandas gigantes son decorativas y ocultas a los lectores de pantalla; con "reducir movimiento", la portada estática.
+- **Rendimiento:** un solo oyente pasivo, medidas tomadas de una vez y después del primer pintado, bucle que se para en reposo. Lighthouse igual que la versión anterior en el mismo equipo (rendimiento 88 a 93, accesibilidad 100).

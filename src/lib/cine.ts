@@ -1,121 +1,158 @@
-// MOTOR DE LA PORTADA CINEMATOGRÁFICA (docs/GUION-PORTADA.md)
+// MOTOR DE LA PORTADA EN MOVIMIENTO (docs/GUION-PORTADA.md)
 //
-// El scroll es la línea de tiempo. Cada escena es un bloque alto con un
-// escenario fijado (position: sticky) dentro; su avance va de 0 a 1 mientras
-// el escenario está fijado, y la escena mueve lo suyo con ese avance.
+// Nada se fija ni bloquea la pantalla: la página siempre avanza con el
+// scroll, y cada pieza se mueve según por dónde pasa (0 cuando asoma por
+// abajo, 1 cuando sale por arriba).
 //
-// Reglas (skills de Emil Kowalski y Taste):
-//   - Scroll nativo: nada se secuestra. Un único oyente pasivo de scroll y,
-//     como mucho, un cálculo por fotograma (requestAnimationFrame).
-//   - Los estilos (solo transform y opacity) se escriben directamente en los
-//     elementos, sin pasar por la reactividad de Vue en cada fotograma.
-//   - Con el foco dentro de una escena, se dibuja su estado de reposo, para
-//     que lo que se maneja con teclado esté siempre en su sitio y visible.
+//   - Inercia: cada pieza sigue su objetivo con un "muelle" (interpolación
+//     por fotograma), así al bajar rápido todo se estira y al parar se asienta.
+//   - Velocidad: se mide lo rápido que se baja (suavizado) y se pasa a las
+//     piezas que la usan (por ejemplo, la tipografía gigante se inclina).
+//   - Rendimiento (skills de Emil Kowalski): un único oyente pasivo, posiciones
+//     medidas solo al cambiar el tamaño, estilos escritos directamente (solo
+//     transform y opacity) y el bucle se para cuando todo está quieto.
+//   - Scroll nativo: nunca se intercepta ni se suaviza el desplazamiento.
 
-export interface Escena {
-  /** El bloque alto que ocupa la escena en el documento. */
-  raiz: HTMLElement
-  /** Lo que queda fijado mientras dura la escena. */
-  escenario: HTMLElement
-  /** Scroll extra que dura la escena, en px (además de la altura del escenario). */
-  extra: () => number
-  /** Dibuja la escena en un avance de 0 a 1. */
-  dibujar: (avance: number) => void
-  /** Avance en el que todo está en su sitio (para el teclado). */
-  reposo: number
-  /** Medidas que dependen del tamaño de la ventana. */
-  medir?: () => void
-  /** Cuánto azul marino tiene el fondo en este avance (0 a 1). */
-  fondo?: (avance: number) => number
+export type Dibujo = (v: number, velocidad: number, el: HTMLElement) => void
+
+interface Pieza {
+  el: HTMLElement
+  dibujar: Dibujo
+  /** Posición en el documento (medida sin transformaciones). */
+  arriba: number
+  alto: number
+  actual: number
+  primera: boolean
+  /** 0 a 1: cuánto se acerca a su objetivo en cada fotograma (más bajo, más inercia). */
+  muelle: number
+  /** 'paso': de asomar por abajo a salir por arriba. 'inicio': de 0 (arriba del todo) a 1 (ya ha salido). */
+  modo: 'paso' | 'inicio'
 }
 
-const escenas = new Set<Escena>()
-const ultimo = new WeakMap<Escena, number>()
-let pendiente = false
-let alFondo: ((marino: number) => void) | null = null
+interface Fondo {
+  el: HTMLElement
+  color: 'claro' | 'marino' | 'verde'
+  arriba: number
+  abajo: number
+}
+
+const piezas = new Set<Pieza>()
+const fondos = new Set<Fondo>()
+let capas: Partial<Record<'marino' | 'verde', HTMLElement>> = {}
+let anterior = 0
+let velocidad = 0
+let marco = 0
+let alturaVentana = 0
 
 export const limitar = (v: number, min = 0, max = 1) => Math.min(max, Math.max(min, v))
-/** Avance local de un tramo [desde, hasta] dentro del avance de la escena. */
 export const tramo = (p: number, desde: number, hasta: number) => limitar((p - desde) / (hasta - desde))
-/** Curvas (las mismas familias que tokens.css). */
 export const salida = (t: number) => 1 - Math.pow(1 - t, 3)
 export const enMedio = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2)
 export const mezclar = (a: number, b: number, t: number) => a + (b - a) * t
+export const esMovil = () => window.innerWidth < 768
 
-export function esMovil(): boolean {
-  return window.innerWidth < 768
+/** Escribe transform y opacidad de una vez. */
+export function poner(
+  el: Element | null | undefined,
+  t: { x?: number; y?: number; s?: number; sx?: number; sy?: number; r?: number; sk?: number; o?: number },
+) {
+  if (!(el instanceof HTMLElement || el instanceof SVGElement)) return
+  const s = t.s ?? 1
+  el.style.transform = `translate3d(${(t.x ?? 0).toFixed(1)}px, ${(t.y ?? 0).toFixed(1)}px, 0) scale(${(s * (t.sx ?? 1)).toFixed(4)}, ${(s * (t.sy ?? 1)).toFixed(4)}) rotate(${(t.r ?? 0).toFixed(2)}deg) skewY(${(t.sk ?? 0).toFixed(2)}deg)`
+  if (t.o !== undefined) el.style.opacity = limitar(t.o).toFixed(3)
 }
 
-/** Alto de la cabecera fija de la portada (el escenario se fija debajo). */
-export function altoCabecera(): number {
-  return document.querySelector<HTMLElement>('[data-cabecera-portada]')?.offsetHeight ?? 0
-}
-
-/**
- * Cuánto hay que mover un elemento del escenario para que su centro quede en
- * (x, y) de la ventana MIENTRAS el escenario está fijado. Se mide en reposo.
- */
-export function haciaPunto(escenario: HTMLElement, el: HTMLElement, xVentana: number, yVentana: number) {
-  const t = el.style.transform
-  el.style.transform = ''
-  const r = el.getBoundingClientRect()
-  const e = escenario.getBoundingClientRect()
-  el.style.transform = t
-  const fijo = Math.min(altoCabecera(), window.innerHeight - escenario.offsetHeight)
-  return {
-    dx: xVentana - (r.left + r.width / 2),
-    dy: yVentana - fijo - (r.top + r.height / 2 - e.top),
-    ancho: r.width,
+// Medir todo de una vez: primero se quitan las transformaciones, luego se
+// leen todas las posiciones y al final se devuelven (un solo cálculo de
+// diseño, en lugar de uno por pieza).
+function medirTodo() {
+  medicionPendiente = 0
+  alturaVentana = window.innerHeight
+  const y = window.scrollY
+  if (primeraMedida) {
+    anterior = y
+    primeraMedida = false
   }
+  const guardadas = [...piezas].map((p) => {
+    const t = p.el.style.transform
+    p.el.style.transform = ''
+    return t
+  })
+  const rects = [...piezas].map((p) => p.el.getBoundingClientRect())
+  const zonas = [...fondos].map((f) => f.el.getBoundingClientRect())
+  ;[...piezas].forEach((p, i) => {
+    p.el.style.transform = guardadas[i]
+    p.arriba = rects[i].top + y
+    p.alto = rects[i].height
+  })
+  ;[...fondos].forEach((f, i) => {
+    f.arriba = zonas[i].top + y
+    f.abajo = zonas[i].bottom + y
+  })
+  despertar()
 }
 
-function avanceDe(e: Escena): number {
-  const r = e.raiz.getBoundingClientRect()
-  const cabecera = altoCabecera()
-  const alto = e.escenario.offsetHeight
-  const recorrido = r.height - alto
-  if (recorrido <= 0) return 0
-  // Empieza cuando el escenario queda fijado: arriba, bajo la cabecera, o,
-  // si es más alto que la pantalla (móvil), cuando se ve su pie.
-  const fijo = Math.min(cabecera, window.innerHeight - alto)
-  return limitar((fijo - r.top) / recorrido)
+let medicionPendiente = 0
+let primeraMedida = true
+function medirPronto() {
+  if (medicionPendiente) return
+  // La primera vez se espera a que el navegador haya pintado la página: así
+  // la medición no adelanta el primer cálculo del diseño (carga más fluida).
+  medicionPendiente = primeraMedida ? window.setTimeout(medirTodo, 150) : requestAnimationFrame(medirTodo)
+}
+
+function pintarFondo(y: number) {
+  if (!fondos.size) return
+  // El color cambia cuando la nueva zona ocupa ya buena parte de la pantalla.
+  const centro = y + alturaVentana * 0.45
+  const banda = alturaVentana * 0.15
+  const peso = { claro: 0, marino: 0, verde: 0 }
+  // Cada sección pesa según lo cerca que está su zona del centro de la pantalla.
+  for (const f of fondos) {
+    const dentro = centro >= f.arriba && centro <= f.abajo ? 1 : 0
+    const distancia = dentro ? 0 : Math.min(Math.abs(centro - f.arriba), Math.abs(centro - f.abajo))
+    peso[f.color] = Math.max(peso[f.color], dentro || limitar(1 - distancia / banda))
+  }
+  const total = peso.claro + peso.marino + peso.verde || 1
+  const m = peso.marino / total
+  const v = peso.verde / total
+  if (capas.marino) capas.marino.style.opacity = m.toFixed(3)
+  if (capas.verde) capas.verde.style.opacity = (v / Math.max(0.001, 1 - m)).toFixed(3)
 }
 
 function fotograma() {
-  pendiente = false
-  const mitad = window.innerHeight / 2
-  let marino = 0
-  for (const e of escenas) {
-    const r = e.raiz.getBoundingClientRect()
-    if (r.bottom < -window.innerHeight || r.top > window.innerHeight * 2) continue
-    const conFoco = e.raiz.contains(document.activeElement) && document.activeElement !== document.body
-    const p = conFoco ? e.reposo : avanceDe(e)
-    if (ultimo.get(e) !== p) {
-      ultimo.set(e, p)
-      e.dibujar(p)
-    }
-    if (e.fondo && r.top <= mitad && r.bottom >= mitad) marino = e.fondo(p)
+  marco = 0
+  const y = window.scrollY
+  velocidad = mezclar(velocidad, y - anterior, 0.18)
+  anterior = y
+  let enMarcha = Math.abs(velocidad) > 0.05
+  // Teclado: si el foco (visible) está dentro de una pieza, esa pieza vuelve a
+  // su sitio de reposo, para que lo enfocado siempre se vea entero y quieto.
+  const foco = document.activeElement
+  const conTeclado = foco instanceof HTMLElement && foco !== document.body && foco.matches(':focus-visible')
+  for (const p of piezas) {
+    if (p.alto === 0 && p.arriba === 0) continue
+    const arriba = p.arriba - y
+    if (arriba > alturaVentana * 1.5 || arriba + p.alto < -alturaVentana * 0.5) continue
+    const reposo = p.modo === 'inicio' ? 0 : 0.5
+    const objetivo =
+      conTeclado && p.el.contains(foco)
+        ? reposo
+        : p.modo === 'inicio'
+          ? limitar(y / Math.max(1, p.arriba + p.alto))
+          : limitar((alturaVentana - arriba) / (alturaVentana + p.alto))
+    p.actual = p.primera ? objetivo : mezclar(p.actual, objetivo, p.muelle)
+    p.primera = false
+    if (Math.abs(p.actual - objetivo) > 0.0005) enMarcha = true
+    else p.actual = objetivo
+    p.dibujar(p.actual, velocidad, p.el)
   }
-  alFondo?.(marino)
+  pintarFondo(y)
+  if (enMarcha) marco = requestAnimationFrame(fotograma)
 }
 
-function pedirFotograma() {
-  if (!pendiente) {
-    pendiente = true
-    requestAnimationFrame(fotograma)
-  }
-}
-
-function medirTodo() {
-  for (const e of escenas) {
-    e.medir?.()
-    const alto = e.escenario.offsetHeight
-    // Fijado arriba; si es más alto que la pantalla, se fija cuando se ve su pie.
-    e.escenario.style.top = `${Math.min(altoCabecera(), window.innerHeight - alto)}px`
-    e.raiz.style.height = `${alto + e.extra()}px`
-    ultimo.delete(e)
-  }
-  pedirFotograma()
+function despertar() {
+  if (!marco) marco = requestAnimationFrame(fotograma)
 }
 
 let oyendo = false
@@ -123,31 +160,52 @@ let medidor: ResizeObserver | null = null
 function escuchar() {
   if (oyendo) return
   oyendo = true
-  window.addEventListener('scroll', pedirFotograma, { passive: true })
-  window.addEventListener('resize', medirTodo, { passive: true })
-  document.addEventListener('focusin', pedirFotograma)
-  document.addEventListener('focusout', pedirFotograma)
-  medidor = new ResizeObserver(() => medirTodo())
+  // Sin leer medidas aquí (forzaría el cálculo del diseño durante el montaje):
+  // la primera medición se hace en el siguiente fotograma.
+  primeraMedida = true
+  window.addEventListener('scroll', despertar, { passive: true })
+  window.addEventListener('resize', medirPronto, { passive: true })
+  document.addEventListener('focusin', despertar)
+  document.addEventListener('focusout', despertar)
+  medidor = new ResizeObserver(medirPronto)
+  medidor.observe(document.body)
 }
 
-export function registrarEscena(e: Escena) {
+export function anadirPieza(el: HTMLElement, dibujar: Dibujo, muelle = 0.12, modo: Pieza['modo'] = 'paso'): () => void {
   escuchar()
-  escenas.add(e)
-  medidor?.observe(e.escenario)
-  medirTodo()
+  const p: Pieza = { el, dibujar, arriba: 0, alto: 0, actual: 0, primera: true, muelle, modo }
+  piezas.add(p)
+  medirPronto()
+  return () => {
+    piezas.delete(p)
+    el.style.transform = ''
+    el.style.opacity = ''
+  }
 }
 
-export function quitarEscena(e: Escena) {
-  escenas.delete(e)
-  medidor?.unobserve(e.escenario)
-  e.raiz.style.height = ''
-  e.escenario.style.top = ''
-  if (!escenas.size) alFondo?.(0)
+export function anadirFondo(el: HTMLElement, color: Fondo['color']): () => void {
+  escuchar()
+  const f: Fondo = { el, color, arriba: 0, abajo: 0 }
+  fondos.add(f)
+  medirPronto()
+  return () => fondos.delete(f)
 }
 
-export function alCambiarFondo(fn: ((marino: number) => void) | null) {
-  alFondo = fn
-  pedirFotograma()
+export function capasDeFondo(c: typeof capas) {
+  capas = c
+  despertar()
+}
+
+/** Inclinación según la velocidad del scroll (tipografía que "se estira"). */
+export const inclinar = (velocidad: number, fuerza = 0.18, max = 9) => limitar(velocidad * fuerza, -max, max)
+
+/** Desfase de las dos ondas (OndasSintonia) escrito directamente: 0 en sintonía, 1 media onda. */
+export function desfasarOndas(raiz: Element | null | undefined, d: number) {
+  const g = raiz?.querySelector<SVGGElement>('.ondas-tutor')
+  if (!g) return
+  g.style.transition = 'none'
+  const t = limitar(d)
+  g.style.transform = `translateX(${(t * 100).toFixed(1)}px) scaleY(${(1 - t * 0.35).toFixed(3)})`
 }
 
 export function prefiereMenosMovimiento(): boolean {
