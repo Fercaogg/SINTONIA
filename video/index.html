@@ -43,6 +43,7 @@
         background: rgba(52, 198, 163, 0.08);
       }
       .w { display: inline-block; }
+      .ch { display: inline-block; }
       .rate { display: flex; gap: 12px; }
       .rate span {
         width: 56px; height: 56px; border-radius: 50%; border: 2px solid var(--border); background: #fff;
@@ -110,7 +111,7 @@
       <div class="scene clip" id="s2" data-start="4.75" data-duration="5.5" data-track-index="1">
         <div class="scene-content" id="c2" style="justify-content:flex-start;padding-top:250px;gap:40px;">
           <div id="s2-pill" class="pill">TUTORÍA DE TFM, TFG Y TESIS</div>
-          <div id="s2-word" class="wordmark" style="font-size:180px;">SINTON<span class="i">Í</span>A</div>
+          <div id="s2-word" class="wordmark" style="font-size:180px;"><span class="ch">S</span><span class="ch">I</span><span class="ch">N</span><span class="ch">T</span><span class="ch">O</span><span class="ch">N</span><span class="ch i">Í</span><span class="ch i">A</span></div>
           <p id="s2-lema" class="body-text" style="font-size:44px;color:#5A6B75;">Acompañar el trabajo académico, sin vigilar.</p>
         </div>
       </div>
@@ -209,7 +210,7 @@
         <div class="scene-content" id="c7" style="justify-content:flex-start;padding-top:200px;gap:36px;">
           <h1 id="s7-title" class="display" style="font-size:156px;">En sintonía.</h1>
           <div id="s7-brand" style="display:flex;align-items:center;gap:36px;">
-            <div class="wordmark" style="font-size:60px;">SINTON<span class="i">Í</span>A</div>
+            <div id="s7-word" class="wordmark" style="font-size:60px;">SINTON<span class="i">ÍA</span></div>
             <div style="width:2px;height:48px;background:#E3EAEA;"></div>
             <div style="font-size:36px;font-weight:600;color:#1D7060;">sintonia360-ferca.vercel.app</div>
           </div>
@@ -254,84 +255,125 @@
 
       // Scene windows (data-start/data-duration, 0.5s overlap) are managed by the runtime.
 
-      // ---------- Crossfade 0.5s + 20px vertical drift at every boundary ----------
+      // ---------- Text splitting (deterministic, synchronous) ----------
+      function splitWords(sel) {
+        var el = document.querySelector(sel);
+        el.innerHTML = el.textContent.trim().split(/\s+/).map(function (w) { return '<span class="w">' + w + '</span>'; }).join(" ");
+        return sel + " .w";
+      }
+      function splitChars(sel) {
+        var el = document.querySelector(sel);
+        el.innerHTML = el.textContent.trim().split(/\s+/).map(function (w) {
+          return '<span class="w" style="white-space:nowrap;">' + w.split("").map(function (c) { return '<span class="ch">' + c + "</span>"; }).join("") + "</span>";
+        }).join(" ");
+        return sel + " .ch";
+      }
+      var s2Lema = splitWords("#s2-lema"), s3Quote = splitWords("#s3-quote"), s4Title = splitWords("#s4-title");
+      var s5Title = splitWords("#s5-title"), s6Title = splitWords("#s6-title"), s7Title = splitChars("#s7-title");
+
+      // ---------- Scene transitions: push up/out, rise in ----------
       [[5, "#c1", "#c2"], [10, "#c2", "#c3"], [20, "#c3", "#c4"], [26, "#c4", "#c5"], [32, "#c5", "#c6"], [36, "#c6", "#c7"]].forEach(function (b) {
-        tl.to(b[1], { autoAlpha: 0, y: -20, duration: 0.5, ease: "power2.inOut" }, b[0] - 0.25);
-        tl.fromTo(b[2], { autoAlpha: 0, y: 20 }, { autoAlpha: 1, y: 0, duration: 0.5, ease: "power2.out" }, b[0] - 0.25);
+        tl.to(b[1], { autoAlpha: 0, y: -70, scale: 0.97, duration: 0.45, ease: "power3.in" }, b[0] - 0.3);
+        tl.fromTo(b[2], { autoAlpha: 0, y: 70, scale: 1.03 }, { autoAlpha: 1, y: 0, scale: 1, duration: 0.6, ease: "power3.out" }, b[0] - 0.2);
       });
 
-      // ---------- Background drift (whole video) ----------
-      tl.fromTo("#bgwaves-g", { x: -240 }, { x: 240, duration: 40, ease: "none" }, 0);
+      // ---------- Background drift (whole video), faster ----------
+      tl.fromTo("#bgwaves-g", { x: -420 }, { x: 420, duration: 40, ease: "none" }, 0);
+      tl.fromTo("#bgwaves-g", { y: -10 }, { y: 10, duration: 5, ease: "sine.inOut", yoyo: true, repeat: 7 }, 0);
       tl.to(P, { t: 40, duration: 40, ease: "none", onUpdate: drawWaves }, 0);
 
-      // === SCENE 1 (0–5s) — el problema ===
-      tl.to("#wclipr", { attr: { width: 1920 }, duration: 1.8, ease: "power2.out" }, 0.1);
-      tl.from("#s1-la", { x: -30, autoAlpha: 0, duration: 0.7, ease: "power2.out" }, 0.9);
-      tl.from("#s1-lb", { x: -30, autoAlpha: 0, duration: 0.7, ease: "power2.out" }, 1.1);
-      tl.from("#s1-text .w", { y: 24, autoAlpha: 0, duration: 0.6, ease: "power3.out", stagger: { each: 0.13, from: "start" } }, 1.0);
-      tl.to("#s1-text", { scale: 1.02, duration: 3, ease: "sine.inOut" }, 2.2);
+      // === SCENE 1 (0–5s) — el problema; two out-of-step waves ===
+      tl.to("#wclipr", { attr: { width: 1920 }, duration: 1.3, ease: "power3.out" }, 0.05);
+      tl.to(A, { a: 60, duration: 1.2, ease: "sine.inOut", yoyo: true, repeat: 3, onUpdate: drawWaves }, 0.2);
+      tl.to(B, { a: 70, duration: 0.9, ease: "sine.inOut", yoyo: true, repeat: 3, onUpdate: drawWaves }, 0.5);
+      tl.from("#s1-la", { x: -80, autoAlpha: 0, duration: 0.6, ease: "power4.out" }, 0.5);
+      tl.from("#s1-lb", { x: -80, autoAlpha: 0, duration: 0.6, ease: "power4.out" }, 0.7);
+      tl.from("#s1-text .w", { y: 60, autoAlpha: 0, duration: 0.55, ease: "power4.out", stagger: 0.07 }, 0.8);
+      tl.to("#s1-text .w:nth-child(4), #s1-text .w:nth-child(5)", { color: "#1D7060", duration: 0.4, ease: "power2.out" }, 2.2);
+      tl.to("#s1-text .w:nth-child(4), #s1-text .w:nth-child(5)", { y: -8, duration: 0.25, ease: "sine.inOut", yoyo: true, repeat: 1 }, 2.2);
+      tl.to("#s1-text", { scale: 1.05, duration: 2.6, ease: "sine.inOut" }, 2.1);
 
       // === SCENE 2 (5–10s) — presentación; waves merge into one ===
-      tl.to(M, { m: 1, duration: 2.4, ease: "power2.inOut", onUpdate: drawWaves }, 4.9);
-      tl.from("#s2-pill", { y: 16, autoAlpha: 0, duration: 0.6, ease: "power2.out" }, 5.5);
-      tl.fromTo("#s2-word", { scale: 0.9, autoAlpha: 0 }, { scale: 1, autoAlpha: 1, duration: 1.1, ease: "power2.out" }, 5.8);
-      tl.from("#s2-lema", { y: 20, autoAlpha: 0, duration: 0.7, ease: "power3.out" }, 6.7);
-      tl.to("#s2-word", { y: -6, duration: 1.4, ease: "sine.inOut", yoyo: true, repeat: 1 }, 7.1);
-      tl.to("#waves", { autoAlpha: 0, duration: 0.6, ease: "power2.inOut" }, 9.7);
+      tl.to(M, { m: 1, duration: 1.8, ease: "power3.inOut", onUpdate: drawWaves }, 4.8);
+      tl.from("#s2-pill", { y: -30, scale: 0.8, autoAlpha: 0, duration: 0.5, ease: "back.out(1.8)" }, 5.3);
+      tl.from("#s2-word .ch", { y: 140, rotation: 8, autoAlpha: 0, duration: 0.7, ease: "power4.out", stagger: 0.06 }, 5.5);
+      tl.fromTo("#s2-word .i", { scale: 1 }, { scale: 1.18, duration: 0.3, ease: "sine.inOut", yoyo: true, repeat: 1, stagger: 0.1 }, 6.5);
+      tl.from(s2Lema, { y: 30, autoAlpha: 0, duration: 0.5, ease: "power3.out", stagger: 0.06 }, 6.6);
+      tl.to("#s2-word", { y: -10, scale: 1.03, duration: 1.2, ease: "sine.inOut", yoyo: true, repeat: 1 }, 7.4);
+      tl.to("#waves", { autoAlpha: 0, duration: 0.5, ease: "power2.inOut" }, 9.7);
 
       // === SCENE 3 (10–20s) — cómo funciona ===
-      tl.from("#s3-phone", { y: 50, autoAlpha: 0, duration: 0.9, ease: "power3.out" }, 10.1);
-      tl.from("#s3-student", { x: -40, autoAlpha: 0, duration: 0.7, ease: "power2.out" }, 10.5);
-      tl.to("#s3-phone", { y: -8, duration: 1.5, ease: "sine.inOut", yoyo: true, repeat: 1 }, 11.0);
-      tl.to("#s3-b4", { backgroundColor: "#1D7060", borderColor: "#1D7060", color: "#FFFFFF", duration: 0.45, ease: "power2.out" }, 11.9);
-      tl.to("#s3-b4", { scale: 1.14, duration: 0.25, ease: "sine.inOut", yoyo: true, repeat: 1 }, 11.9);
-      tl.to("#s3-btn", { scale: 0.97, duration: 0.18, ease: "sine.inOut", yoyo: true, repeat: 1 }, 12.5);
-      tl.from("#s3-tutor", { x: 60, autoAlpha: 0, duration: 0.8, ease: "power3.out" }, 13.1);
-      tl.to("#s3-t2", { backgroundColor: "#1D7060", borderColor: "#1D7060", color: "#FFFFFF", duration: 0.45, ease: "power2.out" }, 14.6);
-      tl.to("#s3-t2", { scale: 1.14, duration: 0.25, ease: "sine.inOut", yoyo: true, repeat: 1 }, 14.6);
-      tl.to("#s3-tutor", { y: -6, duration: 0.6, ease: "sine.inOut", yoyo: true, repeat: 1 }, 14.9);
-      tl.to(["#s3-phone", "#s3-student", "#s3-tutor"], { autoAlpha: 0, scale: 0.96, duration: 0.5, ease: "power2.inOut", stagger: 0.05 }, 15.9);
-      tl.from("#s3-n4", { x: -160, autoAlpha: 0, duration: 0.8, ease: "power3.out" }, 16.3);
-      tl.from("#s3-n2", { x: 160, autoAlpha: 0, duration: 0.8, ease: "power3.out" }, 16.3);
-      tl.from("#s3-vs", { autoAlpha: 0, duration: 0.5, ease: "sine.inOut" }, 16.8);
-      tl.from("#s3-tag", { y: -16, scale: 0.92, autoAlpha: 0, duration: 0.6, ease: "back.out(1.3)" }, 17.0);
-      tl.from("#s3-quote", { y: 24, autoAlpha: 0, duration: 0.7, ease: "power2.out" }, 17.5);
-      tl.to("#s3-n4", { y: -8, duration: 1.1, ease: "sine.inOut", yoyo: true, repeat: 1 }, 17.4);
-      tl.to("#s3-n2", { y: 8, duration: 1.1, ease: "sine.inOut", yoyo: true, repeat: 1 }, 17.4);
+      tl.from("#s3-phone", { y: 260, rotation: -8, autoAlpha: 0, duration: 0.8, ease: "power4.out" }, 10.0);
+      tl.from("#s3-student", { x: -120, autoAlpha: 0, duration: 0.6, ease: "power4.out" }, 10.4);
+      tl.from("#s3-screen .rate span", { scale: 0, autoAlpha: 0, duration: 0.4, ease: "back.out(2)", stagger: 0.07 }, 10.7);
+      tl.to("#s3-phone", { y: -12, rotation: 1.5, duration: 1.1, ease: "sine.inOut", yoyo: true, repeat: 3 }, 11.0);
+      tl.to("#s3-screen .rate span", { borderColor: "#34C6A3", duration: 0.15, ease: "none", stagger: { each: 0.15, yoyo: true, repeat: 1 } }, 11.3);
+      tl.to("#s3-b4", { backgroundColor: "#1D7060", borderColor: "#1D7060", color: "#FFFFFF", duration: 0.3, ease: "power2.out" }, 12.0);
+      tl.to("#s3-b4", { scale: 1.3, duration: 0.18, ease: "power2.out", yoyo: true, repeat: 1 }, 12.0);
+      tl.to("#s3-btn", { scale: 0.92, backgroundColor: "#34C6A3", duration: 0.15, ease: "power2.out", yoyo: true, repeat: 1 }, 12.6);
+      tl.from("#s3-tutor", { x: 220, rotation: 4, autoAlpha: 0, duration: 0.7, ease: "power4.out" }, 13.0);
+      tl.from("#s3-tutor .rate span", { scale: 0, autoAlpha: 0, duration: 0.4, ease: "back.out(2)", stagger: 0.07 }, 13.5);
+      tl.to("#s3-t2", { backgroundColor: "#1D7060", borderColor: "#1D7060", color: "#FFFFFF", duration: 0.3, ease: "power2.out" }, 14.5);
+      tl.to("#s3-t2", { scale: 1.3, duration: 0.18, ease: "power2.out", yoyo: true, repeat: 1 }, 14.5);
+      tl.to("#s3-tutor", { y: -10, duration: 0.4, ease: "sine.inOut", yoyo: true, repeat: 1 }, 14.8);
+      tl.to(["#s3-phone", "#s3-student", "#s3-tutor"], { autoAlpha: 0, scale: 0.85, y: 40, duration: 0.4, ease: "power3.in", stagger: 0.06 }, 15.6);
+      tl.from("#s3-n4", { x: -420, autoAlpha: 0, duration: 0.7, ease: "power4.out" }, 16.1);
+      tl.from("#s3-n2", { x: 420, autoAlpha: 0, duration: 0.7, ease: "power4.out" }, 16.1);
+      tl.from("#s3-n4 .num, #s3-n2 .num", { scale: 0.4, duration: 0.7, ease: "back.out(1.8)" }, 16.1);
+      tl.from("#s3-vs", { scale: 0.6, autoAlpha: 0, duration: 0.4, ease: "back.out(2)" }, 16.6);
+      tl.from("#s3-tag", { y: -40, scale: 0.6, autoAlpha: 0, duration: 0.5, ease: "back.out(2)" }, 16.8);
+      tl.from(s3Quote, { y: 40, autoAlpha: 0, duration: 0.5, ease: "power4.out", stagger: 0.06 }, 17.2);
+      tl.to("#s3-n4", { x: 24, duration: 0.6, ease: "sine.inOut", yoyo: true, repeat: 3 }, 17.4);
+      tl.to("#s3-n2", { x: -24, duration: 0.6, ease: "sine.inOut", yoyo: true, repeat: 3 }, 17.4);
+      tl.to("#s3-tag", { scale: 1.1, duration: 0.3, ease: "sine.inOut", yoyo: true, repeat: 3 }, 18.0);
 
-      // === SCENE 4 (20–26s) — la agenda ===
-      tl.from("#s4-title", { y: 24, autoAlpha: 0, duration: 0.7, ease: "power2.out" }, 20.2);
+      // === SCENE 4 (20–26s) — la agenda; each question takes its turn ===
+      tl.from(s4Title, { y: 50, autoAlpha: 0, duration: 0.5, ease: "power4.out", stagger: 0.05 }, 20.1);
       ["#s4-q1", "#s4-q2", "#s4-q3"].forEach(function (sel, i) {
-        tl.from(sel, { y: 50, autoAlpha: 0, duration: 0.8, ease: "power3.out" }, 20.9 + i * 0.6);
-        tl.to(sel, { y: -6, duration: 1.2, ease: "sine.inOut", yoyo: true, repeat: 1 }, 22.6 + i * 0.3);
+        tl.from(sel, { y: 160, rotation: (i - 1) * 4, autoAlpha: 0, duration: 0.7, ease: "power4.out" }, 20.7 + i * 0.25);
+        tl.from(sel + " .qn", { scale: 0, duration: 0.4, ease: "back.out(2.2)" }, 21.1 + i * 0.25);
+        var t = 22.2 + i * 1.1;
+        tl.to(sel, { y: -22, borderColor: "#34C6A3", boxShadow: "0 26px 60px rgba(29,112,96,0.22)", duration: 0.4, ease: "power3.out" }, t);
+        tl.to(sel + " .qn", { backgroundColor: "#1D7060", color: "#FFFFFF", scale: 1.2, duration: 0.3, ease: "back.out(2)" }, t);
+        tl.to(sel, { y: 0, borderColor: "#E3EAEA", boxShadow: "0 14px 40px rgba(10,74,108,0.09)", duration: 0.5, ease: "power2.inOut" }, t + 0.9);
+        tl.to(sel + " .qn", { scale: 1, duration: 0.3, ease: "power2.out" }, t + 0.9);
       });
 
       // === SCENE 5 (26–32s) — privacidad ===
-      tl.from("#s5-title", { y: 28, autoAlpha: 0, duration: 0.8, ease: "power2.out" }, 26.2);
-      tl.from("#s5-table", { autoAlpha: 0, duration: 0.5, ease: "sine.inOut" }, 26.8);
+      tl.from(s5Title, { y: 70, autoAlpha: 0, duration: 0.55, ease: "power4.out", stagger: 0.06 }, 26.1);
+      tl.from("#s5-table", { y: 60, autoAlpha: 0, duration: 0.5, ease: "power3.out" }, 26.6);
       ["#s5-r1", "#s5-r2", "#s5-r3"].forEach(function (sel, i) {
-        tl.from(sel, { x: -30, autoAlpha: 0, duration: 0.6, ease: "power2.out" }, 27.0 + i * 0.6);
+        tl.from(sel, { x: -120, autoAlpha: 0, duration: 0.5, ease: "power4.out" }, 26.9 + i * 0.4);
       });
       ["#s5-c1", "#s5-c2", "#s5-c3"].forEach(function (sel, i) {
-        tl.from(sel, { scale: 0.8, autoAlpha: 0, duration: 0.5, ease: "back.out(1.4)" }, 27.3 + i * 0.6);
+        tl.from(sel, { scale: 0, autoAlpha: 0, duration: 0.45, ease: "back.out(2.2)" }, 27.2 + i * 0.4);
       });
-      tl.from("#s5-foot", { y: 16, autoAlpha: 0, duration: 0.6, ease: "power2.out" }, 29.4);
-      tl.to("#s5-title", { scale: 1.015, duration: 4.5, ease: "sine.inOut" }, 27.0);
+      tl.to("#s5-c1", { scale: 1.15, duration: 0.25, ease: "sine.inOut", yoyo: true, repeat: 3 }, 28.6);
+      tl.to("#s5-c2, #s5-c3", { x: 8, duration: 0.07, ease: "sine.inOut", yoyo: true, repeat: 5, stagger: 0.3 }, 29.3);
+      tl.from("#s5-foot", { y: 30, scale: 0.9, autoAlpha: 0, duration: 0.5, ease: "back.out(1.8)" }, 29.6);
+      tl.to("#s5-title", { scale: 1.04, duration: 4.2, ease: "sine.inOut" }, 27.0);
 
-      // === SCENE 6 (32–36s) — puente al doctorado ===
-      tl.from("#s6-title", { y: 24, autoAlpha: 0, duration: 0.7, ease: "power2.out" }, 32.2);
-      tl.from("#s6-p1", { y: 24, autoAlpha: 0, duration: 0.6, ease: "power3.out" }, 32.6);
-      tl.to("#s6-line", { strokeDashoffset: 0, duration: 1.6, ease: "power1.inOut" }, 32.9);
-      tl.from("#s6-p2", { y: 24, autoAlpha: 0, duration: 0.6, ease: "power3.out" }, 33.5);
-      tl.from("#s6-p3", { y: 24, autoAlpha: 0, duration: 0.6, ease: "power3.out" }, 34.3);
-      tl.to("#s6-p2 .dot, #s6-p3 .dot", { backgroundColor: "#E0F5EF", duration: 0.6, ease: "sine.inOut", stagger: 0.6 }, 34.0);
+      // === SCENE 6 (32–36s) — puente al doctorado; dots light as the line reaches them ===
+      tl.from(s6Title, { y: 50, autoAlpha: 0, duration: 0.5, ease: "power4.out", stagger: 0.07 }, 32.1);
+      tl.from("#s6-p1", { y: 50, autoAlpha: 0, duration: 0.5, ease: "power4.out" }, 32.4);
+      tl.from("#s6-p1 .dot", { scale: 0, duration: 0.5, ease: "back.out(2.2)" }, 32.4);
+      tl.to("#s6-line", { strokeDashoffset: 0, duration: 1.5, ease: "none" }, 32.8);
+      tl.from("#s6-p2", { y: 50, autoAlpha: 0, duration: 0.5, ease: "power4.out" }, 33.3);
+      tl.from("#s6-p3", { y: 50, autoAlpha: 0, duration: 0.5, ease: "power4.out" }, 34.0);
+      tl.to("#s6-p2 .dot", { backgroundColor: "#1D7060", borderColor: "#1D7060", color: "#FFFFFF", scale: 1.25, duration: 0.25, ease: "power2.out" }, 33.55);
+      tl.to("#s6-p2 .dot", { scale: 1, duration: 0.3, ease: "power2.out" }, 33.8);
+      tl.to("#s6-p3 .dot", { backgroundColor: "#1D7060", borderColor: "#1D7060", color: "#FFFFFF", scale: 1.25, duration: 0.25, ease: "power2.out" }, 34.3);
+      tl.to("#s6-p3 .dot", { scale: 1, duration: 0.3, ease: "power2.out" }, 34.55);
+      tl.to("#s6-title", { scale: 1.04, duration: 3, ease: "sine.inOut" }, 32.8);
 
       // === SCENE 7 (36–40s) — cierre; the single wave returns ===
-      tl.to("#waves", { autoAlpha: 1, duration: 0.8, ease: "power2.out" }, 35.75);
-      tl.from("#s7-title", { y: 30, scale: 0.96, autoAlpha: 0, duration: 0.9, ease: "power2.out" }, 36.2);
-      tl.from("#s7-brand", { y: 20, autoAlpha: 0, duration: 0.7, ease: "power3.out" }, 36.9);
-      tl.from("#s7-foot", { autoAlpha: 0, duration: 0.7, ease: "sine.inOut" }, 37.5);
-      tl.to("#s7-title", { scale: 1.02, duration: 2.9, ease: "sine.inOut" }, 37.1);
+      tl.to("#waves", { autoAlpha: 1, duration: 0.6, ease: "power2.out" }, 35.75);
+      tl.to(F, { a: 58, duration: 1, ease: "sine.inOut", yoyo: true, repeat: 3, onUpdate: drawWaves }, 35.9);
+      tl.from(s7Title, { y: 120, rotation: 6, autoAlpha: 0, duration: 0.6, ease: "power4.out", stagger: 0.04 }, 36.1);
+      tl.from("#s7-brand", { y: 40, autoAlpha: 0, duration: 0.5, ease: "power4.out" }, 36.7);
+      tl.fromTo("#s7-word .i", { scale: 1 }, { scale: 1.2, duration: 0.25, ease: "sine.inOut", yoyo: true, repeat: 1 }, 37.2);
+      tl.from("#s7-foot", { y: 20, autoAlpha: 0, duration: 0.5, ease: "power3.out" }, 36.4);
+      tl.to("#s7-title", { scale: 1.05, duration: 2.6, ease: "sine.inOut" }, 37.3);
 
       window.__timelines["main"] = tl;
     </script>
