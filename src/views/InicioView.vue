@@ -20,7 +20,6 @@ import AccesosDemo from '@/components/comun/AccesosDemo.vue'
 import PiePublico from '@/components/layout/PiePublico.vue'
 import CabeceraSeccion from '@/components/portada/CabeceraSeccion.vue'
 import RecorridoProducto from '@/components/portada/RecorridoProducto.vue'
-import PerspectiveTunnelHero from '@/components/ui/PerspectiveTunnelHero.vue'
 import IlustracionPaso from '@/components/portada/IlustracionPaso.vue'
 import DemoSintonia from '@/components/portada/DemoSintonia.vue'
 import CifraAnimada from '@/components/portada/CifraAnimada.vue'
@@ -168,31 +167,35 @@ const estilo = (e: Record<string, string>) => e
         Hemos borrado tu cuenta y todos tus datos. Gracias por haber participado.
       </p>
 
-      <!-- 1. Inicio: túnel en perspectiva (prueba, DECISIONES.md 14/11/2026). La versión anterior está en la rama version-1. -->
-      <PerspectiveTunnelHero>
-        <template #botones>
-          <a v-if="modoDemo" href="#entrar" class="btn-primary px-6 py-3">Entrar en la demostración</a>
-          <RouterLink v-else to="/registro" class="btn-primary px-6 py-3">Tengo un código</RouterLink>
-          <a v-if="modoDemo" href="#como-funciona" class="btn-secondary px-6 py-3 bg-papel/80">Ver cómo funciona</a>
-          <RouterLink v-else-if="hayDemostracion" to="/demo" class="btn-secondary px-6 py-3 bg-papel/80">Ver la demostración</RouterLink>
-          <a v-else href="#demostracion" class="btn-secondary px-6 py-3 bg-papel/80">Ver la demostración</a>
-        </template>
-      </PerspectiveTunnelHero>
-
-      <!-- 1b. Así es cada semana: el recorrido animado del producto -->
-      <section class="relative overflow-hidden border-t border-surface-200" aria-labelledby="t-semana">
+      <!-- 1. Inicio: qué es, para qué y cómo probarlo; a la derecha, el producto -->
+      <section class="relative overflow-hidden" aria-labelledby="t-inicio">
         <CampoSintonia />
-        <div class="relative z-10 max-w-[1180px] mx-auto px-4 sm:px-6 py-16 sm:py-24 grid gap-14 lg:grid-cols-12 lg:items-center">
-          <div class="entrada lg:col-span-5">
-            <p class="text-xs font-semibold uppercase tracking-[0.16em] text-brand-900">Cada semana</p>
-            <h2 id="t-semana" class="mt-3 font-display text-4xl sm:text-5xl font-semibold tracking-tight text-surface-900 text-balance">Así es SINTONÍA por dentro</h2>
-            <ul class="mt-8 space-y-4 text-lg">
-              <li class="flex items-start gap-3"><AppIcon name="clock" :size="22" class="mt-1 shrink-0 text-brand-900" /><span class="text-surface-900 font-medium">Unos 60 segundos a la semana</span></li>
-              <li class="flex items-start gap-3"><AppIcon name="shield" :size="22" class="mt-1 shrink-0 text-brand-900" /><span class="text-surface-900 font-medium">Sin notas, sin rankings</span></li>
-              <li class="flex items-start gap-3"><AppIcon name="lock" :size="22" class="mt-1 shrink-0 text-brand-900" /><span class="text-surface-900 font-medium">Tu bienestar solo lo ves tú</span></li>
+        <div class="relative z-10 max-w-[1180px] mx-auto px-4 sm:px-6 pt-14 pb-16 sm:pt-20 sm:pb-24 grid gap-14 lg:grid-cols-12 lg:items-center">
+          <div class="entrada lg:col-span-6">
+            <p class="inline-flex items-center gap-2 rounded-full border border-surface-200 bg-papel/80 px-3 py-1 text-xs font-semibold uppercase tracking-[0.14em] text-brand-900">
+              <span class="h-1.5 w-1.5 rounded-full bg-brand-500" aria-hidden="true" />Tutoría de TFM, TFG y tesis
+            </p>
+            <h1 id="t-inicio" class="mt-6 font-display text-[2.6rem] leading-[1.04] sm:text-6xl lg:text-[3.6rem] xl:text-[4rem] font-bold tracking-tight text-surface-900 text-balance">
+              Acompañar el trabajo académico,
+              <span class="text-brand-900">sin vigilar</span>
+            </h1>
+            <p class="mt-6 text-lg sm:text-xl leading-relaxed texto-suave max-w-xl">
+              Un registro semanal muy breve de estudiante y tutor/a para que las tutorías empiecen por lo que importa.
+            </p>
+            <div class="mt-9 flex flex-col sm:flex-row gap-3">
+              <a v-if="modoDemo" href="#entrar" class="btn-primary px-6 py-3">Entrar en la demostración</a>
+              <RouterLink v-else to="/registro" class="btn-primary px-6 py-3">Tengo un código</RouterLink>
+              <a v-if="modoDemo" href="#como-funciona" class="btn-secondary px-6 py-3">Ver cómo funciona</a>
+              <RouterLink v-else-if="hayDemostracion" to="/demo" class="btn-secondary px-6 py-3">Ver la demostración</RouterLink>
+              <a v-else href="#demostracion" class="btn-secondary px-6 py-3">Ver la demostración</a>
+            </div>
+            <ul class="mt-10 grid gap-4 sm:grid-cols-3 border-t border-surface-200 pt-6 text-sm">
+              <li class="flex items-start gap-2.5"><AppIcon name="clock" :size="18" class="mt-0.5 shrink-0 text-brand-900" /><span class="text-surface-900 font-medium">Unos 60 segundos a la semana</span></li>
+              <li class="flex items-start gap-2.5"><AppIcon name="shield" :size="18" class="mt-0.5 shrink-0 text-brand-900" /><span class="text-surface-900 font-medium">Sin notas, sin rankings</span></li>
+              <li class="flex items-start gap-2.5"><AppIcon name="lock" :size="18" class="mt-0.5 shrink-0 text-brand-900" /><span class="text-surface-900 font-medium">Tu bienestar solo lo ves tú</span></li>
             </ul>
           </div>
-          <div class="lg:col-span-7 lg:col-start-6">
+          <div class="lg:col-span-6 lg:col-start-7">
             <RecorridoProducto />
           </div>
         </div>

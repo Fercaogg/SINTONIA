@@ -415,7 +415,3 @@ Motor ligero en `src/lib/efectos.ts`; nada fija ni intercepta el scroll.
 - **Ligado al desplazamiento:** barra de progreso de lectura bajo la cabecera; las ondas de "El problema" se acercan al leer; en la banda azul, ondas grandes de fondo se deslizan; la línea de Puente se dibuja y cada paso se enciende al llegar; las ondas del cierre coinciden al bajar.
 - **Ilustraciones de "Cómo funciona":** al aparecer, se marcan las respuestas, llegan las preguntas y las ondas del paso 2 se acercan con el scroll.
 - **Reglas:** solo transform y opacity (la luz solo cambia dos variables de una tarjeta); estilos aplicados desde código por la CSP; con "reducir movimiento", todo quieto y en su sitio.
-
-### 12.2. Prueba: túnel en perspectiva en el inicio
-
-`src/components/ui/PerspectiveTunnelHero.vue`, adaptación en Vue de un componente React de 21st.dev. Nueve tarjetas con fragmentos del producto vuelan hacia quien mira por un pasillo 3D; la cámara sigue al ratón con muelles. El avance sale del scroll normal (el inicio sube más despacio que la página, sin fijarse). El titular comparte el espacio 3D con las tarjetas, con un halo del color del fondo detrás del texto, para que las tarjetas lejanas pasen por detrás. Con "reducir movimiento", quieto. La versión anterior está en la rama `version-1`.
