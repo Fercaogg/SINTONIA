@@ -18,7 +18,7 @@ import BandaEntorno from '@/components/comun/BandaEntorno.vue'
 import AccesosDemo from '@/components/comun/AccesosDemo.vue'
 import PiePublico from '@/components/layout/PiePublico.vue'
 import CabeceraSeccion from '@/components/portada/CabeceraSeccion.vue'
-import MaquetaProducto from '@/components/portada/MaquetaProducto.vue'
+import RecorridoProducto from '@/components/portada/RecorridoProducto.vue'
 import IlustracionPaso from '@/components/portada/IlustracionPaso.vue'
 import DemoSintonia from '@/components/portada/DemoSintonia.vue'
 import CifraAnimada from '@/components/portada/CifraAnimada.vue'
@@ -131,7 +131,7 @@ const PUENTE = [
             </ul>
           </div>
           <div class="lg:col-span-6 lg:col-start-7">
-            <MaquetaProducto />
+            <RecorridoProducto />
           </div>
         </div>
       </section>

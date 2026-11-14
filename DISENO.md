@@ -391,7 +391,7 @@ Sustituye la composición de la portada del apartado 11 (se mantienen tokens, ti
 
 **Orden, de más a menos importante para quien llega:**
 
-1. Inicio: qué es, botones (entrar en la demostración o "Tengo un código") y tres garantías (60 segundos, sin notas, el bienestar solo lo ves tú). A la derecha, la maqueta del producto.
+1. Inicio: qué es, botones (entrar en la demostración o "Tengo un código") y tres garantías (60 segundos, sin notas, el bienestar solo lo ves tú). A la derecha, el recorrido animado del producto (`RecorridoProducto`): un móvil que pasa solo por las cuatro fases de cada semana (responde el estudiante, responde el tutor/a, se comparan las dos miradas, llega la agenda) con una guía de pasos al lado. Cada paso tiene su barra de tiempo; se puede pulsar cualquier paso o pausar, se para fuera de pantalla y, con "reducir movimiento", no avanza solo.
 2. Para quién es: una franja con los cuatro destinatarios.
 3. Entrar en la demostración (solo en modo demostración): los cuatro perfiles en una fila.
 4. El problema, con las dos ondas como ilustración.
@@ -404,4 +404,4 @@ Sustituye la composición de la portada del apartado 11 (se mantienen tokens, ti
 
 **Reglas de composición** (skill ui-ux-pro-max, estilo suizo): retícula de 12 columnas en un ancho de 1180 px; todos los apartados empiezan igual (etiqueta numerada, título y, si hay, entradilla en las columnas 8 a 12, componente `CabeceraSeccion`); fondos alternos (claro y papel con bordes) y una sola banda azul marino; tarjetas de altura igual; iconos SVG de la casa, nunca emojis; movimiento solo en la entrada del inicio y en las ondas, y nada con "reducir movimiento".
 
-**Componentes nuevos:** `MaquetaProducto`, `IlustracionPaso`, `QuienVeBienestar`, `TarjetasPerfiles`, `CabeceraSeccion`. Se retiran `PestanasPerfiles` y `ComoFuncionaOndas`.
+**Componentes nuevos:** `RecorridoProducto`, `IlustracionPaso`, `QuienVeBienestar`, `TarjetasPerfiles`, `CabeceraSeccion`. Se retiran `PestanasPerfiles` y `ComoFuncionaOndas`.
