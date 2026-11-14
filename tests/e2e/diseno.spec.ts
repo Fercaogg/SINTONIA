@@ -27,7 +27,7 @@ test.describe('modo oscuro', () => {
 test('con "reducir movimiento" todo se ve en su estado final', async ({ page }) => {
   await page.emulateMedia({ reducedMotion: 'reduce' })
   await page.goto('/')
-  await expect(page.locator('#como-funciona').getByText('En sintonía')).toBeAttached()
+  await expect(page.locator('#como-funciona').getByRole('heading', { name: 'Dos miradas' })).toBeAttached()
   await expect(page.getByLabel('SINTONÍA en cifras')).toContainText('60')
   const animacion = await page.locator('.entrada').first().evaluate((el) => getComputedStyle(el).animationName)
   expect(animacion).toBe('none')

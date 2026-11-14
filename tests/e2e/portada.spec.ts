@@ -39,16 +39,13 @@ test('la demostración del inicio muestra el desajuste y tres preguntas, sin lla
   expect(peticiones).toEqual([])
 })
 
-test('las pestañas de perfiles se manejan con el teclado', async ({ page }) => {
+test('los tres perfiles se ven a la vez, con lo que ve y no ve cada uno', async ({ page }) => {
   await page.goto('/#perfiles')
-  const estudiante = page.getByRole('tab', { name: 'Estudiante' })
-  await estudiante.click()
-  await expect(page.getByRole('tabpanel')).toContainText('Unos 60 segundos a la semana')
-  await page.keyboard.press('ArrowRight')
-  await expect(page.getByRole('tab', { name: 'Tutor/a' })).toBeFocused()
-  await expect(page.getByRole('tabpanel')).toContainText('Unos 30 segundos a la semana')
-  await page.keyboard.press('ArrowRight')
-  await expect(page.getByRole('tabpanel')).toContainText('Ninguna cifra calculada sobre menos de 5 personas')
+  const tarjetas = page.locator('#perfiles').getByRole('listitem').filter({ has: page.getByRole('heading', { level: 3 }) })
+  await expect(tarjetas).toHaveCount(3)
+  await expect(tarjetas.nth(0)).toContainText('Unos 60 segundos a la semana')
+  await expect(tarjetas.nth(1)).toContainText('Unos 30 segundos a la semana')
+  await expect(tarjetas.nth(2)).toContainText('Ninguna cifra calculada sobre menos de 5 personas')
 })
 
 test('Dirección: dos tarjetas iguales, en orden alfabético y solo con los datos facilitados', async ({ page }) => {

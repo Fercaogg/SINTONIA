@@ -9,6 +9,9 @@ import { INICIO_ROL } from '@/lib/tipos'
 import AppIcon from './AppIcon.vue'
 import AvisoError from './AvisoError.vue'
 
+// ancho: en la portada, los cuatro perfiles en una fila (pantallas grandes).
+withDefaults(defineProps<{ ancho?: boolean }>(), { ancho: false })
+
 const ICONOS = { estudiante: 'person', tutor: 'users', direccion: 'chart', investigador: 'flask' } as const
 
 const router = useRouter()
@@ -46,7 +49,7 @@ async function entrar(email: string) {
     <h2 id="t-demo" class="font-semibold text-surface-900">Entrar en la demostración</h2>
     <p class="text-sm texto-suave mt-1 mb-4">Elige un perfil. Todos los datos y nombres son ficticios.</p>
     <AvisoError v-if="error" :mensaje="error" class="mb-4" />
-    <ul class="grid gap-3 sm:grid-cols-2">
+    <ul class="grid gap-3 sm:grid-cols-2" :class="{ 'lg:grid-cols-4': ancho }">
       <li v-for="a in ACCESOS_DEMO" :key="a.rol">
         <button
           type="button"

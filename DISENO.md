@@ -384,3 +384,24 @@ Segunda pasada con las skills (14/11/2026), centrada en lo que verán estudiante
   - los números de la escala se hunden al tocarlos;
   - las tarjetas con enlace se elevan 2 px al pasar el ratón (Taste);
   - la navegación del menú, que se usa muchas veces, no se anima (Emil).
+
+## 12. Portada reestructurada (14/11/2026)
+
+Sustituye la composición de la portada del apartado 11 (se mantienen tokens, tipografía, ondas y campo de ondas del inicio).
+
+**Orden, de más a menos importante para quien llega:**
+
+1. Inicio: qué es, botones (entrar en la demostración o "Tengo un código") y tres garantías (60 segundos, sin notas, el bienestar solo lo ves tú). A la derecha, la maqueta del producto.
+2. Para quién es: una franja con los cuatro destinatarios.
+3. Entrar en la demostración (solo en modo demostración): los cuatro perfiles en una fila.
+4. El problema, con las dos ondas como ilustración.
+5. Cómo funciona: tres tarjetas, cada una con su ilustración.
+6. Pruébalo: la demostración interactiva y las cifras, sobre azul marino.
+7. Privacidad y ética, con el gráfico de quién ve el bienestar.
+8. Para cada perfil: tres tarjetas iguales.
+9. Puente al doctorado: recorrido vertical en tres pasos.
+10. Dirección, preguntas frecuentes, contacto y cierre "En sintonía.".
+
+**Reglas de composición** (skill ui-ux-pro-max, estilo suizo): retícula de 12 columnas en un ancho de 1180 px; todos los apartados empiezan igual (etiqueta numerada, título y, si hay, entradilla en las columnas 8 a 12, componente `CabeceraSeccion`); fondos alternos (claro y papel con bordes) y una sola banda azul marino; tarjetas de altura igual; iconos SVG de la casa, nunca emojis; movimiento solo en la entrada del inicio y en las ondas, y nada con "reducir movimiento".
+
+**Componentes nuevos:** `MaquetaProducto`, `IlustracionPaso`, `QuienVeBienestar`, `TarjetasPerfiles`, `CabeceraSeccion`. Se retiran `PestanasPerfiles` y `ComoFuncionaOndas`.
