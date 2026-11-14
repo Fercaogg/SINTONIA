@@ -15,8 +15,8 @@
  */
 
 import type pg from 'pg'
-import { cerrarSemanas, type Almacen } from '../../servidor/cierre-semana'
-import { sortear } from '../../servidor/logica/sorteo'
+import { cerrarSemanas, type Almacen } from '../cierre-semana.js'
+import { sortear } from '../logica/sorteo.js'
 
 export const CONTRASENA_DEMO = 'demo-sintonia'
 export const DOMINIO_DEMO = 'sintonia.example'

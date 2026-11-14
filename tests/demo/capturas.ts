@@ -207,6 +207,7 @@ test('páginas legales y registro seguro', async ({ page }, info) => {
     ['/cookies', '34-cookies', 'Cookies'],
     ['/consentimiento', '35-consentimiento-publico', 'Consentimiento informado'],
     ['/investigacion', '36-investigacion-publica', 'La investigación'],
+    ['/demo', '37-demo', 'Entra como quieras'],
   ]) {
     await page.goto(ruta)
     await page.getByRole('heading', { name: titulo, level: 1 }).waitFor()

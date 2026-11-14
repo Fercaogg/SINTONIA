@@ -1,7 +1,7 @@
 <script setup lang="ts">
 // Accesos rápidos de la demostración: entrar con un clic como cada perfil.
 import { onMounted, ref } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { supabase } from '@/lib/supabase'
 import { ACCESOS_DEMO, CONTRASENA_DEMO, accesosDisponibles, comprobarModoServidor } from '@/lib/demo'
 import { useSesion } from '@/stores/sesion'
@@ -12,6 +12,7 @@ import AvisoError from './AvisoError.vue'
 const ICONOS = { estudiante: 'person', tutor: 'users', direccion: 'chart', investigador: 'flask' } as const
 
 const router = useRouter()
+const route = useRoute()
 const sesion = useSesion()
 const listo = ref(false)
 const entrando = ref('')
@@ -20,6 +21,9 @@ const error = ref('')
 onMounted(async () => {
   await comprobarModoServidor()
   listo.value = true
+  // Desde /demo se puede llegar con ?entrar=<perfil> para entrar directamente.
+  const pedido = ACCESOS_DEMO.find((a) => a.rol === route.query.entrar)
+  if (pedido && accesosDisponibles()) await entrar(pedido.email)
 })
 
 async function entrar(email: string) {

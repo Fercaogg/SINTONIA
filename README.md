@@ -222,6 +222,8 @@ Pasos:
 3. Crea un **segundo proyecto** en Vercel con el mismo repositorio y las variables del proyecto de demostración, más:
    - `VITE_MODO_DEMO` = `true`
    - `CORREO_PROVEEDOR` = `ninguno` (la demostración no envía correos)
+   - `MODO_DEMO` = `true` y `DEMO_DATABASE_URL` = la cadena de conexión de la base de datos de demostración: así se reinicia sola cada noche.
+4. En el proyecto **real** de Vercel, añade `VITE_URL_DEMO` con la dirección de la demostración (por ejemplo, `https://sintonia-demo.vercel.app`). La página `/demo` de la web real llevará allí, con un botón por perfil.
 
 Las semanas simuladas se calculan desde el día en que se genera la demostración. Para "rejuvenecerla" más adelante, repite el paso 2 añadiendo `-- --reiniciar` al final (solo vacía bases de datos marcadas como demostración).
 

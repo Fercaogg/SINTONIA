@@ -5,6 +5,7 @@ interface ImportMetaEnv {
   readonly VITE_SUPABASE_ANON_KEY: string
   readonly VITE_ENTORNO_LOCAL?: string
   readonly VITE_MODO_DEMO?: string
+  readonly VITE_URL_DEMO?: string
 }
 
 interface ImportMeta {

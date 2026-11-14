@@ -6,6 +6,7 @@ Allow: /privacidad
 Allow: /aviso-legal
 Allow: /cookies
 Allow: /investigacion$
+Allow: /demo$
 Allow: /consentimiento$
 Allow: /acceso$
 Allow: /registro$

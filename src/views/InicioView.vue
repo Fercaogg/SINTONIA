@@ -10,6 +10,7 @@ import { useSesion } from '@/stores/sesion'
 import { INICIO_ROL } from '@/lib/tipos'
 import { modoDemo } from '@/lib/supabase'
 import { useVisibleUnaVez } from '@/lib/movimiento'
+import { hayDemostracion } from '@/lib/demo'
 import { ANTECEDENTE, AUTOR, DATOS_CLAVE, DIRECCION, PARA_QUIEN, REFERENCIAS } from '@/contenido/portada'
 import AppLogo from '@/components/comun/AppLogo.vue'
 import AppIcon from '@/components/comun/AppIcon.vue'
@@ -112,7 +113,8 @@ const PUENTE = [
             <AccesosDemo v-if="modoDemo" class="mt-8" />
             <div class="mt-8 flex flex-col sm:flex-row gap-3">
               <RouterLink v-if="!modoDemo" to="/registro" class="btn-primary px-6 py-3">Tengo un código</RouterLink>
-              <a href="#demostracion" class="btn-secondary px-6 py-3">Ver la demostración</a>
+              <RouterLink v-if="hayDemostracion" to="/demo" class="btn-secondary px-6 py-3">Ver la demostración</RouterLink>
+              <a v-else href="#demostracion" class="btn-secondary px-6 py-3">Ver la demostración</a>
             </div>
           </div>
           <div class="entrada entrada-2">

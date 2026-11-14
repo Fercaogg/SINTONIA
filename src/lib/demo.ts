@@ -1,6 +1,6 @@
 // Modo demostración: cuentas públicas de la instalación de demostración
 // (datos ficticios, dominio inventado sintonia.example). Deben coincidir con
-// scripts/demo/generar-demo.ts.
+// servidor/demo/generar-demo.ts.
 
 import { ref } from 'vue'
 import { llamar } from './api'
@@ -29,3 +29,18 @@ export function comprobarModoServidor(): Promise<void> {
 
 /** Los accesos rápidos solo aparecen si la aplicación Y la base de datos son de demostración. */
 export const accesosDisponibles = () => modoDemo && modoServidor.value === 'demo'
+
+/**
+ * Dirección de la instalación de demostración (otro proyecto de Supabase y de
+ * Vercel, separado de los datos reales). La usa /demo para llevar a cada
+ * perfil. Vacía mientras no exista.
+ */
+export const URL_DEMO = (import.meta.env.VITE_URL_DEMO ?? '').replace(/\/$/, '')
+
+/** Enlace para entrar directamente como un perfil en la demostración. */
+export function enlaceEntrada(rol: Rol): string {
+  return `${modoDemo ? '' : URL_DEMO}/acceso?entrar=${rol}`
+}
+
+/** ¿Hay demostración a la que llevar? (esta misma instalación o la otra). */
+export const hayDemostracion = modoDemo || URL_DEMO !== ''

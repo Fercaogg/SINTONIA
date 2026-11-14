@@ -14,7 +14,7 @@ import pg from 'pg'
 import { crearBaseDeDatos, urlDe } from '../local/bd.mjs'
 import { CLAVE_ANON_LOCAL, CLAVE_SERVIDOR_LOCAL, PUERTO_LOCAL, crearServidor } from '../local/servidor-local.mjs'
 import { clienteServidor, crearAlmacenSupabase } from '../../servidor/almacen-supabase.ts'
-import { generarDemo, CONTRASENA_DEMO, CUENTAS_DEMO } from './generar-demo.ts'
+import { generarDemo, CONTRASENA_DEMO, CUENTAS_DEMO } from '../../servidor/demo/generar-demo.ts'
 
 const remoto = process.argv.includes('--remoto')
 // En local la base de datos se crea siempre de cero, así que --reiniciar solo

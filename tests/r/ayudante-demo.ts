@@ -6,7 +6,7 @@ import pg from 'pg'
 import { crearBaseDeDatos, urlDe } from '../../scripts/local/bd.mjs'
 import { CLAVE_SERVIDOR_LOCAL, crearServidor } from '../../scripts/local/servidor-local.mjs'
 import { clienteServidor, crearAlmacenSupabase } from '../../servidor/almacen-supabase'
-import { generarDemo } from '../../scripts/demo/generar-demo'
+import { generarDemo } from '../../servidor/demo/generar-demo'
 
 export async function baseDeDatosDemo(nombre: string) {
   await crearBaseDeDatos(nombre)

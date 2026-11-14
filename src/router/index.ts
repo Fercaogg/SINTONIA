@@ -28,6 +28,7 @@ const routes: RouteRecordRaw[] = [
   { path: '/privacidad', component: () => import('@/views/legal/PrivacidadView.vue'), meta: { publica: true, titulo: 'Política de privacidad' } },
   { path: '/aviso-legal', component: () => import('@/views/legal/AvisoLegalView.vue'), meta: { publica: true, titulo: 'Aviso legal' } },
   { path: '/investigacion', component: () => import('@/views/InvestigacionPublicaView.vue'), meta: { publica: true, titulo: 'La investigación' } },
+  { path: '/demo', component: () => import('@/views/DemoView.vue'), meta: { publica: true, titulo: 'Demostración' } },
   { path: '/cookies', component: () => import('@/views/legal/CookiesView.vue'), meta: { publica: true, titulo: 'Cookies' } },
   { path: '/consentimiento/aceptar', component: () => import('@/views/acceso/ConsentimientoView.vue'), meta: { titulo: 'Consentimiento informado' } },
   {

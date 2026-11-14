@@ -101,3 +101,12 @@ test('la página de la investigación tiene su estructura y las referencias perm
   await sinRayasLargas(page)
   await sinErroresDeAccesibilidad(page)
 })
+
+test('/demo tiene su banda fija y, sin demostración configurada, lo dice con un texto digno', async ({ page }) => {
+  await page.goto('/demo')
+  await expect(page.locator('[data-banda-demo]')).toHaveText('Demostración: datos ficticios')
+  await expect(page.getByRole('heading', { level: 1, name: 'Entra como quieras' })).toBeVisible()
+  await expect(page.getByText('En elaboración. Se publicará aquí cuando esté disponible.')).toBeVisible()
+  expect(await page.locator('body').innerText()).not.toContain('[PENDIENTE')
+  await sinErroresDeAccesibilidad(page)
+})

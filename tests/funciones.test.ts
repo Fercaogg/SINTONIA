@@ -21,6 +21,7 @@ describe('funciones de Vercel', () => {
       'api/notificar-apoyo': 401,
       'api/recordatorios': 401,
       'api/registro': 503,
+      'api/reiniciar-demo': 401,
     })
   }, 60_000)
 })

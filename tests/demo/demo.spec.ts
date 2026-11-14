@@ -38,7 +38,7 @@ for (const [perfil, { inicio, rutas }] of Object.entries(RUTAS) as [Perfil, (typ
 }
 
 test('las pantallas públicas son accesibles', async ({ page }) => {
-  for (const ruta of ['/', '/acceso', '/como-funciona', '/investigacion', '/privacidad', '/aviso-legal', '/cookies', '/consentimiento', '/no-existe']) {
+  for (const ruta of ['/', '/acceso', '/como-funciona', '/investigacion', '/demo', '/privacidad', '/aviso-legal', '/cookies', '/consentimiento', '/no-existe']) {
     await page.goto(ruta)
     await page.waitForLoadState('networkidle')
     await sinErroresDeAccesibilidad(page)
@@ -165,4 +165,15 @@ test('calendario: la dirección publica un evento para todo el máster', async (
   const ev = page.getByRole('article', { name: `Seminario o evento: ${titulo}` }).first()
   await expect(ev).toContainText('Todo el máster')
   await expect(ev).toContainText('Lo anotó: Dirección del máster')
+})
+
+test('/demo lleva a cada perfil con un clic', async ({ page }) => {
+  await page.goto('/demo')
+  await expect(page.locator('[data-banda-demo]')).toHaveText('Demostración: datos ficticios')
+  await page.getByRole('link', { name: /Entrar como estudiante/ }).click()
+  await expect(page).toHaveURL(/\/estudiante$/)
+  await page.evaluate(() => localStorage.clear())
+  await page.goto('/demo')
+  await page.getByRole('link', { name: /Entrar como investigación/ }).click()
+  await expect(page).toHaveURL(/\/investigador$/)
 })
