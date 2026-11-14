@@ -53,6 +53,8 @@ export default defineConfig(({ mode }) => {
   const proxy = supabaseLocal ? { '/api': { target: supabaseLocal, changeOrigin: true, xfwd: true } } : undefined
   return {
     plugins: [vue(), precargarFuentes()],
+    // NEXT_PUBLIC_: las variables PÚBLICAS que pone la integración de Supabase en Vercel.
+    envPrefix: ['VITE_', 'NEXT_PUBLIC_'],
     define: {
       __VERSION_SINTONIA__: JSON.stringify(JSON.parse(readFileSync(new URL('./package.json', import.meta.url), 'utf8')).version),
     },

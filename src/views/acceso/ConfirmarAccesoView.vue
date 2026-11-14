@@ -15,6 +15,27 @@ const sesion = useSesion()
 const error = ref('')
 
 onMounted(async () => {
+  // Formato por defecto de Supabase: la sesión llega en el fragmento (#...).
+  const fragmento = new URLSearchParams(window.location.hash.slice(1))
+  if (fragmento.get('access_token') && fragmento.get('refresh_token')) {
+    const { error: e } = await supabase.auth.setSession({
+      access_token: fragmento.get('access_token')!,
+      refresh_token: fragmento.get('refresh_token')!,
+    })
+    history.replaceState(null, '', window.location.pathname)
+    if (e) {
+      error.value = 'El enlace ha caducado o ya se ha usado. Pide uno nuevo.'
+      return
+    }
+    await sesion.cargar(true)
+    router.replace(sesion.rol ? INICIO_ROL[sesion.rol] : '/')
+    return
+  }
+  if (fragmento.get('error')) {
+    error.value = 'El enlace ha caducado o ya se ha usado. Pide uno nuevo.'
+    return
+  }
+  // Formato de SINTONÍA (plantilla del correo con token_hash).
   const token_hash = String(route.query.token_hash || '')
   const tipo = String(route.query.type || 'email') as 'email' | 'signup' | 'magiclink'
   if (!token_hash) {

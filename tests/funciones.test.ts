@@ -18,6 +18,7 @@ describe('funciones de Vercel', () => {
       'api/acceso': 503,
       'api/cerrar-semana': 401,
       'api/contacto': 503,
+      'api/instalar': 401,
       'api/notificar-apoyo': 401,
       'api/recordatorios': 401,
       'api/registro': 503,

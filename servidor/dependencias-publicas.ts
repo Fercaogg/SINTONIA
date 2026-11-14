@@ -19,7 +19,8 @@ export function dependenciasDesdeEntorno(env: Record<string, string | undefined>
       rpc<boolean>('servicio_limitar', { p_tipo: tipo, p_claves: claves, p_limite: limite, p_minutos: minutos }),
     autorizarRegistro: (codigo, email) => rpc<{ ok: boolean }>('servicio_autorizar_registro', { p_codigo: codigo, p_email: email }),
     enviarEnlace: async (email, { crearCuenta, datos }) => {
-      const { error } = await cliente.auth.signInWithOtp({ email, options: { shouldCreateUser: crearCuenta, data: datos } })
+      const redireccion = env.APP_URL ? `${env.APP_URL.replace(/\/$/, '')}/acceso/confirmar` : undefined
+      const { error } = await cliente.auth.signInWithOtp({ email, options: { shouldCreateUser: crearCuenta, data: datos, emailRedirectTo: redireccion } })
       if (error) throw new Error(error.message)
     },
     enviador: enviadorDesdeEntorno(env),

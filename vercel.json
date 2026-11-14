@@ -17,7 +17,7 @@
       "headers": [
         {
           "key": "Content-Security-Policy",
-          "value": "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; connect-src 'self' https://hegsmcuhwpatkzilbxgz.supabase.co wss://hegsmcuhwpatkzilbxgz.supabase.co; frame-src 'none'; frame-ancestors 'none'; object-src 'none'; base-uri 'self'; form-action 'self'; manifest-src 'self'; worker-src 'self'; upgrade-insecure-requests"
+          "value": "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; connect-src 'self' https://skzpyzawkhwovfbgnuep.supabase.co wss://skzpyzawkhwovfbgnuep.supabase.co; frame-src 'none'; frame-ancestors 'none'; object-src 'none'; base-uri 'self'; form-action 'self'; manifest-src 'self'; worker-src 'self'; upgrade-insecure-requests"
         },
         {
           "key": "X-Frame-Options",
@@ -68,5 +68,11 @@
       "path": "/api/reiniciar-demo",
       "schedule": "30 2 * * *"
     }
-  ]
+  ],
+  "functions": {
+    "api/instalar.ts": {
+      "includeFiles": "supabase/instalacion-completa.sql",
+      "maxDuration": 120
+    }
+  }
 }
