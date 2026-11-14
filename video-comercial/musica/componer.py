@@ -1,229 +1,293 @@
 #!/usr/bin/env python3
 """
-SINTONÍA · banda sonora del spot (60 s, 120 BPM, La menor → Do mayor).
+SINTONÍA · banda sonora del spot — rage / UK underground, 140 BPM en half-time, Fa menor.
 
-Síntesis 100 % propia (numpy): sin samples ni licencias de terceros.
-Cada golpe, whoosh y riser está colocado sobre los tiempos del montaje
-(ver la tabla "Rejilla de música" del README).
+Composición y síntesis originales (numpy, sin samples ni melodías de terceros).
+Cada aparición del vídeo cae en un tiempo de la rejilla de 140 BPM (ver musica/tiempos.py,
+réplica de SX.QM en assets/js/sx.js) y recibe un golpe de 808 + campana o click metálico.
 
-Uso:  python3 musica/componer.py            → assets/music/sintonia-bgm.wav
+Uso:
+  python3 musica/componer.py
+  ffmpeg -y -i assets/music/sintonia-bgm.wav -af loudnorm=I=-14.5:TP=-1:LRA=7 -ar 48000 -b:a 256k assets/music/sintonia-bgm.mp3
 """
-import os, wave
+import os, sys, wave
 import numpy as np
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from tiempos import QM  # noqa: E402
 
 SR = 48000
 DUR = 60.0
-BEAT = 0.5
 N = int(SR * DUR)
-rng = np.random.default_rng(7)  # determinista
+BPM = 140
+B = 60 / BPM          # negra
+BAR = 4 * B           # compás
+S16 = B / 4           # semicorchea
+rng = np.random.default_rng(140)
 
-L = np.zeros(N); R = np.zeros(N)
-
-def t_(d): return np.arange(int(SR * d)) / SR
 def hz(m): return 440.0 * 2 ** ((m - 69) / 12)
+def t_(d): return np.arange(int(SR * d)) / SR
+def idx(t): return int(round(t * SR))
 
-def put(sig, at, gain=1.0, pan=0.0):
-    i = int(at * SR)
-    if i >= N: return
+def bus(st=True): return np.zeros((N, 2)) if st else np.zeros(N)
+LEAD, BELL, DRUM, SEND = bus(), bus(), bus(), bus()
+BASS = bus(False)
+
+def put(dst, sig, at, gain=1.0, pan=0.0):
+    i = idx(at)
+    if i >= N or i < 0: return
     s = sig[: N - i] * gain
-    L[i:i + len(s)] += s * np.sqrt(0.5 * (1 - pan))
-    R[i:i + len(s)] += s * np.sqrt(0.5 * (1 + pan))
+    if dst.ndim == 1: dst[i:i + len(s)] += s if s.ndim == 1 else s.mean(axis=1); return
+    if s.ndim == 1:
+        dst[i:i + len(s), 0] += s * np.sqrt(0.5 * (1 - pan)); dst[i:i + len(s), 1] += s * np.sqrt(0.5 * (1 + pan))
+    else:
+        dst[i:i + len(s)] += s
 
-def smooth(x, n):  # moving-average low-pass
+def smooth(x, n):
     if n <= 1: return x
     k = np.ones(n) / n
-    return np.convolve(x, k, mode="same")
+    if x.ndim == 1: return np.convolve(x, k, mode="same")
+    return np.stack([np.convolve(x[:, c], k, mode="same") for c in range(x.shape[1])], axis=1)
 
-def hp(x, n): return x - smooth(x, n)
+def lp2(x, fc):
+    """Two cascaded one-pole low-passes; fc may be a per-sample array."""
+    fc = np.broadcast_to(np.asarray(fc, dtype=float), (len(x),))
+    a = 1 - np.exp(-2 * np.pi * fc / SR)
+    y = np.array(x, dtype=float)
+    for _ in range(2):
+        out = np.empty_like(y); z = np.zeros(y.shape[1:]) if y.ndim > 1 else 0.0
+        for i in range(len(y)):
+            z = z + a[i] * (y[i] - z); out[i] = z
+        y = out
+    return y
 
-# ---------------------------------------------------------------- instruments
-def kick(gain=1.0):
-    t = t_(0.45)
-    f = 45 + 95 * np.exp(-t * 28)
-    ph = 2 * np.pi * np.cumsum(f) / SR
-    s = np.sin(ph) * np.exp(-t * 7.5)
-    s[:240] += rng.standard_normal(240) * np.linspace(0.5, 0, 240)  # click
-    return np.tanh(s * 1.6) * gain
+# ---------------------------------------------------------------- timeline (vídeo)
+# Apariciones en tiempo del corte original de 45 s → tiempo final en la rejilla de 140 BPM.
+APPEAR = [0, 1, 2, 3.5,                                   # gancho
+          4, 4.5, 6, 7, 7.5, 8, 9.5, 9.75, 10, 11.5, 12,  # datos
+          13, 14, 14.5, 15, 15.5,                         # reveal
+          17, 17.5, 19, 20, 20.5, 20.75, 21, 22, 23, 23.5, 25, 25.5, 26, 26.5,  # cómo funciona
+          28, 28.5, 29, 29.5, 30, 31, 31.5, 32, 33, 33.5,  # confianza
+          35, 35.5, 37, 37.5, 38, 38.5,                   # perfiles
+          40, 42, 43.5]                                   # cierre
+TAPS = [17.75, 18.0, 18.25, 18.5]                         # pulsaciones del móvil → solo click
+BIG = {3.5, 14.5, 23, 31, 31.5, 32, 42}                   # golpes principales → campana larga
+SECTIONS = [QM(t) for t in (4.0, 13.0, 17.0, 28.0, 35.0, 40.0)]  # entradas de sección
+DROP_IN = SECTIONS[0]                                     # entra la batería
+END_CUT = DUR - 2 * B                                     # último medio compás: solo cola
 
-def clap():
-    t = t_(0.3)
-    n = hp(rng.standard_normal(len(t)), 12)
-    env = np.exp(-t * 22)
-    for d in (0.0, 0.011, 0.022):  # three quick transients
-        j = int(d * SR); env[j:j + 200] += np.linspace(0.6, 0, 200)
-    return smooth(n, 3) * env * 0.5
+events = sorted({round(QM(t), 4) for t in APPEAR})
+taps = [QM(t) for t in TAPS]
 
-def hat(open_=False):
-    t = t_(0.25 if open_ else 0.06)
-    n = hp(rng.standard_normal(len(t)), 4)
-    return n * np.exp(-t * (14 if open_ else 70)) * 0.22
+def snap(t):  # nearest 140 BPM sixteenth
+    return round(t / S16) * S16
 
-def tone(m, d, harm=6, decay=3.0, bright=1.6, detune=0.0, attack=0.004):
-    t = t_(d); f = hz(m); s = np.zeros_like(t)
-    for k in range(1, harm + 1):
-        s += np.sin(2 * np.pi * f * k * (1 + detune * (k % 2 - 0.5)) * t) * np.exp(-t * decay * (k ** (bright - 1))) / k
-    a = np.minimum(1, t / attack)
-    return s * a
+# gate: corte total de medio compás antes de cada sección (y al final), dejando solo la reverb
+gate = np.ones(N)
+cuts = [(s - 2 * B, s) for s in SECTIONS[1:]] + [(END_CUT, DUR)]
+for a, b in cuts:
+    i, j = idx(a), idx(b); gate[i:j] = 0
+    k = 120; gate[max(0, i - k):i] *= np.linspace(1, 0, min(k, i))  # micro-fundido sin click
+def in_cut(t): return any(a - 0.01 <= t < b for a, b in cuts)
 
-def pluck(m, d=0.6): return tone(m, d, harm=7, decay=5.5, bright=1.5) * 0.32
+# ---------------------------------------------------------------- composición
+# Bucle de 2 compases (32 semicorcheas). Melodía original con notas repetidas.
+F5, G5, Ab5, Bb5, C6, Eb5, Db6 = 77, 79, 80, 82, 84, 75, 85
+LOOP = [(0, F5), (2, F5), (3, F5), (6, Ab5), (8, G5), (10, F5), (11, F5), (14, Eb5),
+        (16, F5), (18, F5), (19, F5), (22, Ab5), (24, C6), (26, Bb5), (27, Ab5), (30, G5)]
+LOOP_LEN = 32 * S16
+# 808 (MIDI), posición en negras dentro del bucle, glide hacia la nota
+F1, Ab1, Db1, C1, Eb1 = 29, 32, 25, 24, 27
+BASSLINE = [(0, F1, False), (1.5, F1, False), (3.0, Ab1, True), (4.0, Db1, False),
+            (5.5, Db1, False), (6.5, C1, True), (7.25, Eb1, True)]
 
-def piano(m, d=2.5):
-    s = tone(m, d, harm=9, decay=1.6, bright=1.45) + 0.4 * tone(m + 12, d, harm=4, decay=2.4)
-    return s * 0.22
+def loop_starts(a, b):
+    k0 = int(np.ceil(a / LOOP_LEN - 1e-9)); out = []
+    k = k0
+    while k * LOOP_LEN < b - 1e-9: out.append(k * LOOP_LEN); k += 1
+    return out
 
-def bass(m, d):
-    t = t_(d); f = hz(m); s = np.zeros_like(t)
-    for k in range(1, 6): s += np.sin(2 * np.pi * f * k * t) / k ** 1.3
-    env = np.minimum(1, t / 0.008) * np.exp(-t * 3.0)
-    return np.tanh(s * env * 1.4) * 0.34
+# ---------------------------------------------------------------- instrumentos
+def polyblep_saw(f, d, phase0=0.0):
+    n = int(SR * d); dt = f / SR
+    ph = (phase0 + dt * np.arange(n)) % 1.0
+    s = 2 * ph - 1
+    m = ph < dt; x = ph[m] / dt; s[m] -= x + x - x * x - 1
+    m = ph > 1 - dt; x = (ph[m] - 1) / dt; s[m] -= x * x + x + x + 1
+    return s
 
-def pad(notes, d, harm=7, gain=0.11, fade=0.6):
-    t = t_(d); s = np.zeros_like(t)
-    for m in notes:
-        for det in (-0.004, 0.0, 0.0045):
-            f = hz(m) * (1 + det)
-            for k in range(1, harm + 1):
-                s += np.sin(2 * np.pi * f * k * t + k * det * 900) / k ** 1.35
-    env = np.minimum(1, t / fade) * np.minimum(1, (d - t) / fade)
-    return s * env * gain / len(notes)
+DETUNE = [-23, -14, -6, 0, 6, 14, 23]      # cents, 7 voces
+PANS = [-1, -0.66, -0.33, 0, 0.33, 0.66, 1]
 
-def sub(m, d, gain=0.35):
+def supersaw(m, d):
+    out = np.zeros((int(SR * d), 2))
+    for c, p in zip(DETUNE, PANS):
+        s = polyblep_saw(hz(m) * 2 ** (c / 1200), d, rng.random())
+        out[:, 0] += s * np.sqrt(0.5 * (1 - p)); out[:, 1] += s * np.sqrt(0.5 * (1 + p))
     t = t_(d)
-    return np.sin(2 * np.pi * hz(m) * t) * np.minimum(1, t / 0.01) * np.exp(-t * 2.2) * gain
+    env = np.minimum(1, t / 0.004) * np.clip((d - t) / 0.02, 0, 1) * (0.75 + 0.25 * np.exp(-t * 9))
+    return out * env[:, None] / 3.2
 
-def whoosh(d=0.45, peak=0.6):
-    t = t_(d); n = rng.standard_normal(len(t))
-    env = np.exp(-((t / d - peak) ** 2) / 0.03)
-    lo = smooth(n, 28); hi = hp(n, 6)
-    mix = lo * (1 - t / d) + hi * 0.35 * (t / d)
-    return mix * env * 0.9
+def bell(m, d=1.2, gain=1.0):  # FM bell
+    t = t_(d); f = hz(m)
+    s = np.sin(2 * np.pi * f * t + 2.2 * np.exp(-t * 6) * np.sin(2 * np.pi * f * 3.5 * t))
+    return s * np.exp(-t * 3.5) * np.minimum(1, t / 0.002) * gain
 
-def riser(d):
-    t = t_(d); n = rng.standard_normal(len(t))
-    f = 200 * 2 ** (t / d * 3.2)
-    sw = np.sin(2 * np.pi * np.cumsum(f) / SR) * 0.25
-    noise = hp(n, 3) * 0.35
-    env = (t / d) ** 2.2
-    return (sw + noise) * env * 0.7
+def metal_click():
+    t = t_(0.08); s = np.zeros_like(t)
+    for f in (3150, 4870, 6420, 8960): s += np.sin(2 * np.pi * f * t)
+    n = rng.standard_normal(len(t)); n = n - smooth(n, 3)
+    return (s * 0.25 + n * 0.4) * np.exp(-t * 60)
 
-def impact(big=True):
-    d = 2.6 if big else 1.0; t = t_(d)
-    boom = np.sin(2 * np.pi * np.cumsum(38 + 60 * np.exp(-t * 9)) / SR) * np.exp(-t * (1.6 if big else 4))
-    n = smooth(rng.standard_normal(len(t)), 6) * np.exp(-t * 9) * 0.5
-    return np.tanh((boom + n) * 1.5) * (0.9 if big else 0.5)
+def kick():
+    t = t_(0.28)
+    f = 48 + 140 * np.exp(-t * 40)
+    s = np.sin(2 * np.pi * np.cumsum(f) / SR) * np.exp(-t * 14)
+    s[:150] += rng.standard_normal(150) * np.linspace(0.6, 0, 150)
+    return np.tanh(s * 2.2) * 0.9
 
-def tick(): return hp(rng.standard_normal(int(0.02 * SR)), 2) * np.exp(-t_(0.02) * 200) * 0.35
+def clap():  # seca
+    t = t_(0.16); n = rng.standard_normal(len(t)); n = smooth(n - smooth(n, 10), 2)
+    env = np.exp(-t * 34)
+    for d in (0.0, 0.009, 0.018):
+        j = idx(d); env[j:j + 160] += np.linspace(0.7, 0, 160)
+    return n * env * 0.75
 
-# ---------------------------------------------------------------- harmony
-# (start, end, chord) — La menor · Fa · Do · Sol, cambio cada 4 s (2 compases)
-A, F, C, G = [57, 60, 64], [53, 57, 60], [48, 52, 55, 59], [55, 59, 62]
-prog = []
-seq = [A, F, C, G]
-for i, s in enumerate(np.arange(4.0, 52.0, 4.0)):
-    prog.append((s, s + 4.0, seq[i % 4]))
-prog += [(52.0, 55.5, F), (55.5, 60.0, [48, 52, 55, 62])]  # cierre: Fa → Do(add9)
-root = {tuple(A): 45, tuple(F): 41, tuple(C): 48, tuple(G): 43, (48, 52, 55, 62): 48}
+def hat(dec=80, g=0.22):
+    t = t_(0.05); n = rng.standard_normal(len(t)); n = n - smooth(n, 3)
+    return n * np.exp(-t * dec) * g
 
-def chord_at(t):
-    for s, e, c in prog:
-        if s <= t < e: return c
-    return A
+# ---------------------------------------------------------------- 808 (mono, glide, saturado)
+notes = []  # (time, midi, glide)
+def root_at(t):
+    if t < DROP_IN: return F1
+    lt = (t % LOOP_LEN) / B; cur = F1
+    for pos, m, _ in BASSLINE:
+        if pos <= lt + 1e-9: cur = m
+    return cur
+for L0 in loop_starts(DROP_IN, END_CUT):
+    for pos, m, gl in BASSLINE:
+        notes.append((L0 + pos * B, m, gl))
+for e in events:
+    if e >= DROP_IN - 1e-6: notes.append((e, root_at(e), False))
+notes = sorted({(round(t, 4), m, g) for t, m, g in notes if not in_cut(t) and t < END_CUT})
 
-def beats(a, b, step=BEAT):
-    return [round(a + i * step, 4) for i in range(int(round((b - a) / step)))]
+freq = np.full(N, hz(F1)); amp = np.zeros(N); punch = np.zeros(N)
+for k, (t0, m, gl) in enumerate(notes):
+    i0 = idx(t0); i1 = idx(notes[k + 1][0]) if k + 1 < len(notes) else N
+    seg = np.arange(i1 - i0) / SR
+    f1 = hz(m)
+    if gl and k > 0:
+        f0 = hz(notes[k - 1][1]); g = np.clip(seg / 0.075, 0, 1)
+        freq[i0:i1] = f0 * (f1 / f0) ** g
+    else:
+        freq[i0:i1] = f1
+    amp[i0:i1] = np.minimum(1, seg / 0.003) * (0.35 + 0.65 * np.exp(-seg * 1.1))
+    punch[i0:i1] = np.exp(-seg * 70)
+ph = 2 * np.pi * np.cumsum(freq * (1 + 1.0 * punch)) / SR
+b808 = np.sin(ph) * amp
+b808 = np.tanh(b808 * 4.0 + 0.25 * b808 ** 2) * 0.95      # saturación fuerte
+b808 = b808 - smooth(b808, 900) * 0.15                       # quita DC de la asimetría
+BASS += b808
 
-# ---------------------------------------------------------------- arrangement
-# 0–4 · gancho: pulso grave y tic-tac, tensión
-for b in beats(0, 3.5): put(sub(33, 0.45, 0.42), b)
-for b in beats(0, 3.5, 0.25): put(hat(), b, 0.55 if (b * 4) % 2 else 0.9, pan=0.3)
-put(pad([57, 64], 3.6, harm=5, gain=0.07, fade=0.3), 0.0)
-put(riser(1.0), 2.5, 0.8)
+# ---------------------------------------------------------------- batería
+for t0, _, _ in notes: put(DRUM, kick(), t0, 0.85)           # bombo con el 808
+for L0 in loop_starts(DROP_IN, END_CUT):
+    for bar in (0, 1):
+        tc = L0 + bar * BAR + 2 * B                              # caja en el 3 (half-time)
+        if not in_cut(tc): put(DRUM, clap(), tc, 0.9); put(SEND, clap(), tc, 0.25)
+    for e8 in range(16):                                         # corcheas
+        th = L0 + e8 * B / 2
+        if th < END_CUT and not in_cut(th): put(DRUM, hat(g=0.24 if e8 % 2 else 0.17), th, 1.0, pan=0.25)
+    k = int(round(L0 / LOOP_LEN))
+    if k % 2 == 0:                                               # redoble de tresillos (último tiempo)
+        for j in range(6):
+            th = L0 + 7 * B + j * B / 6
+            if not in_cut(th): put(DRUM, hat(110, 0.16 + 0.02 * j), th, 1.0, pan=0.25)
+    else:                                                        # redoble de fusas (último medio tiempo)
+        for j in range(8):
+            th = L0 + 7.5 * B + j * B / 16 * 2
+            if not in_cut(th): put(DRUM, hat(140, 0.12 + 0.02 * j), th, 1.0, pan=-0.2)
 
-# 4–18 · datos: arpegio pulsado, medio tiempo
-def arp(a, b, gain=1.0, step=0.25, octave=12):
-    for i, x in enumerate(beats(a, b, step)):
-        c = chord_at(x); m = c[i % len(c)] + octave
-        put(pluck(m), x, gain, pan=0.35 * np.sin(i * 1.3))
+# ---------------------------------------------------------------- lead + capa frágil
+def lead_loop(L0, gain=1.0):
+    for step, m in LOOP:
+        t0 = L0 + step * S16
+        if t0 >= DUR: continue
+        put(LEAD, supersaw(m, S16 * 1.7), t0, gain)
+        put(LEAD, supersaw(m - 12, S16 * 1.7), t0, gain * 0.35)
 
-arp(4.0, 18.0, 0.9)
-for s, e, c in prog:
-    if e <= 4 or s >= 60: continue
-    put(pad(c, e - s + 0.4, gain=0.10), s)
-for b in beats(4.0, 18.0, 2.0): put(kick(0.85), b)
-for b in beats(4.0, 18.0, 0.5): put(hat(), b + 0.25, 0.7, pan=-0.25)
-for s, e, c in prog:
-    if 4 <= s < 18: put(bass(root[tuple(c)] - 12, e - s), s, 0.8)
+for L0 in loop_starts(0, END_CUT): lead_loop(L0)
+for L0 in loop_starts(DROP_IN, END_CUT):                        # campana: dobla el 2.º compás, 8.ª alta
+    if int(round(L0 / LOOP_LEN)) % 2 == 1:
+        for step, m in LOOP[8:]:
+            put(BELL, bell(m + 12, 0.9, 0.16), L0 + step * S16, pan=0.45)
 
-# 18–19.5 · reveal: las ondas, subida y flash
-put(riser(1.5), 18.0, 1.0)
-for b in beats(18.0, 19.5, 0.5): put(sub(45, 0.4, 0.3), b)
+# filtro de la intro: paso bajo cerrado que se abre hasta la entrada de la batería
+cut = np.full(N, 14000.0)
+i_drop = idx(DROP_IN)
+r = np.arange(i_drop) / i_drop
+cut[:i_drop] = 180 * (14000 / 180) ** (r ** 1.6)
+i_conf, i_conf_end = idx(SECTIONS[3]), idx(SECTIONS[4] - 2 * B)
+cut[i_conf:i_conf_end] = 2600                                  # confianza: lead más oscuro
+for a_, b_ in ((0, i_drop + idx(0.3)), (i_conf - idx(0.3), i_conf_end)):   # filtra solo donde cambia
+    LEAD[a_:b_] = lp2(LEAD[a_:b_], cut[a_:b_])
+LEAD[:] = smooth(LEAD, 2)
 
-# 19.5–23 · wordmark: piano + pad, entra el pulso
-for i, x in enumerate([19.5, 20.0, 20.5, 21.0, 21.5, 22.0, 22.5]):
-    put(piano([69, 72, 76, 72, 74, 72, 71][i] - 12), x, 0.9, pan=0.15 * (i % 2 * 2 - 1))
-for b in beats(21.0, 23.0, 1.0): put(kick(0.6), b)
-arp(21.0, 23.0, 0.55)
+# ---------------------------------------------------------------- apariciones: 808 (arriba) + campana / click
+for e in events:
+    if in_cut(e): continue
+    if e < DROP_IN:   # intro: solo el lead → aparición marcada con campana
+        put(BELL, bell(89 if e > 0 else 84, 1.6, 0.32), e, pan=0.2); continue
+    if (round((e - 0) / B) % 2) == 0 or any(abs(QM(b) - e) < 1e-3 for b in BIG):
+        put(BELL, bell(96 if any(abs(QM(b) - e) < 1e-3 for b in BIG) else 89, 0.5, 0.22), e, pan=-0.3)
+    else:
+        put(BELL, metal_click(), e, 0.6, pan=0.35)
+for t in taps:
+    if not in_cut(t): put(BELL, metal_click(), t, 0.5, pan=-0.4)
 
-# 23–37 · cómo funciona: groove completo
-for b in beats(23.0, 36.5, 0.5): put(kick(1.0), b)
-for b in beats(23.5, 36.5, 1.0): put(clap(), b, 0.9)
-for b in beats(23.0, 36.5, 0.25): put(hat(), b, 0.8 if (b * 4) % 2 else 0.45, pan=0.3)
-for b in beats(23.0, 36.5, 0.25):
-    if (b * 4) % 2 == 1: continue
-    c = chord_at(b); put(bass(root[tuple(c)] - 12, 0.24), b, 0.75)
-arp(23.0, 36.5, 0.75)
-for x in (23.75, 24.0, 24.25, 24.5): put(tick(), x, 1.0, pan=-0.4)  # pulsaciones del móvil
-for x in (26.5, 26.75, 27.0): put(tick(), x, 0.8, pan=0.4)          # valoraciones del tutor/a
-for x in (33.0, 33.5, 34.0): put(kick(0.7), x); put(pluck(76), x, 0.6)  # tarjetas de agenda
-put(riser(1.0), 36.0, 0.8)
+# ---------------------------------------------------------------- mezcla
+LEAD *= gate[:, None]; BELL *= gate[:, None]; DRUM *= gate[:, None]; BASS *= gate; SEND *= gate[:, None]
+SEND += LEAD * 0.55 + BELL * 0.7
 
-# 37–47 · confianza: oscuro, medio tiempo, latido
-for s, e, c in prog:
-    if 36 <= s < 48: put(pad([m - 12 for m in c], e - s + 0.4, harm=4, gain=0.12), s)
-for b in beats(37.0, 47.0, 2.0): put(kick(0.7), b); put(kick(0.4), b + 0.35)  # latido
-for b in beats(37.0, 47.0, 0.5): put(sub(33 if chord_at(b) is A else root[tuple(chord_at(b))] - 24, 0.45, 0.22), b)
-for x in (41.0, 41.5, 42.0): put(impact(False), x, 1.0); put(clap(), x, 0.7)  # Sin notas · Sin rankings · Sin vigilar
-for i, x in enumerate(beats(43.0, 46.5, 0.5)): put(pluck([64, 67, 69, 72][i % 4]), x, 0.45, pan=0.4)
-
-# 47–53 · perfiles: vuelve el pulso, más ligero
-for b in beats(47.0, 52.5, 1.0): put(kick(0.85), b)
-for b in beats(47.0, 52.5, 0.5): put(hat(), b + 0.25, 0.7, pan=-0.3)
-arp(47.0, 52.5, 0.7)
-for x, m in ((50.0, 76), (50.5, 81), (51.0, 84)): put(piano(m - 12, 2.0), x, 1.0)  # pasos del puente
-
-# 53–60 · cierre: piano y resolución en Do
-for i, x in enumerate(beats(53.0, 55.0, 0.5)): put(piano([64, 65, 69, 72][i] - 12), x, 0.9)
-put(riser(1.5), 54.0, 0.9)
-for m in (48, 55, 64, 67, 74): put(piano(m, 4.5), 55.5, 0.75)
-put(pad([60, 64, 67, 74], 4.5, gain=0.12, fade=0.4), 55.5)
-put(sub(36, 3.0, 0.4), 55.5)
-
-# ---------------------------------------------------------------- impacts and transitions
-for x in (0.0, 3.5, 19.5, 29.5, 56.5): put(impact(True), x, 1.0)
-for x in (1.0, 4.0, 23.0, 37.0, 47.0, 53.0): put(impact(False), x, 0.7)
-for x in (8.0, 11.5, 26.0, 47.0, 49.5): put(whoosh(), x - 0.3, 0.8, pan=(-0.5 if x in (8.0, 26.0) else 0.0))
-put(whoosh(0.5, 0.75), 22.6, 0.9)  # zoom a través del wordmark
-
-# ---------------------------------------------------------------- reverb + master
-def reverb(x, d=1.6, mix=0.22):
-    ir_t = t_(d)
-    ir = rng.standard_normal(len(ir_t)) * np.exp(-ir_t * 3.2)
-    ir = smooth(ir, 3); ir /= np.sqrt(np.sum(ir ** 2))
+def dark_reverb(x, d=4.2):
+    t = t_(d)
+    ir = np.stack([rng.standard_normal(len(t)), rng.standard_normal(len(t))], axis=1) * np.exp(-t * 1.5)[:, None]
+    ir = smooth(ir, 9)                                   # oscura
+    ir[: idx(0.02)] = 0                                  # pre-delay
+    ir /= np.sqrt((ir ** 2).sum(axis=0))
     n = 1 << int(np.ceil(np.log2(len(x) + len(ir))))
-    y = np.fft.irfft(np.fft.rfft(x, n) * np.fft.rfft(ir, n), n)[: len(x)]
-    return x + y * mix
+    return np.stack([np.fft.irfft(np.fft.rfft(x[:, c], n) * np.fft.rfft(ir[:, c], n), n)[: len(x)] for c in (0, 1)], axis=1)
 
-L = reverb(L); R = reverb(R)
-fade = np.ones(N); k = int(2.5 * SR); fade[-k:] = np.linspace(1, 0, k) ** 1.5
-L *= fade; R *= fade
-peak = max(np.abs(L).max(), np.abs(R).max())
-L = np.tanh(L / peak * 1.3) / np.tanh(1.3) * 0.89
-R = np.tanh(R / peak * 1.3) / np.tanh(1.3) * 0.89
+wet = dark_reverb(SEND)
+# bombeo: el lead y la reverb respiran con el bombo/808
+duck = np.ones(N)
+for t0, _, _ in notes:
+    i = idx(t0); k = min(idx(0.18), N - i); duck[i:i + k] = np.minimum(duck[i:i + k], 0.55 + 0.45 * np.linspace(0, 1, k) ** 0.7)
+
+mix = (LEAD * 0.42 + wet * 0.34) * duck[:, None] + BELL * 0.55 + DRUM * 0.62
+mix += (BASS * 0.95)[:, None]                            # el 808 manda
+fade = np.ones(N); k = idx(1.2); fade[-k:] = np.linspace(1, 0, k) ** 1.4
+mix *= fade[:, None]
+
+# master: saturación + limitador (look-ahead 5 ms)
+mix = np.tanh(mix * 1.6) / np.tanh(1.6)
+peak = np.abs(mix).max(axis=1)
+la = idx(0.005)
+need = np.maximum(1, peak / 0.89)
+need = np.maximum.reduce([np.roll(need, -j) for j in range(0, la, 24)])
+g = 1 / need
+rel = 1 - np.exp(-1 / (0.08 * SR))
+gs = np.empty_like(g); z = 1.0
+for i in range(N):
+    z = g[i] if g[i] < z else z + rel * (g[i] - z); gs[i] = z
+mix *= gs[:, None]
 
 here = os.path.dirname(os.path.abspath(__file__))
-out = os.path.join(here, "..", "assets", "music", "sintonia-bgm.wav")  # después: ffmpeg -i …wav -af loudnorm=I=-16:TP=-1.5 -b:a 256k sintonia-bgm.mp3
+out = os.path.join(here, "..", "assets", "music", "sintonia-bgm.wav")
 os.makedirs(os.path.dirname(out), exist_ok=True)
-pcm = (np.stack([L, R], axis=1) * 32767).astype(np.int16)
+pcm = (np.clip(mix, -1, 1) * 32767).astype(np.int16)
 with wave.open(out, "wb") as w:
     w.setnchannels(2); w.setsampwidth(2); w.setframerate(SR); w.writeframes(pcm.tobytes())
-print("escrito", os.path.normpath(out), f"{DUR:.1f} s")
+print("escrito", os.path.normpath(out), f"{DUR:.1f} s · {len(events)} apariciones · {len(notes)} notas de 808")
+print("secciones:", ", ".join(f"{s:.3f}" for s in SECTIONS))

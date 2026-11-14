@@ -28,14 +28,25 @@
     return s;
   }
 
+  /* Music grid: 140 BPM (half-time). Every on-screen appearance sits on the original
+     0.5 s grid; Q() snaps that anchor to the nearest 140 BPM beat and keeps the small
+     pre/post offset (an exit 0.25 s before a cut stays 0.25 s before it). 60 s = 140 beats. */
+  var B140 = 60 / 140;
+  function Q(f) {
+    var a = Math.floor(f * 2 + 0.5 + 1e-9) / 2; // nearest 0.5 s anchor, ties go to the later event
+    return Math.floor(a / B140 + 0.5) * B140 + (f - a);
+  }
+  function QM(t) { return Q(M(t)); }
+
   window.SX = {
-    BEAT: 0.5,
-    M: M, // original cut time → final time
+    BEAT: B140,
+    M: M,   // original cut time → time with reading holds
+    QM: QM, // original cut time → final time on the 140 BPM grid
 
     /* Scene clock: T0/D/g from the scene's window in the original cut. */
     scene: function (start, end) {
-      var T0 = M(start);
-      return { T0: T0, D: M(end) - T0, g: function (t) { return M(t) - T0; } };
+      var T0 = QM(start);
+      return { T0: T0, D: QM(end) - T0, g: function (t) { return QM(t) - T0; } };
     },
     wpath: wpath,
 

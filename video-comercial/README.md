@@ -11,14 +11,22 @@ Comprobar: `npx hyperframes doctor`
 
 ## Música
 
-`assets/music/sintonia-bgm.mp3` es una pista original de 60 s a 120 BPM (La menor → Do mayor), generada por `musica/componer.py` (Python + numpy, sin samples). Cada impacto, whoosh y subida está colocado sobre los cortes de la tabla de abajo. Para regenerarla:
+`assets/music/sintonia-bgm.mp3` es una pista original estilo rage / UK underground: 140 BPM en half-time, Fa menor, −14,5 LUFS. La genera `musica/componer.py` (Python + numpy, sin samples ni melodías de terceros):
+
+- Lead: supersaw de 7 voces desafinadas, abierta en estéreo, bucle de 2 compases con notas repetidas y reverb larga y oscura.
+- Capa frágil: campana FM una octava arriba, doblando el 2.º compás del bucle.
+- 808 largo con glide y saturación fuerte (lo que más pesa); bombo con el 808, clap seca en el 3, hi-hats en corcheas con redobles de tresillos y fusas.
+- Cada aparición del vídeo: golpe de 808 + campana corta o click metálico.
+- Antes de cada sección, corte total de medio compás con solo la cola de reverb; intro de 2 compases con el lead filtrado que se abre.
+
+Para regenerarla:
 
 ```bash
 python3 musica/componer.py
 ```
 
 ```bash
-ffmpeg -y -i assets/music/sintonia-bgm.wav -af loudnorm=I=-16:TP=-1.5 -b:a 256k assets/music/sintonia-bgm.mp3
+ffmpeg -y -i assets/music/sintonia-bgm.wav -af loudnorm=I=-15:TP=-1.2:LRA=7 -ar 48000 -b:a 256k assets/music/sintonia-bgm.mp3
 ```
 
 ## Alternativa: pista del catálogo HeyGen
@@ -75,38 +83,8 @@ compositions/perfiles.html  6 · Para cada perfil (47–53 s)
 compositions/cierre.html    7 · Cierre (53–60 s)
 ```
 
-## Rejilla de música (120 BPM)
+## Rejilla de música (140 BPM, half-time)
 
-Un golpe cada 0,5 s (30 frames a 60 fps). Las pausas de lectura (15 s en total) son golpes enteros, así que cortes y entradas siguen cayendo en la rejilla. Están en `assets/js/sx.js` (`HOLDS`): cada escena se escribe en el tiempo del corte original de 45 s y `SX.M()` lo pasa al tiempo final.
+Un tiempo cada 0,4286 s (60 s = 140 tiempos). Las escenas se escriben en el tiempo del corte original de 45 s; `SX.QM()` (en `assets/js/sx.js`, con réplica en `musica/tiempos.py`) añade las pausas de lectura y lleva cada aparición al tiempo de 140 BPM más cercano, conservando su anticipación (una salida 0,25 s antes de un corte sigue 0,25 s antes).
 
-| s    | golpe | evento |
-|------|------:|--------|
-| 0 | 1 | "Mismo trabajo." |
-| 1 | 3 | corte vertical, "Dos miradas." |
-| 2 | 5 | "¿Quién tiene razón?" |
-| 3.5 | 8 | "Nadie." (las mitades chocan) |
-| 4 | 9 | wipe diagonal → datos |
-| 4.5 | 10 | barras crecen |
-| 8 | 17 | whip pan → 32 % |
-| 11.5 | 24 | match cut silueta → reloj |
-| 14.5 | 30 | frase de consecuencia |
-| 18 | 37 | dos ondas |
-| 19 | 39 | las ondas se acompasan |
-| 19.5 | 40 | flash + wordmark |
-| 20 / 20.5 | 41 / 42 | píldora / lema |
-| 23 | 47 | zoom a través → móvil |
-| 23.75–24.5 | — | cuatro pulsaciones (medio golpe) |
-| 26 | 53 | whip pan → tutor/a |
-| 28.5 | 58 | 4 y 2 vuelan |
-| 29.5 | 60 | sello DESAJUSTE |
-| 32.5 | 66 | agenda; tarjetas en 33 · 33.5 · 34 |
-| 37 | 75 | iris → confianza |
-| 38 · 38.5 · 39 | — | filas con snap |
-| 41 · 41.5 · 42 | 83 / 84 / 85 | Sin notas. · Sin rankings. · Sin vigilar. |
-| 43 | 87 | "No deduce emociones." |
-| 47 | 95 | whip vertical → perfiles |
-| 49.5 | 100 | zoom a través de la tarjeta Estudiante |
-| 50 · 50.5 · 51 | — | pasos 1 · 2 · 3 |
-| 53 | 107 | "Para másteres, programas y escuelas de doctorado." |
-| 55 | 111 | la onda cruza → "En sintonía." |
-| 56.5 | 114 | wordmark + URL |
+Entradas de sección (golpe con todo, tras medio compás de corte): 3,857 · 18,000 · 23,143 · 36,857 · 47,143 · 53,143 s.
