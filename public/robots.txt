@@ -1,0 +1,14 @@
+# SINTONÍA: solo las páginas públicas pueden aparecer en buscadores.
+User-agent: *
+Allow: /$
+Allow: /como-funciona
+Allow: /privacidad
+Allow: /aviso-legal
+Allow: /cookies
+Allow: /investigacion$
+Allow: /consentimiento$
+Allow: /acceso$
+Allow: /registro$
+Disallow: /
+
+Sitemap: https://sintonia360-ferca.vercel.app/sitemap.xml

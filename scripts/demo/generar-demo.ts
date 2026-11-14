@@ -62,12 +62,15 @@ export async function generarDemo(opciones: { bd: pg.Client; almacen: Almacen; s
   await q(`insert into private.ajustes (clave, valor) values ('modo', 'demo') on conflict (clave) do update set valor = 'demo'`)
   await q(`update public.configuracion set valor = $1 where clave = 'dominios_permitidos'`, [DOMINIO_DEMO])
 
-  const cuenta = async (email: string, datos: Record<string, string>) =>
-    (await q(
+  const cuenta = async (email: string, datos: Record<string, string>) => {
+    // Como haría el servidor (api/registro) antes de crear la cuenta.
+    if (datos.codigo) await q(`insert into private.registros_autorizados (email, codigo, expira_at) values (lower($1), upper($2), now() + interval '15 minutes') on conflict (email) do update set codigo = excluded.codigo, expira_at = excluded.expira_at`, [email, datos.codigo])
+    return (await q(
       `insert into auth.users (email, raw_user_meta_data, encrypted_password, email_confirmed_at)
        values ($1, $2, extensions.crypt($3, extensions.gen_salt('bf')), now()) returning id`,
       [email, JSON.stringify(datos), CONTRASENA_DEMO],
     ))[0].id as string
+  }
   const consentir = (uid: string) => q(`insert into public.consentimientos (user_id, version) values ($1, 1)`, [uid])
 
   // Personas y códigos (directamente en la base de datos, como lo haría el investigador).

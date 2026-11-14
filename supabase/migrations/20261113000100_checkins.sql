@@ -615,7 +615,6 @@ $$;
 -- ---------------------------------------------------------------------------
 
 revoke all on all functions in schema public from public, anon, authenticated;
-grant execute on function public.comprobar_codigo(text, text) to anon, authenticated;
 grant execute on function public.configuracion_publica() to anon, authenticated;
 grant execute on function
   public.mi_perfil(),
@@ -626,7 +625,7 @@ grant execute on function
   public.mis_codigos_pareja(),
   public.listar_masters(),
   public.crear_master(text, public.tipo_trabajo),
-  public.crear_codigos(uuid, public.rol_usuario, integer, uuid, text),
+  public.crear_codigos(uuid, public.rol_usuario, integer, uuid, text, integer, integer),
   public.listar_codigos(uuid),
   public.listar_tutores(uuid),
   public.estado_semana(),

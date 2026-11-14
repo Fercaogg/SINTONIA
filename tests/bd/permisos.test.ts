@@ -154,9 +154,8 @@ describe('Visitantes sin cuenta', () => {
     },
   )
 
-  it('solo pueden comprobar un código y leer la configuración pública', async () => {
-    const r = await bd.rpc(null, 'comprobar_codigo', { p_codigo: 'NOEXISTE' })
-    expect(r.valido).toBe(false)
+  it('solo pueden leer la configuración pública (los códigos se comprueban en el servidor)', async () => {
+    await expect(bd.rpc(null, 'comprobar_codigo', { p_codigo: 'NOEXISTE' })).rejects.toThrow()
     await expect(bd.rpc(null, 'mi_perfil')).rejects.toThrow(/permission denied/)
   })
 })

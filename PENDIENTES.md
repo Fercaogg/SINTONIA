@@ -7,13 +7,18 @@ Todo lo que SINTONÍA necesita y que no se puede inventar. En la aplicación, ca
 | Dato | Dónde se usa | Dónde se cambia | Quién lo aporta |
 |---|---|---|---|
 | Consentimiento informado (versión 1). **Recomendación:** que diga que los datos de SINTONÍA no forman parte de la evaluación del trabajo ni de ningún informe del tutor (ver NORMATIVA.md, apartado 1) | Registro de estudiantes y tutores | tabla `consentimiento_textos` | Comité de Ética de la USAL |
-| Política de privacidad | "Cómo funciona y tus datos" | `configuracion > texto_politica_privacidad` | Comité de Ética de la USAL |
+| Política de privacidad (texto completo) y, en /privacidad, base jurídica, conservación y destinatarios (contratos con los servicios técnicos) | /privacidad y "Cómo funciona y tus datos" | `configuracion > texto_politica_privacidad` y `src/views/legal/PrivacidadView.vue` | Comité de Ética de la USAL |
+| Aviso legal: datos identificativos del titular, propiedad intelectual, responsabilidad y legislación aplicable | /aviso-legal | `src/views/legal/AvisoLegalView.vue` | Fernando y la USAL |
 | Responsable del tratamiento y datos de contacto (RGPD) | "Cómo funciona y tus datos" | `configuracion > responsable_tratamiento` | Fernando y la USAL |
 
 ## Contenido del estudio
 
 | Dato | Dónde se usa | Dónde se cambia | Quién lo aporta |
 |---|---|---|---|
+| Pregunta de investigación (CTS) e hipótesis H1, H2 y H3 | /investigacion | `src/views/InvestigacionPublicaView.vue` | Fernando |
+| Qué se hace en enero y en mayo y junio de 2027 (calendario) | /investigacion | `src/views/InvestigacionPublicaView.vue` | Fernando |
+| Enlace del preregistro en OSF | /investigacion | `src/views/InvestigacionPublicaView.vue` | Fernando |
+| Compromiso por escrito de que los datos no cuentan para la nota (pregunta frecuente "¿Cuenta para la nota?") | Portada y consentimiento | `src/contenido/portada.ts` | Comité de Ética de la USAL |
 | Textos definitivos de los 4 ítems del estudiante y los 2 del tutor (ahora provisionales) | Check-ins | tabla `items` | Fernando y sus directores |
 | Ítems de la escala validada del pretest y del postest | Cuestionarios | tabla `cuestionario_items` | Fernando |
 | Pregunta (y opciones) de conocimiento sobre las convocatorias predoctorales | Cuestionarios | tabla `cuestionario_items` | Fernando |
@@ -37,6 +42,11 @@ Todo lo que SINTONÍA necesita y que no se puede inventar. En la aplicación, ca
 
 | Dato | Dónde se usa | Quién lo aporta |
 |---|---|---|
+| **Proyecto real de Supabase en Fráncfort, conectado a Vercel** (hoy la web publicada no tiene base de datos: AUDITORIA C1) | Todo | Fernando, o Claude con un token de Supabase |
+| Confirmar la región de Supabase (y guardar la prueba en VERIFICACION.md) antes de volver a afirmar que los datos están en la UE | /como-funciona | Fernando, con Claude |
+| En Supabase: enlace de acceso de 15 minutos (Authentication > Providers > Email > Email OTP Expiration = 900) y copias de seguridad (según el plan) | Acceso y restauración | Fernando |
+| Cerrar `connect-src` de la CSP a la dirección exacta del proyecto de Supabase | `vercel.json` | Claude, cuando exista el proyecto |
+| Dominio definitivo de la web (hoy `sintonia360-ferca.vercel.app`, también en `public/sitemap.xml`, `public/robots.txt` y la imagen para compartir de `index.html`) | Buscadores y redes | Fernando |
 | Cuenta de Resend (u otro proveedor) y dominio verificado desde el que enviar los correos | Recordatorios, avisos y enlaces de acceso | Fernando |
 | Remitente de los correos (dirección y nombre) | Variable `CORREO_REMITENTE` en Vercel | Fernando |
 | Decidir si se usa el modelo de lenguaje en el piloto y quién paga la clave de la API | Variable `AGENDA_MODO` | Fernando |

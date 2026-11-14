@@ -1,14 +1,14 @@
 # Verificación
 
-Cómo se comprueba cada criterio de aceptación del encargo y qué resultado dio la última ejecución (13 de noviembre de 2026, rama `calendario`).
+Cómo se comprueba cada criterio de aceptación del encargo y qué resultado dio la última ejecución (13 de noviembre de 2026, rama `fase-4-diseno`).
 
 ## Resumen de las comprobaciones automáticas
 
 | Orden | Resultado |
 |---|---|
-| `npm test` (lógica, base de datos y R) | 313 tests superados, 0 fallidos |
-| `npm run test:e2e` (navegador, móvil y escritorio) | 52 recorridos superados, 0 fallidos |
-| `npm run test:demo` (demostración, accesibilidad de todas las pantallas) | 26 comprobaciones superadas, 0 fallidas (también el calendario de los cuatro perfiles) |
+| `npm test` (lógica, base de datos y R) | 343 tests superados, 0 fallidos |
+| `npm run test:e2e` (navegador, móvil y escritorio) | 92 recorridos superados, 0 fallidos, con la aplicación compilada y sus cabeceras de seguridad (CSP incluida) |
+| `npm run test:demo` (demostración, accesibilidad de todas las pantallas) | 26 comprobaciones superadas, 0 fallidas, en móvil a 360 px y en escritorio |
 | `npm run rendimiento` | Check-in listo en 1,9 s en un móvil con conexión 3G y procesador lento |
 | `npm run typecheck` y `npm run build` | Sin errores |
 
@@ -49,3 +49,17 @@ Cómo se comprueba cada criterio de aceptación del encargo y qué resultado dio
 - Tras enviar un check-in, "Revisar mis respuestas" mostraba "Enviar" en lugar de "Guardar cambios".
 - Un estudiante que pedía apoyo sin nombre no podía añadirlo después.
 - La exportación era unas 50 veces más lenta de lo necesario por el modo de cifrado.
+
+## Encargo de blindaje: Fase 2
+
+| Criterio | Cómo se comprueba | Resultado |
+|---|---|---|
+| Las 6 cabeceras de seguridad | `tests/e2e/seguridad.spec.ts` (presencia y CSP sin `unsafe-inline` ni `unsafe-eval`; ningún recurso bloqueado en ninguna pantalla de ningún perfil) | Cumple en local. La nota de securityheaders.com se comprobará al publicar |
+| RLS en todas las tablas y los 5 casos del encargo | `tests/bd/blindaje.test.ts` | Cumple |
+| Códigos de 12 caracteres, caducidad, usos máximos y anulación | `tests/bd/alta.test.ts` | Cumple |
+| Límite de intentos y mensajes que no revelan nada | `servidor/acceso-publico.test.ts`, `tests/bd/alta.test.ts` y `tests/e2e/acceso.spec.ts` | Cumple |
+| Las funciones del servidor arrancan como en Vercel | `tests/funciones.test.ts` | Cumple |
+| Ningún "[PENDIENTE]" en páginas públicas; páginas legales enlazadas | `tests/e2e/acceso.spec.ts` | Cumple |
+| robots.txt, sitemap.xml y noindex en páginas privadas | `tests/e2e/seguridad.spec.ts` y `tests/e2e/acceso.spec.ts` | Cumple |
+| npm audit sin vulnerabilidades altas ni críticas | `npm audit` | Cumple (0 altas, 0 críticas; 7 moderadas en herramientas de desarrollo) |
+| Región de Supabase en la UE | Panel de Supabase | **Pendiente**: la web publicada no tiene todavía base de datos (AUDITORIA C1) |

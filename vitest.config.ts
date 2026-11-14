@@ -8,10 +8,12 @@ export default defineConfig({
     alias: { '@': fileURLToPath(new URL('./src', import.meta.url)) },
   },
   test: {
-    include: ['tests/**/*.test.ts', 'src/**/*.test.ts', 'servidor/**/*.test.ts'],
-    environmentMatchGlobs: [['src/**', 'jsdom']],
-    environment: 'node',
     testTimeout: 30000,
     hookTimeout: 60000,
+    // Lo de la aplicación (src/) se prueba en un navegador simulado; el resto, en Node.
+    projects: [
+      { extends: true, test: { name: 'aplicacion', include: ['src/**/*.test.ts'], environment: 'jsdom' } },
+      { extends: true, test: { name: 'servidor', include: ['tests/**/*.test.ts', 'servidor/**/*.test.ts'], environment: 'node' } },
+    ],
   },
 })

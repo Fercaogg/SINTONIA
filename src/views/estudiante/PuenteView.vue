@@ -93,7 +93,7 @@ const { t } = useTerminos()
               aria-hidden="true"
             >
               <span
-                class="absolute top-1 left-1 w-6 h-6 rounded-full bg-white shadow transition-transform duration-200"
+                class="absolute top-1 left-1 w-6 h-6 rounded-full bg-papel shadow transition-transform duration-200"
                 :class="{ 'translate-x-6': activado }"
               />
             </span>

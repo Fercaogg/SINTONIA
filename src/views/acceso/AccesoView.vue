@@ -9,6 +9,8 @@ import LayoutAcceso from '@/components/layout/LayoutAcceso.vue'
 import AppIcon from '@/components/comun/AppIcon.vue'
 import AvisoError from '@/components/comun/AvisoError.vue'
 import AccesosDemo from '@/components/comun/AccesosDemo.vue'
+import CampoTrampa from '@/components/comun/CampoTrampa.vue'
+import { enviarAlServidor } from '@/lib/servidor'
 
 const router = useRouter()
 const sesion = useSesion()
@@ -22,18 +24,16 @@ const error = ref('')
 const contrasena = ref('')
 const usarContrasena = ref(false)
 
+// Pasa por el servidor de SINTONÍA, que limita los intentos y responde igual
+// exista o no una cuenta con ese correo.
+const sitio = ref('')
 async function enviarEnlace() {
   error.value = ''
   enviando.value = true
-  const { error: e } = await supabase.auth.signInWithOtp({
-    email: email.value.trim(),
-    options: { shouldCreateUser: false },
-  })
+  const r = await enviarAlServidor('acceso', { email: email.value, sitio: sitio.value })
   enviando.value = false
-  if (e) {
-    error.value = /signups not allowed|not found/i.test(e.message)
-      ? 'No encontramos una cuenta con ese correo. Si es tu primera vez, regístrate con tu código.'
-      : 'No hemos podido enviar el enlace. Inténtalo de nuevo en unos minutos.'
+  if (!r.ok) {
+    error.value = r.error ?? 'No hemos podido enviar el enlace. Inténtalo de nuevo en unos minutos.'
     return
   }
   enviado.value = true
@@ -71,6 +71,7 @@ async function entrarConContrasena() {
           <label for="contrasena" class="label">Contraseña</label>
           <input id="contrasena" v-model="contrasena" type="password" required autocomplete="current-password" class="input-field" />
         </div>
+        <CampoTrampa v-if="!usarContrasena" v-model="sitio" />
         <button type="submit" :disabled="enviando" class="btn-primary w-full py-3.5">
           <template v-if="enviando">Enviando...</template>
           <template v-else-if="usarContrasena">Entrar</template>
@@ -99,8 +100,8 @@ async function entrarConContrasena() {
       </div>
       <h1 class="titulo-pagina mb-2">Revisa tu correo</h1>
       <p class="texto-suave">
-        Te hemos enviado un enlace a <strong class="text-surface-900">{{ email }}</strong>.
-        Ábrelo desde este dispositivo o desde cualquier otro.
+        Si hay una cuenta con <strong class="text-surface-900">{{ email.trim().toLowerCase() }}</strong>, te llegará un enlace para entrar.
+        Caduca en poco tiempo y solo sirve una vez. Puedes abrirlo desde este dispositivo o desde cualquier otro.
       </p>
       <p class="text-sm texto-suave mt-6">
         ¿No llega? Mira en la carpeta de correo no deseado o

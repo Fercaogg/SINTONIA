@@ -19,7 +19,7 @@ test('la dirección ve datos agregados y "datos insuficientes" donde hay menos d
 
 test('el investigador descarga el CSV semanal y queda en la auditoría', async ({ page }) => {
   await entrarConContrasena(page, 'investigador@usal.es')
-  await page.goto('/investigacion/datos')
+  await page.goto('/investigador/datos')
   await sinErroresDeAccesibilidad(page)
   const descarga = page.waitForEvent('download')
   await page.getByRole('button', { name: 'Descargar CSV' }).first().click()
@@ -33,7 +33,7 @@ test('el investigador descarga el CSV semanal y queda en la auditoría', async (
 
 test('el investigador descarga el pretest y el postest por separado', async ({ page }) => {
   await entrarConContrasena(page, 'investigador@usal.es')
-  await page.goto('/investigacion/datos')
+  await page.goto('/investigador/datos')
   const nombres: string[] = []
   page.on('download', (d) => nombres.push(d.suggestedFilename()))
   await page.getByRole('button', { name: 'Descargar CSV' }).nth(1).click()

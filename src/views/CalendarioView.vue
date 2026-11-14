@@ -159,7 +159,7 @@ const textoIntro = computed(() => {
             :key="tipo"
             type="button"
             class="inline-flex items-center gap-2 px-3 min-h-tactil rounded-full border text-sm font-medium"
-            :class="visibles.has(tipo) ? 'bg-white border-surface-800 text-surface-900' : 'bg-surface-100 border-surface-200 text-surface-600 line-through'"
+            :class="visibles.has(tipo) ? 'bg-papel border-surface-800 text-surface-900' : 'bg-surface-100 border-surface-200 text-surface-600 line-through'"
             :aria-pressed="visibles.has(tipo)"
             @click="alternar(tipo)"
           >
@@ -202,7 +202,7 @@ const textoIntro = computed(() => {
                     type="button"
                     class="w-full min-h-[52px] sm:min-h-[72px] rounded-md flex flex-col items-center sm:items-start p-1 sm:p-2 text-sm border transition-colors"
                     :class="[
-                      dia.fecha === diaElegido ? 'border-surface-900 bg-brand-50' : 'border-transparent hover:bg-surface-100',
+                      dia.fecha === diaElegido ? 'border-marino bg-brand-50' : 'border-transparent hover:bg-surface-100',
                       dia.delMes ? 'text-surface-900' : 'text-surface-600',
                     ]"
                     :aria-pressed="dia.fecha === diaElegido"
@@ -210,7 +210,7 @@ const textoIntro = computed(() => {
                   >
                     <span
                       class="inline-flex items-center justify-center w-7 h-7 rounded-full tabular-nums"
-                      :class="dia.fecha === HOY ? 'bg-surface-900 text-white font-semibold' : ''"
+                      :class="dia.fecha === HOY ? 'bg-marino text-white font-semibold' : ''"
                     ><span class="sr-only">{{ etiquetaDia(dia.fecha).antes }}</span>{{ Number(dia.fecha.slice(8)) }}<span class="sr-only">{{ etiquetaDia(dia.fecha).despues }}</span></span>
                     <span class="flex flex-wrap gap-0.5 mt-1 sm:hidden" aria-hidden="true">
                       <span v-for="e in puntos(dia.fecha).slice(0, 3)" :key="e.id" class="w-1.5 h-1.5 rounded-full" :style="{ backgroundColor: TIPOS[e.tipo].color }" />

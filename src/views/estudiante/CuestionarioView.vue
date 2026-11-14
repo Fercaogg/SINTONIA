@@ -124,7 +124,7 @@ async function enviar() {
                 role="radio"
                 :aria-checked="respuestas[item.id] === op.v"
                 class="flex-1 min-h-tactil rounded-2xl border-2 font-semibold transition-all"
-                :class="respuestas[item.id] === op.v ? 'border-brand-900 bg-brand-50 text-surface-900' : 'border-surface-300 bg-white text-surface-800'"
+                :class="respuestas[item.id] === op.v ? 'border-brand-900 bg-brand-50 text-surface-900' : 'border-surface-300 bg-papel text-surface-800'"
                 @click="respuestas[item.id] = op.v"
               >
                 {{ op.t }}

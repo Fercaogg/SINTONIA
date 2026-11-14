@@ -111,7 +111,8 @@ Con eso se crean todas las tablas, las reglas de permisos, las funciones y la cl
    - En **Confirm signup**, pon exactamente el mismo enlace.
 
    Puedes cambiar también el texto de los correos (en español, sin presión).
-3. **Authentication > Emails > SMTP Settings**: activa un servidor de correo propio. El correo que trae Supabase de serie solo envía unos pocos mensajes por hora y no sirve para el piloto. Con Resend:
+3. **Authentication > Providers > Email**: pon **Email OTP Expiration** en `900` (15 minutos). Así el enlace de acceso dura poco; además, solo sirve una vez.
+4. **Authentication > Emails > SMTP Settings**: activa un servidor de correo propio. El correo que trae Supabase de serie solo envía unos pocos mensajes por hora y no sirve para el piloto. Con Resend:
    - Host `smtp.resend.com`, puerto `465`, usuario `resend`, contraseña: tu clave de API de Resend.
    - Remitente: la dirección de tu dominio verificado en Resend.
 
@@ -143,6 +144,7 @@ En **Project Settings > API** (o **API Keys**) encontrarás tres cosas. Apúntal
    | `RESEND_API_KEY` | tu clave de API de Resend |
    | `CORREO_REMITENTE` | por ejemplo `SINTONÍA <sintonia@tu-dominio.es>` |
    | `AGENDA_MODO` | `banco` (o `modelo`, ver 3.7) |
+   | `CORREO_CONTACTO` | dirección que recibe el formulario de contacto (por defecto, `ferca@usal.es`) |
 
 4. Pulsa **Deploy**. Al terminar, Vercel te da la dirección pública. Si es distinta de la que pusiste en `APP_URL` o en Supabase (3.3), corrígela en los dos sitios y vuelve a desplegar (**Deployments > Redeploy**).
 
@@ -177,11 +179,11 @@ Como investigador **no verás ningún nombre**: tutores y estudiantes aparecen c
 
 ### 4.2. Preparar el estudio
 
-En el menú **Investigación**:
+En el menú **Investigación** (panel en `/investigador`):
 
 1. **Calendario del estudio**: fecha de inicio de la semana 1, duración (10 semanas) y días de apertura y cierre. Mientras no pongas la fecha, el estudio "no ha empezado".
 2. **Másteres y códigos**: crea los dos másteres y genera:
-   - un código por cada persona de **dirección** y cada **tutor/a** (con una etiqueta, por ejemplo "Tutor 3", nunca un nombre);
+   - un código por cada persona de **dirección** y cada **tutor/a** (con una etiqueta, por ejemplo "Tutor 3", nunca un nombre). Por defecto, cada código sirve para una persona y caduca a los 30 días; puedes cambiarlo al crearlo y anular un código desde la lista;
    - cuando los tutores se hayan registrado, los **códigos de pareja** para sus estudiantes (cada tutor/a los ve también en su panel para repartirlos).
 3. **Parejas y tutores**: refleja las decisiones de la comisión académica, como un cambio de tutor/a o una cotutoría (hasta dos cotutores además del principal). Cada cotutor hace su propio check-in y ve la misma agenda.
 4. **Eventos del máster** (opcional): publica congresos, seminarios o plazos que verán todos los estudiantes y tutores de ese máster. La dirección del máster puede hacerlo también desde su menú ("Calendario del máster").

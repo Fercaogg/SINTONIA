@@ -17,11 +17,11 @@
  * ejecución completará las agendas que falten sin volver a sortear.
  */
 
-import { calcularDesajustes, ITEMS, type Desajuste, type Regla, type RespuestaEstudiante, type SemanaPareja } from './logica/desajuste'
-import { ALGORITMO_SORTEO, motivoNoElegible, nuevaSemilla, sortear, type MotivoNoElegible } from './logica/sorteo'
-import { entradaParaModelo, seleccionarDelBanco, validarSalidaModelo, type PreguntaBanco } from './logica/agenda'
-import { VERSION_PROMPT, type Redactor } from './logica/modelo'
-import { decidirPuente, type Convocatoria, type DecisionPuente } from './logica/puente'
+import { calcularDesajustes, ITEMS, type Desajuste, type Regla, type RespuestaEstudiante, type SemanaPareja } from './logica/desajuste.js'
+import { ALGORITMO_SORTEO, motivoNoElegible, nuevaSemilla, sortear, type MotivoNoElegible } from './logica/sorteo.js'
+import { entradaParaModelo, seleccionarDelBanco, validarSalidaModelo, type PreguntaBanco } from './logica/agenda.js'
+import { VERSION_PROMPT, type Redactor } from './logica/modelo.js'
+import { decidirPuente, type Convocatoria, type DecisionPuente } from './logica/puente.js'
 
 export interface SemanaPendiente {
   estudio_id: string

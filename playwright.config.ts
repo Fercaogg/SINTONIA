@@ -36,7 +36,9 @@ export default defineConfig({
       },
     },
     {
-      command: `npx vite --port ${PUERTO_APP} --strictPort`,
+      // La aplicación compilada, como en Vercel, y con sus mismas cabeceras
+      // de seguridad (CSP incluida, ver vite.config.ts).
+      command: `npx vite build --outDir .local/dist-e2e --emptyOutDir && npx vite preview --outDir .local/dist-e2e --port ${PUERTO_APP} --strictPort`,
       port: PUERTO_APP,
       reuseExistingServer: false,
       env: {

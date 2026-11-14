@@ -61,7 +61,7 @@ function teclado(ev: KeyboardEvent) {
           compacta ? 'w-11 h-11 text-base' : 'w-12 h-12 sm:w-14 sm:h-14 text-lg',
           modelValue === n
             ? 'border-brand-900 bg-brand-50 text-surface-900 scale-110 shadow-lg shadow-brand-500/20'
-            : 'border-surface-300 bg-white text-surface-800 hover:bg-surface-50',
+            : 'border-surface-300 bg-papel text-surface-800 hover:bg-surface-50',
         ]"
         @click="elegir(n)"
       >

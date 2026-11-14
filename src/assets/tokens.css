@@ -3,28 +3,48 @@
   Origen de cada valor: DISENO.md (WW360 = código fuente de WORKWELL360).
   Ninguna pantalla escribe colores directamente: todas usan estas variables
   o las clases de Tailwind equivalentes (tailwind.config.js).
+
+  Modo oscuro: según la preferencia del sistema (DISENO.md, apartado 11).
+  La identidad no cambia: el azul marino #0A4A6C sigue siendo el de las
+  bandas y el verde de la marca, el del logotipo y los acentos. En oscuro
+  solo se invierten los neutros (fondo, papel, texto) y el verde de los
+  enlaces se aclara para mantener el contraste.
 */
 
 :root {
+  /* Neutros en canales RGB (para Tailwind, con transparencias). */
+  --rgb-s50: 245 247 246;    /* #F5F7F6 fondo, WW360 main.css:21 */
+  --rgb-s100: 240 244 243;   /* #F0F4F3 WW360 tailwind.config.js:20 */
+  --rgb-s200: 227 234 234;   /* #E3EAEA bordes, WW360 main.css:22 */
+  --rgb-s300: 138 155 165;   /* #8A9BA5 solo decoración */
+  --rgb-s600: 90 107 117;    /* #5A6B75 texto de párrafo */
+  --rgb-s800: 58 74 84;      /* #3A4A54 etiquetas */
+  --rgb-s900: 10 74 108;     /* #0A4A6C títulos */
+  --rgb-papel: 255 255 255;  /* tarjetas */
+  --rgb-b900: 29 112 96;     /* #1d7060 verde de acción (texto e iconos) */
+
   /* Marca */
   --color-primary: #34C6A3;          /* WW360 main.css:15. Identidad: logo, progreso, selección */
   --color-primary-hover: #2FB393;    /* WW360 main.css:16 */
   --color-primary-light: #4ED7C2;    /* WW360 main.css:17 */
-  --color-accion: #1d7060;           /* WW360 tailwind.config.js:16. Botones y enlaces (5,93:1) */
+  --color-accion: #1d7060;           /* WW360 tailwind.config.js:16. Enlaces y bordes de acción (5,93:1) */
   --color-accion-hover: #0A4A6C;     /* WW360 main.css:18 */
+  --color-accion-fondo: #1d7060;     /* Fondo de los botones principales (texto blanco) */
+  --color-accion-fondo-hover: #0A4A6C;
+  --color-marino: #0A4A6C;           /* Bandas y avatares: igual en claro y en oscuro */
   --color-primary-tint-08: rgba(52,198,163,0.08); /* WW360 tailwind.config.js:8 */
   --color-primary-tint-15: rgba(52,198,163,0.15); /* WW360 tailwind.config.js:9 */
   --color-primary-tint-40: rgba(52,198,163,0.4);  /* WW360 tailwind.config.js:10 */
 
-  /* Neutros */
-  --color-heading: #0A4A6C;          /* WW360 main.css:18 */
-  --color-label: #3A4A54;            /* WW360 main.css:19 */
-  --color-body: #5A6B75;             /* WW360 main.css:20 */
-  --color-muted: #8A9BA5;            /* WW360 tailwind.config.js:22. Solo decoración */
-  --color-bg: #F5F7F6;               /* WW360 main.css:21 */
-  --color-surface-alt: #F0F4F3;      /* WW360 tailwind.config.js:20 */
-  --color-border: #E3EAEA;           /* WW360 main.css:22 */
-  --color-white: #FFFFFF;
+  /* Neutros con nombre (los usan main.css y los gráficos) */
+  --color-heading: rgb(var(--rgb-s900));
+  --color-label: rgb(var(--rgb-s800));
+  --color-body: rgb(var(--rgb-s600));
+  --color-muted: rgb(var(--rgb-s300));
+  --color-bg: rgb(var(--rgb-s50));
+  --color-surface-alt: rgb(var(--rgb-s100));
+  --color-border: rgb(var(--rgb-s200));
+  --color-white: rgb(var(--rgb-papel));
 
   /* Sombras: WW360 main.css:24 a 26 */
   --shadow-soft: 0 1px 3px rgba(0,0,0,0.04), 0 4px 12px rgba(10,74,108,0.06);
@@ -35,4 +55,41 @@
   --radius-sm: 4px;
   --radius-md: 6px;
   --radius-lg: 8px;
+
+  /* Movimiento (skill de Emil Kowalski): curvas fuertes y duraciones cortas */
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+  --dur-micro: 160ms;
+  --dur-ui: 220ms;
+  --dur-entrada: 420ms;
+
+  --color-graf-tutores: #248a73;
+
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --rgb-s50: 9 24 31;        /* #09181F */
+    --rgb-s100: 15 33 42;      /* #0F212A */
+    --rgb-s200: 36 63 75;      /* #243F4B */
+    --rgb-s300: 92 118 130;    /* #5C7682 solo decoración */
+    --rgb-s600: 170 190 199;   /* #AABEC7 */
+    --rgb-s800: 204 218 224;   /* #CCDAE0 */
+    --rgb-s900: 234 243 246;   /* #EAF3F6 */
+    --rgb-papel: 14 37 48;     /* #0E2530 */
+    --rgb-b900: 95 224 200;    /* #5FE0C8 */
+
+    --color-accion: #5FE0C8;
+    --color-accion-hover: #9BEEDD;
+    --color-accion-fondo-hover: #248a73;
+
+    --shadow-soft: 0 1px 3px rgba(0,0,0,0.3), 0 4px 12px rgba(0,0,0,0.25);
+    --shadow-card: rgba(0,0,0,0.45) 0px 20px 40px -20px, rgba(0,0,0,0.3) 0px 10px 20px -10px;
+    --shadow-elevated: rgba(0,0,0,0.5) 0px 20px 40px -12px, rgba(0,0,0,0.3) 0px 10px 20px -8px;
+
+    --color-graf-tutores: #4ED7C2;
+
+    color-scheme: dark;
+  }
 }

@@ -22,7 +22,7 @@ export default defineConfig({
     reducedMotion: 'reduce',
   },
   projects: [
-    { name: 'movil', use: { ...devices['Pixel 7'] } },
+    { name: 'movil', use: { ...devices['Pixel 7'], viewport: { width: 360, height: 780 } } },
     {
       name: 'escritorio',
       use: { ...devices['Desktop Chrome'], viewport: { width: 1366, height: 860 }, ...(process.env.CAPTURAS ? { deviceScaleFactor: 2 } : {}) },

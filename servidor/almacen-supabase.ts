@@ -2,8 +2,8 @@
 // servidor (service_role). Solo se usa en el servidor, nunca en el navegador.
 
 import { createClient, type SupabaseClient } from '@supabase/supabase-js'
-import type { Almacen } from './cierre-semana'
-import type { AlmacenCorreos } from './recordatorios'
+import type { Almacen } from './cierre-semana.js'
+import type { AlmacenCorreos } from './recordatorios.js'
 
 export function clienteServidor(url: string, claveServidor: string): SupabaseClient {
   return createClient(url, claveServidor, { auth: { persistSession: false, autoRefreshToken: false } })

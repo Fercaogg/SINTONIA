@@ -44,13 +44,13 @@ const MENUS: Record<Rol, Enlace[]> = {
     COMO,
   ],
   investigador: [
-    { to: '/investigacion', label: 'Másteres y códigos', icon: 'building', exact: true },
-    { to: '/investigacion/parejas', label: 'Parejas y tutores', icon: 'team' },
-    { to: '/investigacion/calendario', label: 'Calendario del estudio', icon: 'calendar' },
+    { to: '/investigador', label: 'Másteres y códigos', icon: 'building', exact: true },
+    { to: '/investigador/parejas', label: 'Parejas y tutores', icon: 'team' },
+    { to: '/investigador/calendario', label: 'Calendario del estudio', icon: 'calendar' },
     { ...CALENDARIO, label: 'Eventos del máster' },
-    { to: '/investigacion/convocatorias', label: 'Convocatorias', icon: 'graduation' },
-    { to: '/investigacion/cuestionarios', label: 'Cuestionarios', icon: 'document' },
-    { to: '/investigacion/datos', label: 'Datos y auditoría', icon: 'download' },
+    { to: '/investigador/convocatorias', label: 'Convocatorias', icon: 'graduation' },
+    { to: '/investigador/cuestionarios', label: 'Cuestionarios', icon: 'document' },
+    { to: '/investigador/datos', label: 'Datos y auditoría', icon: 'download' },
     CUENTA,
     COMO,
   ],
@@ -98,7 +98,7 @@ async function salir() {
         class="fixed lg:sticky top-0 left-0 z-50 h-screen w-64 flex flex-col transition-transform duration-300 lg:translate-x-0"
         :class="[
           menuAbierto ? 'translate-x-0' : '-translate-x-full',
-          oscuro ? 'bg-surface-900' : 'bg-white border-r border-surface-200/60',
+          oscuro ? 'bg-marino' : 'bg-papel border-r border-surface-200/60',
         ]"
         aria-label="Menú principal"
         @keydown.esc="menuAbierto = false"
@@ -141,7 +141,7 @@ async function salir() {
           </div>
           <button
             type="button"
-            :class="oscuro ? 'sidebar-link-oscuro w-full' : 'sidebar-link w-full !text-red-700 hover:!bg-red-50'"
+            :class="oscuro ? 'sidebar-link-oscuro w-full' : 'sidebar-link w-full !text-red-700 hover:!bg-red-50 dark:!text-red-300 dark:hover:!bg-red-950'"
             @click="salir"
           >
             <AppIcon name="logout" :size="18" />

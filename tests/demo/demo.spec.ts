@@ -16,8 +16,8 @@ const RUTAS: Record<Perfil, { inicio: RegExp; rutas: string[] }> = {
   'Tutor/a': { inicio: /\/tutor$/, rutas: ['/tutor', '/tutor/checkin', '/tutor/codigos', '/calendario', '/cuenta'] },
   'Dirección del máster': { inicio: /\/direccion$/, rutas: ['/direccion', '/direccion/avisos', '/calendario', '/cuenta'] },
   Investigación: {
-    inicio: /\/investigacion$/,
-    rutas: ['/investigacion', '/investigacion/parejas', '/investigacion/calendario', '/investigacion/convocatorias', '/investigacion/cuestionarios', '/investigacion/datos', '/calendario', '/cuenta'],
+    inicio: /\/investigador$/,
+    rutas: ['/investigador', '/investigador/parejas', '/investigador/calendario', '/investigador/convocatorias', '/investigador/cuestionarios', '/investigador/datos', '/calendario', '/cuenta'],
   },
 }
 
@@ -38,7 +38,7 @@ for (const [perfil, { inicio, rutas }] of Object.entries(RUTAS) as [Perfil, (typ
 }
 
 test('las pantallas públicas son accesibles', async ({ page }) => {
-  for (const ruta of ['/', '/acceso', '/como-funciona', '/no-existe']) {
+  for (const ruta of ['/', '/acceso', '/como-funciona', '/investigacion', '/privacidad', '/aviso-legal', '/cookies', '/consentimiento', '/no-existe']) {
     await page.goto(ruta)
     await page.waitForLoadState('networkidle')
     await sinErroresDeAccesibilidad(page)
@@ -97,7 +97,7 @@ test('cotutoría: la tutora 2 ve a su estudiante en cotutoría y hace su propio 
 
 test('el investigador gestiona los tutores de las parejas', async ({ page }, info) => {
   await entrarComo(page, 'Investigación')
-  await page.goto('/investigacion/parejas')
+  await page.goto('/investigador/parejas')
   await expect(page.getByRole('heading', { name: 'Parejas y tutores' })).toBeVisible()
   await expect(page.getByText('12 parejas · 1 con cotutoría')).toBeVisible()
   // Añadir un cotutor a la segunda pareja y quitarlo después.

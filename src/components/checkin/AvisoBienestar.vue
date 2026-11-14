@@ -12,7 +12,7 @@ const urlValida = computed(() => !!props.url && /^https?:\/\//.test(props.url))
 <template>
   <div class="mt-4 p-4 rounded-xl bg-brand-50 border border-brand-200" role="status">
     <div class="flex items-start gap-3">
-      <div class="w-9 h-9 rounded-xl bg-white flex items-center justify-center shrink-0">
+      <div class="w-9 h-9 rounded-xl bg-papel flex items-center justify-center shrink-0">
         <AppIcon name="heart" :size="18" class="text-surface-900" />
       </div>
       <div class="text-sm">

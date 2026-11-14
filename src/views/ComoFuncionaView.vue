@@ -2,14 +2,11 @@
 // "Cómo funciona y tus datos": explicación en lenguaje claro de qué se
 // calcula y quién ve qué. Los textos legales quedan pendientes del Comité.
 import { onMounted, ref } from 'vue'
-import { RouterLink, useRouter } from 'vue-router'
+import { RouterLink } from 'vue-router'
 import { llamar } from '@/lib/api'
-import AppLogo from '@/components/comun/AppLogo.vue'
-import AppIcon from '@/components/comun/AppIcon.vue'
-import BandaEntorno from '@/components/comun/BandaEntorno.vue'
+import LayoutPublico from '@/components/layout/LayoutPublico.vue'
 import Pendiente from '@/components/comun/Pendiente.vue'
-
-const router = useRouter()
+import TablaQuienVe from '@/components/portada/TablaQuienVe.vue'
 const config = ref<Record<string, { valor: string }>>({})
 
 onMounted(async () => {
@@ -31,18 +28,7 @@ const quienVe = [
 </script>
 
 <template>
-  <div class="min-h-screen flex flex-col">
-    <BandaEntorno />
-    <header class="bg-white border-b border-surface-200">
-      <div class="max-w-3xl mx-auto px-4 py-4 flex items-center justify-between gap-3">
-        <RouterLink to="/" class="text-xl" aria-label="SINTONÍA, inicio"><AppLogo /></RouterLink>
-        <button type="button" class="btn-secondary text-sm" @click="router.back()">
-          <AppIcon name="back" :size="16" /> Volver
-        </button>
-      </div>
-    </header>
-
-    <main id="contenido" class="flex-1 w-full min-w-0 max-w-3xl mx-auto px-4 py-10 fade-in">
+  <LayoutPublico>
       <h1 class="titulo-pagina mb-2">Cómo funciona y tus datos</h1>
       <p class="texto-suave mb-10">Lo que hace SINTONÍA, explicado sin letra pequeña.</p>
 
@@ -68,41 +54,8 @@ const quienVe = [
 
       <section class="mb-10" aria-labelledby="quien">
         <h2 id="quien" class="font-display text-xl font-semibold mb-3">Quién ve qué</h2>
-        <!-- Móvil: una tarjeta por dato -->
-        <ul class="space-y-3 sm:hidden">
-          <li v-for="fila in quienVe" :key="fila.dato" class="card p-4">
-            <p class="font-semibold text-surface-900 mb-2">{{ fila.dato }}</p>
-            <dl class="grid grid-cols-[auto,1fr] gap-x-3 gap-y-1 text-sm">
-              <dt class="texto-suave">Tú</dt><dd>{{ fila.tu }}</dd>
-              <dt class="texto-suave">Tu tutor/a</dt><dd>{{ fila.tutor }}</dd>
-              <dt class="texto-suave">Dirección</dt><dd>{{ fila.direccion }}</dd>
-              <dt class="texto-suave">Investigación</dt><dd>{{ fila.investigacion }}</dd>
-            </dl>
-          </li>
-        </ul>
-        <div class="card overflow-x-auto hidden sm:block" tabindex="0" role="region" aria-label="Tabla de quién ve qué">
-          <table class="w-full text-sm text-left">
-            <caption class="sr-only">Quién puede ver cada dato</caption>
-            <thead class="bg-surface-100 text-surface-800">
-              <tr>
-                <th scope="col" class="p-3 font-semibold">Dato</th>
-                <th scope="col" class="p-3 font-semibold">Tú (estudiante)</th>
-                <th scope="col" class="p-3 font-semibold">Tu tutor/a</th>
-                <th scope="col" class="p-3 font-semibold">Dirección del máster</th>
-                <th scope="col" class="p-3 font-semibold">Investigación</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="fila in quienVe" :key="fila.dato" class="border-t border-surface-200 align-top">
-                <th scope="row" class="p-3 font-medium text-surface-900">{{ fila.dato }}</th>
-                <td class="p-3">{{ fila.tu }}</td>
-                <td class="p-3">{{ fila.tutor }}</td>
-                <td class="p-3">{{ fila.direccion }}</td>
-                <td class="p-3">{{ fila.investigacion }}</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
+        <p class="texto-suave mb-4">Pasa por un dato (o tócalo en el móvil) para ver de un vistazo quién lo ve.</p>
+        <TablaQuienVe :filas="quienVe" />
         <p class="text-sm texto-suave mt-3">
           Estas reglas no dependen solo de la aplicación: están escritas en la propia base de datos, que se niega a entregar un dato a quien no le corresponde.
         </p>
@@ -111,16 +64,16 @@ const quienVe = [
       <section class="mb-10" aria-labelledby="derechos">
         <h2 id="derechos" class="font-display text-xl font-semibold mb-3">Tus derechos</h2>
         <p class="text-base leading-relaxed">
-          Puedes consultar tus datos, corregir tu nombre, retirarte del estudio y pedir que se borren tus datos cuando quieras, desde tu panel.
-          Tus datos se guardan en servidores de la Unión Europea.
+          Puedes descargar tus datos, corregir tu nombre, retirarte del estudio y borrar tu cuenta cuando quieras, desde tu panel.
+          SINTONÍA está preparada para guardar los datos en servidores de la Unión Europea (Fráncfort); lo confirmaremos aquí cuando la instalación definitiva esté en marcha.
         </p>
       </section>
 
       <section class="mb-10" aria-labelledby="legal">
         <h2 id="legal" class="font-display text-xl font-semibold mb-3">Política de privacidad</h2>
-        <p class="mb-2"><Pendiente :texto="config.texto_politica_privacidad?.valor" /></p>
-        <p><Pendiente :texto="config.responsable_tratamiento?.valor" /></p>
+        <p class="mb-2"><Pendiente publico :texto="config.texto_politica_privacidad?.valor" /></p>
+        <p class="mb-2">Responsable del tratamiento: <Pendiente publico :texto="config.responsable_tratamiento?.valor" /></p>
+        <p>Toda la estructura, en la <RouterLink to="/privacidad" class="enlace">política de privacidad</RouterLink>.</p>
       </section>
-    </main>
-  </div>
+  </LayoutPublico>
 </template>

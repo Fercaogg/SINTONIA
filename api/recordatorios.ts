@@ -1,10 +1,10 @@
 // Función de Vercel que envía los recordatorios semanales y los avisos de
 // apoyo pendientes, y termina los borrados de cuenta pendientes. La llama Vercel Cron una vez al día (ver vercel.json).
 
-import { clienteServidor, crearAlmacenSupabase } from '../servidor/almacen-supabase'
-import { enviadorDesdeEntorno } from '../servidor/correo'
-import { enviarRecordatorios, notificarAvisosApoyo } from '../servidor/recordatorios'
-import { terminarBorrados } from '../servidor/borrados'
+import { clienteServidor, crearAlmacenSupabase } from '../servidor/almacen-supabase.js'
+import { enviadorDesdeEntorno } from '../servidor/correo.js'
+import { enviarRecordatorios, notificarAvisosApoyo } from '../servidor/recordatorios.js'
+import { terminarBorrados } from '../servidor/borrados.js'
 
 export async function GET(request: Request): Promise<Response> {
   const secreto = process.env.CRON_SECRET

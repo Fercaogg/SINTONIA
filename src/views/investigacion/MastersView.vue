@@ -6,6 +6,7 @@ import { computed, onMounted, ref, watch } from 'vue'
 import { llamar, mensajeDeError } from '@/lib/api'
 import type { Rol, TipoTrabajo } from '@/lib/tipos'
 import { NOMBRE_ROL } from '@/lib/tipos'
+import { fechaCorta } from '@/lib/fechas'
 import AppIcon from '@/components/comun/AppIcon.vue'
 import EstadoCarga from '@/components/comun/EstadoCarga.vue'
 import EstadoVacio from '@/components/comun/EstadoVacio.vue'
@@ -13,7 +14,10 @@ import AvisoError from '@/components/comun/AvisoError.vue'
 
 interface Master { id: string; nombre: string; tipo_trabajo: TipoTrabajo; tutores: number; estudiantes: number; direccion: number }
 interface Tutor { user_id: string; seudonimo: string; etiqueta: string | null; estudiantes: number }
-interface Codigo { codigo: string; rol: Rol; etiqueta: string | null; tutor: string | null; usado: boolean; created_at: string }
+interface Codigo {
+  codigo: string; rol: Rol; etiqueta: string | null; tutor: string | null; usado: boolean; created_at: string
+  usos: number; usos_max: number; caduca_at: string | null; caducado: boolean; revocado: boolean; disponible: boolean
+}
 
 const masters = ref<Master[]>([])
 const seleccionado = ref<string>('')
@@ -24,7 +28,7 @@ const error = ref('')
 const aviso = ref('')
 
 const nuevoMaster = ref({ nombre: '', tipo: 'TFM' as TipoTrabajo })
-const nuevosCodigos = ref({ rol: 'tutor' as Exclude<Rol, 'investigador'>, cantidad: 1, tutor: '', etiqueta: '' })
+const nuevosCodigos = ref({ rol: 'tutor' as Exclude<Rol, 'investigador'>, cantidad: 1, tutor: '', etiqueta: '', dias: 30, usos: 1 })
 const ultimosCodigos = ref<string[]>([])
 
 function plural(n: number, uno: string, varios: string) {
@@ -87,9 +91,30 @@ async function crearCodigos() {
       p_cantidad: n.cantidad,
       p_tutor_id: n.rol === 'estudiante' ? n.tutor || null : null,
       p_etiqueta: n.etiqueta || null,
+      p_dias_validez: n.dias,
+      p_usos_max: n.usos,
     })
     n.etiqueta = ''
     await Promise.all([cargarMaster(), cargarMasters()])
+  } catch (e) {
+    error.value = mensajeDeError(e)
+  }
+}
+
+function estado(c: Codigo): { texto: string; clase: string } {
+  if (c.revocado) return { texto: 'Anulado', clase: 'badge-amber' }
+  if (c.usado) return { texto: c.usos_max > 1 ? `Agotado (${c.usos}/${c.usos_max})` : 'Usado', clase: 'badge-green' }
+  if (c.caducado) return { texto: 'Caducado', clase: 'badge-amber' }
+  return { texto: c.usos_max > 1 ? `Libre (${c.usos}/${c.usos_max})` : 'Libre', clase: 'badge-sky' }
+}
+
+async function anular(c: Codigo) {
+  if (!window.confirm(`¿Anular el código ${c.codigo}? Nadie más podrá registrarse con él.`)) return
+  error.value = ''
+  try {
+    await llamar('revocar_codigo', { p_codigo: c.codigo })
+    aviso.value = `Código ${c.codigo} anulado.`
+    await cargarMaster()
   } catch (e) {
     error.value = mensajeDeError(e)
   }
@@ -169,6 +194,14 @@ async function crearCodigos() {
                 </select>
                 <p v-if="!tutores.length" class="text-xs texto-suave mt-1.5">Primero tiene que registrarse algún tutor/a con su código.</p>
               </div>
+              <div>
+                <label for="c-dias" class="label">Válido durante (días)</label>
+                <input id="c-dias" v-model.number="nuevosCodigos.dias" type="number" min="1" max="365" required class="input-field" />
+              </div>
+              <div>
+                <label for="c-usos" class="label">Personas que pueden usar cada código</label>
+                <input id="c-usos" v-model.number="nuevosCodigos.usos" type="number" min="1" max="500" required class="input-field" />
+              </div>
               <div class="sm:col-span-2">
                 <label for="c-etiqueta" class="label">Etiqueta interna (opcional)</label>
                 <input id="c-etiqueta" v-model="nuevosCodigos.etiqueta" maxlength="60" class="input-field" placeholder="Por ejemplo, Tutor 3" />
@@ -189,7 +222,7 @@ async function crearCodigos() {
           <section class="card p-5" aria-labelledby="t-lista">
             <h2 id="t-lista" class="font-semibold text-surface-900 mb-4">Códigos de este máster</h2>
             <EstadoVacio v-if="!codigos.length" icono="key" titulo="Sin códigos" texto="Crea el primero con el formulario de arriba." />
-            <div v-else class="overflow-x-auto" tabindex="0" role="region" aria-label="Tabla (se puede desplazar)">
+            <div v-else class="relative overflow-x-auto" tabindex="0" role="region" aria-label="Tabla (se puede desplazar)">
               <table class="w-full text-sm text-left">
                 <caption class="sr-only">Códigos de acceso del máster</caption>
                 <thead class="text-surface-800">
@@ -198,7 +231,9 @@ async function crearCodigos() {
                     <th scope="col" class="py-2 pr-3 font-semibold">Para</th>
                     <th scope="col" class="py-2 pr-3 font-semibold">Etiqueta</th>
                     <th scope="col" class="py-2 pr-3 font-semibold">Tutor/a</th>
-                    <th scope="col" class="py-2 font-semibold">Estado</th>
+                    <th scope="col" class="py-2 pr-3 font-semibold">Caduca</th>
+                    <th scope="col" class="py-2 pr-3 font-semibold">Estado</th>
+                    <th scope="col" class="py-2 font-semibold"><span class="sr-only">Acciones</span></th>
                   </tr>
                 </thead>
                 <tbody>
@@ -207,8 +242,14 @@ async function crearCodigos() {
                     <td class="py-2 pr-3">{{ NOMBRE_ROL[c.rol] }}</td>
                     <td class="py-2 pr-3">{{ c.etiqueta || '' }}</td>
                     <td class="py-2 pr-3">{{ c.tutor || '' }}</td>
-                    <td class="py-2">
-                      <span class="badge" :class="c.usado ? 'badge-green' : 'badge-sky'">{{ c.usado ? 'Usado' : 'Libre' }}</span>
+                    <td class="py-2 pr-3 whitespace-nowrap">{{ c.caduca_at ? fechaCorta(c.caduca_at) : 'Sin caducidad' }}</td>
+                    <td class="py-2 pr-3">
+                      <span class="badge" :class="estado(c).clase">{{ estado(c).texto }}</span>
+                    </td>
+                    <td class="py-1">
+                      <button v-if="c.disponible" type="button" class="btn-secondary !px-3 !py-1.5 text-sm" @click="anular(c)">
+                        Anular<span class="sr-only"> el código {{ c.codigo }}</span>
+                      </button>
                     </td>
                   </tr>
                 </tbody>

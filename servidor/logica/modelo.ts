@@ -15,7 +15,7 @@
  */
 
 import Anthropic from '@anthropic-ai/sdk'
-import type { EntradaModelo } from './agenda'
+import type { EntradaModelo } from './agenda.js'
 
 export const VERSION_PROMPT = 'agenda-prompt-v1'
 export const MODELO_POR_DEFECTO = 'claude-opus-5-5'

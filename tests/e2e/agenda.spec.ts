@@ -22,7 +22,7 @@ test('estudiante y tutora ven las mismas tres preguntas', async ({ page }) => {
 
   await salir(page)
   await entrarConContrasena(page, 'tutora@usal.es')
-  if (page.url().endsWith('/consentimiento')) {
+  if (page.url().endsWith('/consentimiento/aceptar')) {
     await page.getByLabel(/He leído el texto/).check()
     await page.getByRole('button', { name: 'Aceptar y continuar' }).click()
   }
@@ -46,7 +46,7 @@ test('las parejas sin agenda ven el mensaje neutro', async ({ page }) => {
 
 test('el investigador ve cuántas parejas recibieron agenda cada semana', async ({ page }) => {
   await entrarConContrasena(page, 'investigador@usal.es')
-  await page.goto('/investigacion/calendario')
+  await page.goto('/investigador/calendario')
   const tabla = page.locator('section', { has: page.getByRole('heading', { name: 'Sorteos por semana' }) })
   await expect(tabla.locator('tbody tr')).toHaveCount(2)
   await sinErroresDeAccesibilidad(page)

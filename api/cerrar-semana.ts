@@ -2,9 +2,9 @@
 // agenda. La llama Vercel Cron una vez al día (ver vercel.json).
 // Protegida con CRON_SECRET: Vercel envía "Authorization: Bearer <CRON_SECRET>".
 
-import { cerrarSemanas } from '../servidor/cierre-semana'
-import { clienteServidor, crearAlmacenSupabase } from '../servidor/almacen-supabase'
-import { redactorDesdeEntorno } from '../servidor/logica/modelo'
+import { cerrarSemanas } from '../servidor/cierre-semana.js'
+import { clienteServidor, crearAlmacenSupabase } from '../servidor/almacen-supabase.js'
+import { redactorDesdeEntorno } from '../servidor/logica/modelo.js'
 
 export async function GET(request: Request): Promise<Response> {
   const secreto = process.env.CRON_SECRET

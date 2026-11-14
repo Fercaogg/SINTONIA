@@ -103,7 +103,7 @@ test('el aviso de apoyo llega a la dirección, con nombre solo si se autoriza', 
 
 test('el investigador ve el calendario con la semana abierta resaltada', async ({ page }) => {
   await entrarConContrasena(page, 'investigador@usal.es')
-  await page.goto('/investigacion/calendario')
+  await page.goto('/investigador/calendario')
   await expect(page.getByRole('heading', { name: 'Calendario del estudio' })).toBeVisible()
   const semanas = page.locator('section', { has: page.getByRole('heading', { name: 'Semanas', exact: true }) })
   await expect(semanas.locator('tbody tr')).toHaveCount(10)

@@ -113,10 +113,20 @@ create table public.codigos_acceso (
   etiqueta text,
   creado_por uuid references auth.users (id) on delete set null,
   created_at timestamptz not null default now(),
+  -- Caducidad, usos máximos y anulación (AUDITORIA.md, A5).
   caduca_at timestamptz,
-  usado_por uuid references auth.users (id) on delete set null,
-  usado_at timestamptz,
+  usos_max integer not null default 1 check (usos_max between 1 and 500),
+  usos integer not null default 0 check (usos >= 0),
+  revocado_at timestamptz,
   check ((rol = 'estudiante') = (tutor_id is not null))
+);
+
+-- Cada uso de un código: quién se registró con él y cuándo.
+create table public.codigos_usos (
+  codigo text not null references public.codigos_acceso (codigo) on delete cascade,
+  user_id uuid not null references auth.users (id) on delete cascade,
+  usado_at timestamptz not null default now(),
+  primary key (codigo, user_id)
 );
 
 create table public.parejas (
@@ -533,7 +543,7 @@ declare
   candidato text;
 begin
   loop
-    candidato := private.aleatorio(8);
+    candidato := private.aleatorio(12);
     exit when not exists (select 1 from public.codigos_acceso where codigo = candidato);
   end loop;
   return candidato;
@@ -611,6 +621,14 @@ $$;
 -- Alta de usuarios: se ejecuta cuando Supabase crea una cuenta nueva
 -- ---------------------------------------------------------------------------
 
+-- ¿Se puede usar este código ahora? (sin caducar, sin anular y con usos libres)
+create or replace function private.codigo_disponible(c public.codigos_acceso)
+returns boolean
+language sql stable set search_path = ''
+as $$
+  select c.revocado_at is null and c.usos < c.usos_max and (c.caduca_at is null or c.caduca_at > now())
+$$;
+
 create or replace function private.alta_usuario()
 returns trigger
 language plpgsql security definer set search_path = ''
@@ -634,13 +652,17 @@ begin
     perform private.error('CODIGO_REQUERIDO', 'Para registrarte necesitas un código de acceso.');
   end if;
 
+  -- Un único mensaje para código y correo: no revela si un código existe.
   select * into c from public.codigos_acceso where codigo = v_codigo for update;
-  if not found or c.usado_por is not null or (c.caduca_at is not null and c.caduca_at < now()) then
-    perform private.error('CODIGO_NO_VALIDO', 'El código no es válido o ya se ha usado.');
+  if not found or not private.codigo_disponible(c) or not private.dominio_permitido(new.email) then
+    perform private.error('REGISTRO_NO_VALIDO', 'No hemos podido completar el registro. Revisa el código y usa tu correo institucional.');
   end if;
 
-  if not private.dominio_permitido(new.email) then
-    perform private.error('DOMINIO_NO_PERMITIDO', 'Usa tu correo institucional.');
+  -- Solo se crean cuentas que haya autorizado antes el servidor de SINTONÍA
+  -- (que limita los intentos). Así nadie puede probar códigos llamando
+  -- directamente al servicio de acceso de Supabase.
+  if not private.consumir_autorizacion_registro(new.email, v_codigo) then
+    perform private.error('REGISTRO_NO_VALIDO', 'No hemos podido completar el registro. Revisa el código y usa tu correo institucional.');
   end if;
 
   if v_nombre = '' then
@@ -650,7 +672,7 @@ begin
   if c.rol = 'estudiante' and not exists (
     select 1 from public.perfiles t where t.user_id = c.tutor_id and t.retirado_at is null
   ) then
-    perform private.error('CODIGO_NO_VALIDO', 'El código no es válido o ya se ha usado.');
+    perform private.error('REGISTRO_NO_VALIDO', 'No hemos podido completar el registro. Revisa el código y usa tu correo institucional.');
   end if;
 
   v_prefijo := case c.rol when 'estudiante' then 'E' when 'tutor' then 'T' else 'D' end;
@@ -666,7 +688,8 @@ begin
     values (c.master_id, new.id, c.tutor_id, private.nuevo_seudonimo('P'));
   end if;
 
-  update public.codigos_acceso set usado_por = new.id, usado_at = now() where codigo = c.codigo;
+  update public.codigos_acceso set usos = usos + 1 where codigo = c.codigo;
+  insert into public.codigos_usos (codigo, user_id) values (c.codigo, new.id);
 
   return new;
 end
@@ -699,31 +722,8 @@ create trigger sintonia_completar_respuesta_tutor
 -- Funciones públicas: cualquier visitante
 -- ---------------------------------------------------------------------------
 
--- Comprueba un código antes de registrarse, para dar un mensaje claro.
-create or replace function public.comprobar_codigo(p_codigo text, p_email text default null)
-returns jsonb
-language plpgsql stable security definer set search_path = ''
-as $$
-declare
-  c public.codigos_acceso;
-  m public.masters;
-begin
-  select * into c from public.codigos_acceso where codigo = upper(trim(coalesce(p_codigo, '')));
-  if not found or c.usado_por is not null or (c.caduca_at is not null and c.caduca_at < now()) then
-    return jsonb_build_object('valido', false, 'motivo', 'CODIGO_NO_VALIDO');
-  end if;
-  if p_email is not null and not private.dominio_permitido(p_email) then
-    return jsonb_build_object('valido', false, 'motivo', 'DOMINIO_NO_PERMITIDO');
-  end if;
-  select * into m from public.masters where id = c.master_id;
-  return jsonb_build_object(
-    'valido', true,
-    'rol', c.rol,
-    'master', m.nombre,
-    'tipo_trabajo', m.tipo_trabajo
-  );
-end
-$$;
+-- El código se comprueba en el servidor (servicio_autorizar_registro, en la
+-- migración de registro seguro), con límite de intentos.
 
 -- Valores de configuración que la interfaz necesita (no sensibles).
 create or replace function public.configuracion_publica()
@@ -855,10 +855,10 @@ begin
     perform private.error('SIN_PERMISO', 'No tienes permiso para hacer esto.');
   end if;
   return coalesce((
-    select jsonb_agg(jsonb_build_object('codigo', codigo, 'caduca_at', caduca_at) order by created_at)
-    from public.codigos_acceso
-    where tutor_id = auth.uid() and rol = 'estudiante' and usado_por is null
-      and (caduca_at is null or caduca_at > now())
+    select jsonb_agg(jsonb_build_object('codigo', c.codigo, 'caduca_at', c.caduca_at,
+                                        'usos', c.usos, 'usos_max', c.usos_max) order by c.created_at)
+    from public.codigos_acceso c
+    where c.tutor_id = auth.uid() and c.rol = 'estudiante' and private.codigo_disponible(c)
   ), '[]'::jsonb);
 end
 $$;
@@ -926,7 +926,10 @@ create or replace function public.crear_codigos(
   p_rol public.rol_usuario,
   p_cantidad integer default 1,
   p_tutor_id uuid default null,
-  p_etiqueta text default null
+  p_etiqueta text default null,
+  -- Caducan por defecto a los 30 días y sirven para una sola persona.
+  p_dias_validez integer default 30,
+  p_usos_max integer default 1
 )
 returns jsonb
 language plpgsql security definer set search_path = ''
@@ -942,6 +945,12 @@ begin
   if p_cantidad not between 1 and 100 then
     perform private.error('CANTIDAD_NO_VALIDA', 'Puedes crear entre 1 y 100 códigos a la vez.');
   end if;
+  if p_dias_validez is null or p_dias_validez not between 1 and 365 then
+    perform private.error('VALIDEZ_NO_VALIDA', 'La validez debe estar entre 1 y 365 días.');
+  end if;
+  if p_usos_max is null or p_usos_max not between 1 and 500 then
+    perform private.error('USOS_NO_VALIDOS', 'Cada código puede servir para entre 1 y 500 personas.');
+  end if;
   if not exists (select 1 from public.masters where id = p_master_id) then
     perform private.error('MASTER_NO_VALIDO', 'Ese máster no existe.');
   end if;
@@ -953,16 +962,19 @@ begin
   end if;
   for i in 1 .. p_cantidad loop
     v_codigo := private.nuevo_codigo();
-    insert into public.codigos_acceso (codigo, rol, master_id, tutor_id, etiqueta, creado_por)
+    insert into public.codigos_acceso (codigo, rol, master_id, tutor_id, etiqueta, creado_por, caduca_at, usos_max)
     values (
       v_codigo, p_rol, p_master_id,
       case when p_rol = 'estudiante' then p_tutor_id end,
       nullif(trim(coalesce(p_etiqueta, '')), ''),
-      auth.uid()
+      auth.uid(),
+      now() + make_interval(days => p_dias_validez),
+      p_usos_max
     );
     codigos := codigos || v_codigo;
   end loop;
-  perform private.auditar('codigos_creados', jsonb_build_object('master_id', p_master_id, 'rol', p_rol, 'cantidad', p_cantidad));
+  perform private.auditar('codigos_creados', jsonb_build_object('master_id', p_master_id, 'rol', p_rol, 'cantidad', p_cantidad,
+                                                                'dias_validez', p_dias_validez, 'usos_max', p_usos_max));
   return to_jsonb(codigos);
 end
 $$;
@@ -979,8 +991,14 @@ begin
       'rol', c.rol,
       'etiqueta', c.etiqueta,
       'tutor', t.seudonimo,
-      'usado', c.usado_por is not null,
-      'usado_at', c.usado_at,
+      'usado', c.usos >= c.usos_max,
+      'usos', c.usos,
+      'usos_max', c.usos_max,
+      'caduca_at', c.caduca_at,
+      'caducado', c.caduca_at is not null and c.caduca_at <= now(),
+      'revocado', c.revocado_at is not null,
+      'disponible', private.codigo_disponible(c),
+      'usado_at', (select max(u.usado_at) from public.codigos_usos u where u.codigo = c.codigo),
       'created_at', c.created_at
     ) order by c.created_at desc)
     from public.codigos_acceso c
@@ -1002,7 +1020,7 @@ begin
     select jsonb_agg(jsonb_build_object(
       'user_id', p.user_id,
       'seudonimo', p.seudonimo,
-      'etiqueta', (select c.etiqueta from public.codigos_acceso c where c.usado_por = p.user_id limit 1),
+      'etiqueta', (select c.etiqueta from public.codigos_usos u join public.codigos_acceso c on c.codigo = u.codigo where u.user_id = p.user_id limit 1),
       'estudiantes', (select count(*) from public.parejas pa where pa.tutor_id = p.user_id),
       'cotutorias', (select count(*) from public.cotutores c where c.tutor_id = p.user_id and c.finalizada_at is null)
     ) order by p.created_at)
@@ -1018,7 +1036,6 @@ $$;
 
 revoke all on all functions in schema public from public, anon, authenticated;
 
-grant execute on function public.comprobar_codigo(text, text) to anon, authenticated;
 grant execute on function public.configuracion_publica() to anon, authenticated;
 grant execute on function
   public.mi_perfil(),
@@ -1029,7 +1046,7 @@ grant execute on function
   public.mis_codigos_pareja(),
   public.listar_masters(),
   public.crear_master(text, public.tipo_trabajo),
-  public.crear_codigos(uuid, public.rol_usuario, integer, uuid, text),
+  public.crear_codigos(uuid, public.rol_usuario, integer, uuid, text, integer, integer),
   public.listar_codigos(uuid),
   public.listar_tutores(uuid)
 to authenticated;
@@ -1695,7 +1712,6 @@ $$;
 -- ---------------------------------------------------------------------------
 
 revoke all on all functions in schema public from public, anon, authenticated;
-grant execute on function public.comprobar_codigo(text, text) to anon, authenticated;
 grant execute on function public.configuracion_publica() to anon, authenticated;
 grant execute on function
   public.mi_perfil(),
@@ -1706,7 +1722,7 @@ grant execute on function
   public.mis_codigos_pareja(),
   public.listar_masters(),
   public.crear_master(text, public.tipo_trabajo),
-  public.crear_codigos(uuid, public.rol_usuario, integer, uuid, text),
+  public.crear_codigos(uuid, public.rol_usuario, integer, uuid, text, integer, integer),
   public.listar_codigos(uuid),
   public.listar_tutores(uuid),
   public.estado_semana(),
@@ -3344,11 +3360,11 @@ begin
       'estudiante_retirado', pe.retirado_at is not null,
       'tutor', case when t.user_id is null then null else jsonb_build_object(
         'user_id', t.user_id, 'seudonimo', t.seudonimo,
-        'etiqueta', (select c.etiqueta from public.codigos_acceso c where c.usado_por = t.user_id limit 1)) end,
+        'etiqueta', (select c.etiqueta from public.codigos_usos u join public.codigos_acceso c on c.codigo = u.codigo where u.user_id = t.user_id limit 1)) end,
       'cotutores', coalesce((
         select jsonb_agg(jsonb_build_object(
           'user_id', ct.user_id, 'seudonimo', ct.seudonimo,
-          'etiqueta', (select c.etiqueta from public.codigos_acceso c where c.usado_por = ct.user_id limit 1)
+          'etiqueta', (select c.etiqueta from public.codigos_usos u join public.codigos_acceso c on c.codigo = u.codigo where u.user_id = ct.user_id limit 1)
         ) order by co.created_at)
         from public.cotutores co join public.perfiles ct on ct.user_id = co.tutor_id
         where co.pareja_id = pa.id and co.finalizada_at is null
@@ -3764,3 +3780,186 @@ grant execute on function public.mi_calendario(date, date), public.guardar_event
 revoke all on function private.puede_ver_evento(text, uuid, uuid, uuid), private.exigir_calendario(),
   private.puede_editar_evento(public.eventos) from public, anon;
 grant execute on function private.puede_ver_evento(text, uuid, uuid, uuid) to authenticated;
+
+-- ===========================================================================
+-- 20261119000100_permisos.sql
+-- ===========================================================================
+
+-- SINTONÍA · Migración 13: permisos cerrados en todas partes
+--
+-- AUDITORIA.md, M1 y M2:
+--   * RLS activada también en las tablas internas (esquema private). Ya eran
+--     inaccesibles (el esquema no se expone y no tienen permisos), pero así
+--     ninguna tabla queda sin RLS.
+--   * Las funciones internas solo las puede ejecutar quien las necesita: las
+--     que usan las reglas de lectura (RLS), para los usuarios identificados.
+--     El resto solo se usan dentro de otras funciones.
+--   * A partir de aquí, ninguna función nueva queda abierta por defecto: cada
+--     una debe concederse de forma explícita.
+
+alter table private.ajustes enable row level security;
+alter table private.borrados_pendientes enable row level security;
+alter table private.investigadores_autorizados enable row level security;
+
+revoke execute on all functions in schema private from public, anon, authenticated;
+grant execute on function
+  private.rol_actual(),
+  private.master_actual(),
+  private.es_investigador(),
+  private.mis_parejas(),
+  private.parejas_como_estudiante(),
+  private.parejas_como_tutor(),
+  private.puede_ver_evento(text, uuid, uuid, uuid)
+  to authenticated;
+
+alter default privileges in schema private revoke execute on functions from public, anon, authenticated;
+alter default privileges in schema public revoke execute on functions from public, anon, authenticated;
+
+-- ===========================================================================
+-- 20261119000200_registro_seguro.sql
+-- ===========================================================================
+
+-- SINTONÍA · Migración 14: registro y acceso seguros (AUDITORIA.md, A5, A6 y M6)
+--
+--   * Los códigos tienen 12 caracteres, caducan (30 días por defecto), tienen
+--     un número máximo de usos y se pueden anular.
+--   * Registro, acceso y contacto pasan por funciones del servidor de
+--     SINTONÍA (carpeta api/), que limitan los intentos por IP y por correo.
+--   * La base de datos solo crea una cuenta si el servidor la ha autorizado
+--     justo antes: nadie puede probar códigos llamando directamente al
+--     servicio de acceso de Supabase.
+--   * Los mensajes de error no revelan si un código o un correo existen.
+
+-- ---------------------------------------------------------------------------
+-- Usos de los códigos
+-- ---------------------------------------------------------------------------
+
+alter table public.codigos_usos enable row level security;
+grant select on public.codigos_usos to authenticated;
+create policy "investigador ve los usos" on public.codigos_usos for select to authenticated
+  using (private.es_investigador());
+
+-- Anular un código que todavía no se ha agotado (investigador, o el tutor
+-- con sus propios códigos de pareja).
+create or replace function public.revocar_codigo(p_codigo text)
+returns jsonb
+language plpgsql security definer set search_path = ''
+as $$
+declare
+  c public.codigos_acceso;
+begin
+  select * into c from public.codigos_acceso where codigo = upper(trim(coalesce(p_codigo, '')));
+  if not found or not (private.es_investigador() or (private.rol_actual() = 'tutor' and c.tutor_id = auth.uid())) then
+    perform private.error('SIN_PERMISO', 'No tienes permiso para hacer esto.');
+  end if;
+  if c.revocado_at is null then
+    update public.codigos_acceso set revocado_at = now() where codigo = c.codigo;
+    perform private.auditar('codigo_revocado', jsonb_build_object('master_id', c.master_id, 'rol', c.rol));
+  end if;
+  return jsonb_build_object('revocado', true);
+end
+$$;
+
+-- ---------------------------------------------------------------------------
+-- Límite de intentos
+-- ---------------------------------------------------------------------------
+
+-- Solo se guarda una huella (no la IP ni el correo) y se borra en 24 horas.
+create table private.intentos (
+  id bigserial primary key,
+  tipo text not null,
+  huella text not null,
+  creado_at timestamptz not null default now()
+);
+create index intentos_busqueda on private.intentos (tipo, huella, creado_at);
+alter table private.intentos enable row level security;
+
+insert into private.ajustes (clave, valor)
+values ('sal_intentos', encode(extensions.gen_random_bytes(32), 'hex'))
+on conflict (clave) do nothing;
+
+-- Anota un intento para cada clave (IP, correo...) y dice si se puede seguir:
+-- false si alguna clave ya ha llegado al límite en la ventana de tiempo.
+create or replace function public.servicio_limitar(p_tipo text, p_claves jsonb, p_limite integer, p_minutos integer)
+returns boolean
+language plpgsql security definer set search_path = ''
+as $$
+declare
+  v_sal text := (select valor from private.ajustes where clave = 'sal_intentos');
+  v_huellas text[];
+  v_superado boolean;
+begin
+  perform private.exigir_servidor();
+  if p_tipo is null or p_limite < 1 or p_minutos < 1 then
+    perform private.error('PARAMETROS_NO_VALIDOS', 'Parámetros no válidos.');
+  end if;
+  delete from private.intentos where creado_at < now() - interval '24 hours';
+  select array_agg(encode(extensions.digest(v_sal || ':' || lower(trim(k)), 'sha256'), 'hex'))
+  into v_huellas
+  from jsonb_array_elements_text(coalesce(p_claves, '[]'::jsonb)) k where coalesce(trim(k), '') <> '';
+  if v_huellas is null then
+    return true;
+  end if;
+  select exists (
+    select 1 from private.intentos
+    where tipo = p_tipo and huella = any (v_huellas) and creado_at > now() - make_interval(mins => p_minutos)
+    group by huella having count(*) >= p_limite
+  ) into v_superado;
+  insert into private.intentos (tipo, huella) select p_tipo, h from unnest(v_huellas) h;
+  return not v_superado;
+end
+$$;
+
+-- ---------------------------------------------------------------------------
+-- Registro autorizado por el servidor
+-- ---------------------------------------------------------------------------
+
+create table private.registros_autorizados (
+  email text primary key,
+  codigo text not null,
+  expira_at timestamptz not null
+);
+alter table private.registros_autorizados enable row level security;
+
+-- El servidor comprueba el código y el correo. Si son válidos, autoriza crear
+-- la cuenta durante 15 minutos. La respuesta no dice qué ha fallado.
+create or replace function public.servicio_autorizar_registro(p_codigo text, p_email text)
+returns jsonb
+language plpgsql security definer set search_path = ''
+as $$
+declare
+  c public.codigos_acceso;
+  v_email text := lower(trim(coalesce(p_email, '')));
+  v_codigo text := upper(regexp_replace(coalesce(p_codigo, ''), '[\s-]', '', 'g'));
+begin
+  perform private.exigir_servidor();
+  delete from private.registros_autorizados where expira_at < now();
+  select * into c from public.codigos_acceso where codigo = v_codigo;
+  if not found or not private.codigo_disponible(c) or not private.dominio_permitido(v_email) then
+    return jsonb_build_object('ok', false);
+  end if;
+  insert into private.registros_autorizados (email, codigo, expira_at)
+  values (v_email, v_codigo, now() + interval '15 minutes')
+  on conflict (email) do update set codigo = excluded.codigo, expira_at = excluded.expira_at;
+  return jsonb_build_object('ok', true, 'codigo', v_codigo);
+end
+$$;
+
+-- La usa la creación de cuentas: comprueba y gasta la autorización.
+create or replace function private.consumir_autorizacion_registro(p_email text, p_codigo text)
+returns boolean
+language plpgsql security definer set search_path = ''
+as $$
+begin
+  delete from private.registros_autorizados
+  where email = lower(trim(p_email)) and codigo = p_codigo and expira_at > now();
+  return found;
+end
+$$;
+
+revoke all on function public.revocar_codigo(text), public.servicio_limitar(text, jsonb, integer, integer),
+  public.servicio_autorizar_registro(text, text), private.consumir_autorizacion_registro(text, text)
+  from public, anon, authenticated;
+grant execute on function public.revocar_codigo(text) to authenticated;
+grant execute on function public.servicio_limitar(text, jsonb, integer, integer), public.servicio_autorizar_registro(text, text)
+  to service_role;

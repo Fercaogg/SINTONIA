@@ -1,59 +1,40 @@
 <script setup lang="ts">
-// Registro con el código que da el tutor/a o la coordinación.
-import { computed, ref } from 'vue'
+// Registro con el código que da el tutor/a o la coordinación. Pasa por el
+// servidor de SINTONÍA, que limita los intentos y no revela si un código
+// existe (ver servidor/acceso-publico.ts).
+import { ref } from 'vue'
 import { RouterLink } from 'vue-router'
-import { supabase } from '@/lib/supabase'
-import { llamar, mensajeDeError } from '@/lib/api'
-import { NOMBRE_ROL, type Rol } from '@/lib/tipos'
+import { enviarAlServidor } from '@/lib/servidor'
+import { useTerminos } from '@/lib/terminos'
 import LayoutAcceso from '@/components/layout/LayoutAcceso.vue'
 import AppIcon from '@/components/comun/AppIcon.vue'
 import AvisoError from '@/components/comun/AvisoError.vue'
+import CampoTrampa from '@/components/comun/CampoTrampa.vue'
 
+const { t } = useTerminos()
 const codigo = ref('')
 const nombre = ref('')
 const email = ref('')
+const sitio = ref('')
 const enviando = ref(false)
 const enviado = ref(false)
 const error = ref('')
-const rolDelCodigo = ref<Rol | null>(null)
-
-const codigoLimpio = computed(() => codigo.value.trim().toUpperCase())
-
-const MOTIVOS: Record<string, string> = {
-  CODIGO_NO_VALIDO: 'El código no es válido o ya se ha usado. Revísalo o pide uno nuevo a tu tutor/a o a la coordinación.',
-  DOMINIO_NO_PERMITIDO: 'Usa tu correo institucional de la Universidad.',
-}
 
 async function registrarse() {
   error.value = ''
   enviando.value = true
-  try {
-    const comprobacion = await llamar<{ valido: boolean; motivo?: string; rol?: Rol }>('comprobar_codigo', {
-      p_codigo: codigoLimpio.value,
-      p_email: email.value.trim(),
-    })
-    if (!comprobacion.valido) {
-      error.value = MOTIVOS[comprobacion.motivo ?? ''] ?? MOTIVOS.CODIGO_NO_VALIDO
-      return
-    }
-    rolDelCodigo.value = comprobacion.rol ?? null
-    const { error: e } = await supabase.auth.signInWithOtp({
-      email: email.value.trim(),
-      options: {
-        shouldCreateUser: true,
-        data: { codigo: codigoLimpio.value, nombre: nombre.value.trim() },
-      },
-    })
-    if (e) {
-      error.value = 'No hemos podido completar el registro. Si ya tienes cuenta, inicia sesión.'
-      return
-    }
-    enviado.value = true
-  } catch (e) {
-    error.value = mensajeDeError(e)
-  } finally {
-    enviando.value = false
+  const r = await enviarAlServidor('registro', {
+    codigo: codigo.value,
+    nombre: nombre.value,
+    email: email.value,
+    sitio: sitio.value,
+  })
+  enviando.value = false
+  if (!r.ok) {
+    error.value = r.error ?? 'No hemos podido completar el registro.'
+    return
   }
+  enviado.value = true
 }
 </script>
 
@@ -76,20 +57,22 @@ async function registrarse() {
             autocomplete="off"
             autocapitalize="characters"
             spellcheck="false"
-            maxlength="12"
+            maxlength="16"
             class="input-field uppercase tracking-widest font-medium"
-            placeholder="Por ejemplo, K7QM2XRA"
+            placeholder="Por ejemplo, K7QM2XRAP4TN"
           />
         </div>
         <div>
           <label for="nombre" class="label">Tu nombre</label>
           <input id="nombre" v-model="nombre" type="text" required maxlength="120" autocomplete="name" class="input-field" />
-          <p class="text-xs texto-suave mt-1.5">Solo lo verá tu tutor/a, para saber a quién responde.</p>
+          <p class="text-xs texto-suave mt-1.5">{{ t('Solo lo verá tu tutor/a, para saber a quién responde.') }}</p>
         </div>
         <div>
           <label for="email" class="label">Correo institucional</label>
-          <input id="email" v-model="email" type="email" required autocomplete="email" class="input-field" placeholder="nombre@usal.es" />
+          <input id="email" v-model="email" type="email" required autocomplete="email" class="input-field" placeholder="nombre@usal.es" aria-describedby="ayuda-email" />
+          <p id="ayuda-email" class="text-xs texto-suave mt-1.5">Usa tu correo de la Universidad. Te enviaremos un enlace para terminar.</p>
         </div>
+        <CampoTrampa v-model="sitio" />
         <button type="submit" :disabled="enviando" class="btn-primary w-full py-3.5">
           {{ enviando ? 'Comprobando...' : 'Continuar' }}
         </button>
@@ -107,8 +90,8 @@ async function registrarse() {
       </div>
       <h1 class="titulo-pagina mb-2">Revisa tu correo</h1>
       <p class="texto-suave">
-        Te hemos enviado un enlace a <strong class="text-surface-900">{{ email }}</strong> para terminar el registro
-        <template v-if="rolDelCodigo"> como {{ NOMBRE_ROL[rolDelCodigo].toLowerCase() }}</template>.
+        Te hemos enviado un enlace a <strong class="text-surface-900">{{ email.trim().toLowerCase() }}</strong> para terminar el registro.
+        Caduca en poco tiempo y solo sirve una vez.
       </p>
     </div>
 
