@@ -1,6 +1,6 @@
 # sintonia-spot
 
-Spot comercial de SINTONÍA: 60 s exactos, 1920×1080, 60 fps, sin audio. Composición HyperFrames (HTML + GSAP), una escena por archivo.
+Spot comercial de SINTONÍA: 60 s exactos, 1920×1080, 60 fps. Música del catálogo de HeyGen (se añade con un script, ver abajo). Composición HyperFrames (HTML + GSAP), una escena por archivo.
 
 ## Requisitos
 
@@ -9,7 +9,27 @@ Spot comercial de SINTONÍA: 60 s exactos, 1920×1080, 60 fps, sin audio. Compos
 
 Comprobar: `npx hyperframes doctor`
 
-## Renderizar
+## Añadir la música (catálogo HeyGen) y renderizar
+
+Desde esta carpeta (la que contiene `index.html`):
+
+```bash
+npx hyperframes auth login
+```
+
+```bash
+node anadir-musica.mjs
+```
+
+```bash
+npx hyperframes render --output sintonia-spot.mp4 --fps 60
+```
+
+- `auth login` abre el navegador para iniciar sesión en HeyGen (gratis; da acceso a más de 10.000 pistas).
+- `anadir-musica.mjs` busca una pista, la copia a `assets/music/`, la coloca en `index.html` (60 s, fundido final de 2 s) y comprueba su tempo. Si avisa de que no va a 120 BPM o no te gusta, prueba otra con una descripción distinta: `node anadir-musica.mjs "cinematic tech, 120 BPM, piano and pulse"`. Cada ejecución sustituye la pista anterior.
+- Antes de renderizar puedes revisarla con `npx hyperframes preview`; el Studio muestra la rejilla de golpes de la pista.
+
+## Renderizar sin música
 
 Desde esta carpeta (la que contiene `index.html`):
 
@@ -26,6 +46,7 @@ npx hyperframes preview
 ## Estructura
 
 ```
+anadir-musica.mjs           añade la música del catálogo HeyGen
 index.html                  raíz: fuentes, GSAP, helpers y las 8 escenas montadas
 assets/js/gsap.min.js       GSAP 3.14.2 (local, sin CDN)
 assets/js/sx.js             helpers compartidos: máscaras, count-up, trazos, cámara, ondas
