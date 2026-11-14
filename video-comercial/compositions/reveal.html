@@ -30,8 +30,7 @@
   </div>
   <script>
     (function () {
-      var T0 = 12.75, D = 4.5;
-      function g(t) { return t - T0; }
+      var CLK = SX.scene(12.75, 17.25), T0 = CLK.T0, D = CLK.D, g = CLK.g; // original-cut time → scene time (reading holds included)
       var tl = gsap.timeline({ paused: true });
       SX.cam(tl, "#reveal-cam", D);
 

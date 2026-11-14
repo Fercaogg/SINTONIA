@@ -117,8 +117,7 @@
   </div>
   <script>
     (function () {
-      var T0 = 16.75, D = 11.5;
-      function g(t) { return t - T0; }
+      var CLK = SX.scene(16.75, 28.25), T0 = CLK.T0, D = CLK.D, g = CLK.g; // original-cut time → scene time (reading holds included)
       var tl = gsap.timeline({ paused: true });
       SX.cam(tl, "#fn-cam", D);
 

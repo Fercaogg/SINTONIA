@@ -65,8 +65,7 @@
   </div>
   <script>
     (function () {
-      var T0 = 27.75, D = 7.5;
-      function g(t) { return t - T0; }
+      var CLK = SX.scene(27.75, 35.25), T0 = CLK.T0, D = CLK.D, g = CLK.g; // original-cut time → scene time (reading holds included)
       SX.waves(document.getElementById("cf-far"), { n: 9, y0: 40, gap: 130, amp: 9, wl: 720, shift: 90, travel: D * 30 });
       SX.waves(document.getElementById("cf-near"), { n: 7, y0: 110, gap: 150, amp: 18, wl: 480, shift: 70, travel: D * 66 });
       var tl = gsap.timeline({ paused: true });

@@ -11,8 +11,32 @@
     return d;
   }
 
+  /* Reading holds: [point in the original 45 s cut, beats of hold added there].
+     Moves keep their speed; only the still reading time grows. Every hold is a whole
+     number of 0.5 s beats, so the 120 BPM grid stays intact. Total: 45 s → 60 s. */
+  var HOLDS = [
+    [6.5, 1.0], [9.0, 1.0], [11.0, 1.0], [12.5, 2.0], // datos
+    [16.5, 1.0],                                      // reveal
+    [21.5, 0.5], [24.5, 1.0], [27.5, 1.5],            // cómo funciona
+    [30.5, 1.0], [34.5, 2.0],                         // confianza
+    [36.5, 0.5], [39.5, 0.5],                         // perfiles
+    [44.5, 2.0],                                      // cierre
+  ];
+  function M(t) {
+    var s = t;
+    for (var i = 0; i < HOLDS.length; i++) if (t >= HOLDS[i][0]) s += HOLDS[i][1];
+    return s;
+  }
+
   window.SX = {
     BEAT: 0.5,
+    M: M, // original cut time → final time
+
+    /* Scene clock: T0/D/g from the scene's window in the original cut. */
+    scene: function (start, end) {
+      var T0 = M(start);
+      return { T0: T0, D: M(end) - T0, g: function (t) { return M(t) - T0; } };
+    },
     wpath: wpath,
 
     /* Fill an <g> with n thin sine lines wide enough to be translated by `travel` px. */

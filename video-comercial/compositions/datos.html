@@ -101,8 +101,7 @@
   </div>
   <script>
     (function () {
-      var T0 = 3.75, D = 9.5;
-      function g(t) { return t - T0; } // global video time → scene time
+      var CLK = SX.scene(3.75, 13.25), T0 = CLK.T0, D = CLK.D, g = CLK.g; // original-cut time → scene time (reading holds included)
       var tl = gsap.timeline({ paused: true });
       SX.cam(tl, "#datos-cam", D, -1);
 
