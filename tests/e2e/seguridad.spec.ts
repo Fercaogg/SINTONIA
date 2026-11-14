@@ -21,11 +21,11 @@ async function vigilarCsp(page: Page) {
 }
 
 const RECORRIDOS: { cuenta: string | null; rutas: string[] }[] = [
-  { cuenta: null, rutas: ['/', '/como-funciona', '/acceso', '/registro', '/privacidad', '/aviso-legal', '/cookies', '/consentimiento', '/no-existe'] },
+  { cuenta: null, rutas: ['/', '/como-funciona', '/investigacion', '/acceso', '/registro', '/privacidad', '/aviso-legal', '/cookies', '/consentimiento', '/no-existe'] },
   { cuenta: 'ana@usal.es', rutas: ['/estudiante', '/estudiante/checkin', '/estudiante/historial', '/estudiante/puente', '/calendario', '/cuenta'] },
   { cuenta: 'tutora@usal.es', rutas: ['/tutor', '/tutor/checkin', '/calendario'] },
   { cuenta: 'direccion@usal.es', rutas: ['/direccion', '/direccion/avisos'] },
-  { cuenta: 'investigador@usal.es', rutas: ['/investigacion', '/investigacion/parejas', '/investigacion/datos'] },
+  { cuenta: 'investigador@usal.es', rutas: ['/investigador', '/investigador/parejas', '/investigador/datos'] },
 ]
 
 test('la política de seguridad (CSP) no bloquea nada en ninguna pantalla', async ({ page }) => {
@@ -60,5 +60,5 @@ test('robots.txt y sitemap.xml existen y solo nombran páginas públicas', async
   expect(await robots.text()).toContain('Disallow: /')
   const mapa = await (await request.get('/sitemap.xml')).text()
   expect(mapa).toContain('<urlset')
-  expect(mapa).not.toMatch(/estudiante|tutor|direccion|investigacion|cuenta/)
+  expect(mapa).not.toMatch(/estudiante|tutor|direccion|investigador|cuenta/)
 })

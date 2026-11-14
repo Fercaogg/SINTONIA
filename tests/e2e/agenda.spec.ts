@@ -46,7 +46,7 @@ test('las parejas sin agenda ven el mensaje neutro', async ({ page }) => {
 
 test('el investigador ve cuántas parejas recibieron agenda cada semana', async ({ page }) => {
   await entrarConContrasena(page, 'investigador@usal.es')
-  await page.goto('/investigacion/calendario')
+  await page.goto('/investigador/calendario')
   const tabla = page.locator('section', { has: page.getByRole('heading', { name: 'Sorteos por semana' }) })
   await expect(tabla.locator('tbody tr')).toHaveCount(2)
   await sinErroresDeAccesibilidad(page)

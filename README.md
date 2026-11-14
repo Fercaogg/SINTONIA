@@ -179,7 +179,7 @@ Como investigador **no verás ningún nombre**: tutores y estudiantes aparecen c
 
 ### 4.2. Preparar el estudio
 
-En el menú **Investigación**:
+En el menú **Investigación** (panel en `/investigador`):
 
 1. **Calendario del estudio**: fecha de inicio de la semana 1, duración (10 semanas) y días de apertura y cierre. Mientras no pongas la fecha, el estudio "no ha empezado".
 2. **Másteres y códigos**: crea los dos másteres y genera:

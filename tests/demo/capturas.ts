@@ -35,7 +35,11 @@ async function bd<T>(sql: string, params: unknown[] = []): Promise<T[]> {
 test('pantallas públicas', async ({ page }, info) => {
   const p = info.project.name
   await page.goto('/')
+  await page.locator('#demostracion').getByLabel('Estudiante').fill('5')
+  await page.locator('#demostracion').getByLabel('Tutor/a').fill('2')
   await foto(page, '01-inicio', p)
+  await page.goto('/')
+  await foto(page, '01b-inicio-primera-pantalla', p, false)
   await page.goto('/como-funciona')
   await foto(page, '02-como-funciona-y-tus-datos', p)
   await page.goto('/acceso')
@@ -138,16 +142,16 @@ test('investigación', async ({ page }, info) => {
   await entrarComo(page, 'Investigación')
   await page.getByRole('heading', { name: 'Códigos de este máster' }).waitFor()
   await foto(page, '21-investigacion-masters-y-codigos', p)
-  await page.goto('/investigacion/calendario')
+  await page.goto('/investigador/calendario')
   await page.getByRole('heading', { name: 'Sorteos por semana' }).waitFor()
   await foto(page, '22-investigacion-calendario-y-sorteos', p)
-  await page.goto('/investigacion/convocatorias')
+  await page.goto('/investigador/convocatorias')
   await page.getByRole('heading', { name: 'Convocatorias' }).waitFor()
   await foto(page, '23-investigacion-convocatorias', p)
-  await page.goto('/investigacion/cuestionarios')
+  await page.goto('/investigador/cuestionarios')
   await page.getByRole('heading', { name: 'Cuestionario inicial' }).waitFor()
   await foto(page, '24-investigacion-cuestionarios', p)
-  await page.goto('/investigacion/datos')
+  await page.goto('/investigador/datos')
   await page.getByRole('heading', { name: 'Registro de auditoría' }).waitFor()
   await foto(page, '25-investigacion-datos-y-auditoria', p)
   await salir(page)
@@ -156,7 +160,7 @@ test('investigación', async ({ page }, info) => {
 test('cotutoría y gestión de tutores', async ({ page }, info) => {
   const p = info.project.name
   await entrarComo(page, 'Investigación')
-  await page.goto('/investigacion/parejas')
+  await page.goto('/investigador/parejas')
   await page.getByRole('heading', { name: 'Parejas y tutores' }).waitFor()
   await foto(page, '26-investigacion-parejas-y-tutores', p)
   await salir(page)
@@ -202,6 +206,7 @@ test('páginas legales y registro seguro', async ({ page }, info) => {
     ['/aviso-legal', '33-aviso-legal', 'Aviso legal'],
     ['/cookies', '34-cookies', 'Cookies'],
     ['/consentimiento', '35-consentimiento-publico', 'Consentimiento informado'],
+    ['/investigacion', '36-investigacion-publica', 'La investigación'],
   ]) {
     await page.goto(ruta)
     await page.getByRole('heading', { name: titulo, level: 1 }).waitFor()

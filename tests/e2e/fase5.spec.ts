@@ -46,7 +46,7 @@ test('el estudiante responde el cuestionario inicial con un único envío', asyn
 
 test('el investigador rellena las fechas de una convocatoria', async ({ page }, info) => {
   await entrarConContrasena(page, 'investigador@usal.es')
-  await page.goto('/investigacion/convocatorias')
+  await page.goto('/investigador/convocatorias')
   const fpu = page.getByRole('form', { name: /\(FPU\)/ })
   await fpu.getByLabel('Fecha de apertura').fill(info.project.name === 'movil' ? '2027-03-01' : '2027-03-02')
   await fpu.getByLabel('Fecha de cierre').fill('2027-03-31')
@@ -57,7 +57,7 @@ test('el investigador rellena las fechas de una convocatoria', async ({ page }, 
 
 test('el investigador ve los cuestionarios, con los ítems pendientes marcados', async ({ page }) => {
   await entrarConContrasena(page, 'investigador@usal.es')
-  await page.goto('/investigacion/cuestionarios')
+  await page.goto('/investigador/cuestionarios')
   await expect(page.getByRole('heading', { name: 'Cuestionario inicial' })).toBeVisible()
   await expect(page.getByRole('heading', { name: 'Cuestionario final' })).toBeVisible()
   await expect(page.getByText('[PENDIENTE: ítems de la escala validada]').first()).toBeVisible()

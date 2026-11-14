@@ -23,7 +23,7 @@ export const INICIO_ROL: Record<Rol, string> = {
   estudiante: '/estudiante',
   tutor: '/tutor',
   direccion: '/direccion',
-  investigador: '/investigacion',
+  investigador: '/investigador',
 }
 
 /** Perfiles que participan en el estudio y deben aceptar el consentimiento. */

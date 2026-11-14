@@ -16,3 +16,9 @@ export function estaPendiente(texto: string | null | undefined): boolean {
 }
 
 export const VERSION = __VERSION_SINTONIA__
+
+/**
+ * Para contenido del proyecto que Fernando aún no ha facilitado (por ejemplo,
+ * las hipótesis): mismo criterio, sin atribuirlo al Comité de Ética.
+ */
+export const EN_ELABORACION_PROYECTO = 'En elaboración. Se publicará aquí cuando esté disponible.'

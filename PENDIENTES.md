@@ -15,6 +15,10 @@ Todo lo que SINTONÍA necesita y que no se puede inventar. En la aplicación, ca
 
 | Dato | Dónde se usa | Dónde se cambia | Quién lo aporta |
 |---|---|---|---|
+| Pregunta de investigación (CTS) e hipótesis H1, H2 y H3 | /investigacion | `src/views/InvestigacionPublicaView.vue` | Fernando |
+| Qué se hace en enero y en mayo y junio de 2027 (calendario) | /investigacion | `src/views/InvestigacionPublicaView.vue` | Fernando |
+| Enlace del preregistro en OSF | /investigacion | `src/views/InvestigacionPublicaView.vue` | Fernando |
+| Compromiso por escrito de que los datos no cuentan para la nota (pregunta frecuente "¿Cuenta para la nota?") | Portada y consentimiento | `src/contenido/portada.ts` | Comité de Ética de la USAL |
 | Textos definitivos de los 4 ítems del estudiante y los 2 del tutor (ahora provisionales) | Check-ins | tabla `items` | Fernando y sus directores |
 | Ítems de la escala validada del pretest y del postest | Cuestionarios | tabla `cuestionario_items` | Fernando |
 | Pregunta (y opciones) de conocimiento sobre las convocatorias predoctorales | Cuestionarios | tabla `cuestionario_items` | Fernando |

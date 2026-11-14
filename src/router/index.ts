@@ -26,6 +26,7 @@ const routes: RouteRecordRaw[] = [
   { path: '/consentimiento', component: () => import('@/views/legal/ConsentimientoInfoView.vue'), meta: { publica: true, titulo: 'Consentimiento informado' } },
   { path: '/privacidad', component: () => import('@/views/legal/PrivacidadView.vue'), meta: { publica: true, titulo: 'Política de privacidad' } },
   { path: '/aviso-legal', component: () => import('@/views/legal/AvisoLegalView.vue'), meta: { publica: true, titulo: 'Aviso legal' } },
+  { path: '/investigacion', component: () => import('@/views/InvestigacionPublicaView.vue'), meta: { publica: true, titulo: 'La investigación' } },
   { path: '/cookies', component: () => import('@/views/legal/CookiesView.vue'), meta: { publica: true, titulo: 'Cookies' } },
   { path: '/consentimiento/aceptar', component: () => import('@/views/acceso/ConsentimientoView.vue'), meta: { titulo: 'Consentimiento informado' } },
   {
@@ -61,7 +62,7 @@ const routes: RouteRecordRaw[] = [
     ],
   },
   {
-    path: '/investigacion',
+    path: '/investigador',
     component: LayoutPanel,
     meta: { rol: 'investigador' },
     children: [
@@ -89,7 +90,8 @@ const routes: RouteRecordRaw[] = [
 export const router = createRouter({
   history: createWebHistory(),
   routes,
-  scrollBehavior: () => ({ top: 0 }),
+  // Los enlaces con ancla (por ejemplo, /#contacto) llevan a su sección.
+  scrollBehavior: (to) => (to.hash ? { el: to.hash, top: 72 } : { top: 0 }),
 })
 
 router.beforeEach(async (to) => {

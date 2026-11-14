@@ -4,6 +4,9 @@ import { RouterLink } from 'vue-router'
 import { AUTORIA, CORREO_CONTACTO, VERSION } from '@/lib/publico'
 
 const ENLACES = [
+  { to: '/investigacion', texto: 'La investigación' },
+  { to: '/#preguntas', texto: 'Preguntas frecuentes' },
+  { to: '/#contacto', texto: 'Contacto' },
   { to: '/como-funciona', texto: 'Cómo funciona y tus datos' },
   { to: '/privacidad', texto: 'Privacidad' },
   { to: '/aviso-legal', texto: 'Aviso legal' },

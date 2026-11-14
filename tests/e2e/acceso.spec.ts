@@ -86,7 +86,7 @@ test('tras muchos intentos con el mismo correo, el registro se detiene un rato',
 test('sin sesión, las páginas privadas llevan a iniciar sesión', async ({ page }) => {
   await page.goto('/estudiante')
   await expect(page).toHaveURL(/\/acceso/)
-  await page.goto('/investigacion')
+  await page.goto('/investigador')
   await expect(page).toHaveURL(/\/acceso/)
 })
 
@@ -94,7 +94,7 @@ test('la dirección no puede abrir las pantallas de investigación', async ({ pa
   await entrarConContrasena(page, 'direccion@usal.es')
   await expect(page).toHaveURL(/\/direccion$/)
   await expect(page.getByRole('heading', { name: 'Resumen del máster' })).toBeVisible()
-  await page.goto('/investigacion')
+  await page.goto('/investigador')
   await expect(page).toHaveURL(/\/direccion$/)
 })
 
@@ -116,7 +116,7 @@ test('la tutora ve a sus estudiantes y los códigos que puede repartir', async (
 
 test('el investigador crea un máster y códigos', async ({ page }, info) => {
   await entrarConContrasena(page, 'investigador@usal.es')
-  await expect(page).toHaveURL(/\/investigacion$/)
+  await expect(page).toHaveURL(/\/investigador$/)
   const nombre = porProyecto(info, ['Máster móvil', 'Máster escritorio'])
   await page.getByLabel('Nombre', { exact: true }).fill(nombre)
   await page.getByRole('button', { name: 'Crear máster' }).click()
@@ -141,7 +141,7 @@ test('las pantallas públicas no se salen por los lados y pasan la revisión de 
 })
 
 test('las páginas públicas nunca muestran "[PENDIENTE]" y enlazan las páginas legales', async ({ page }) => {
-  for (const ruta of ['/', '/como-funciona', '/privacidad', '/aviso-legal', '/cookies', '/consentimiento', '/acceso', '/registro']) {
+  for (const ruta of ['/', '/como-funciona', '/investigacion', '/privacidad', '/aviso-legal', '/cookies', '/consentimiento', '/acceso', '/registro']) {
     await page.goto(ruta)
     await page.waitForLoadState('networkidle')
     const texto = await page.locator('body').innerText()
