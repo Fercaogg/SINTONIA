@@ -120,7 +120,7 @@ async function borrar() {
             v-for="clave in TIPOS_ANOTABLES"
             :key="clave"
             class="inline-flex items-center gap-2 px-3 min-h-tactil rounded-full border cursor-pointer text-sm font-medium has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-brand-900"
-            :class="f.tipo === clave ? 'bg-surface-900 text-white border-surface-900' : 'bg-white text-surface-800 border-surface-200'"
+            :class="f.tipo === clave ? 'bg-marino text-white border-marino' : 'bg-papel text-surface-800 border-surface-200'"
           >
             <input v-model="f.tipo" type="radio" name="tipo" :value="clave" class="sr-only" />
             <AppIcon :name="TIPOS[clave].icono" :size="16" />

@@ -24,8 +24,9 @@ interface Semana {
 }
 
 // Colores de la marca validados para gráficos (ver DISENO.md).
-const COLOR_ESTUDIANTES = '#0A4A6C'
-const COLOR_TUTORES = '#248a73'
+// (Variables de tokens.css: en modo oscuro se aclaran.)
+const COLOR_ESTUDIANTES = 'rgb(var(--rgb-s900))'
+const COLOR_TUTORES = 'var(--color-graf-tutores)'
 const SUPRIMIDA = 'Datos insuficientes para garantizar el anonimato'
 
 const datos = ref<{ master: string; minimo: number; semanas: Semana[] } | null>(null)

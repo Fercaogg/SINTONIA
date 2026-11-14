@@ -2,6 +2,7 @@
 // Ojo: esto solo decide qué pantalla se muestra. Los permisos de verdad los
 // aplica la base de datos (RLS), aunque alguien se salte esta comprobación.
 
+import { nextTick } from 'vue'
 import { createRouter, createWebHistory, type RouteRecordRaw } from 'vue-router'
 import { useSesion } from '@/stores/sesion'
 import { INICIO_ROL, necesitaConsentimiento, type Rol } from '@/lib/tipos'
@@ -117,6 +118,27 @@ router.beforeEach(async (to) => {
   const rolRequerido = to.matched.find((r) => r.meta.rol)?.meta.rol
   if (rolRequerido && rolRequerido !== perfil.rol) return INICIO_ROL[perfil.rol]
   return true
+})
+
+// Cambio de página suave (View Transitions), solo si el navegador lo admite y
+// no se ha pedido reducir el movimiento. Es un fundido corto (main.css).
+let terminarTransicion: (() => void) | null = null
+router.beforeResolve((to, from) => {
+  const doc = document as Document & { startViewTransition?: (actualizar: () => Promise<void>) => unknown }
+  if (!from.matched.length || to.path === from.path || !doc.startViewTransition) return
+  if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return
+  return new Promise<void>((seguir) => {
+    doc.startViewTransition!(() => new Promise<void>((listo) => {
+      terminarTransicion = listo
+      seguir()
+    }))
+  })
+})
+router.afterEach(async () => {
+  if (!terminarTransicion) return
+  await nextTick()
+  terminarTransicion()
+  terminarTransicion = null
 })
 
 router.afterEach((to) => {

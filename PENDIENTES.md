@@ -46,7 +46,7 @@ Todo lo que SINTONÍA necesita y que no se puede inventar. En la aplicación, ca
 | Confirmar la región de Supabase (y guardar la prueba en VERIFICACION.md) antes de volver a afirmar que los datos están en la UE | /como-funciona | Fernando, con Claude |
 | En Supabase: enlace de acceso de 15 minutos (Authentication > Providers > Email > Email OTP Expiration = 900) y copias de seguridad (según el plan) | Acceso y restauración | Fernando |
 | Cerrar `connect-src` de la CSP a la dirección exacta del proyecto de Supabase | `vercel.json` | Claude, cuando exista el proyecto |
-| Dominio definitivo de la web (hoy `sintonia360-ferca.vercel.app`, también en `public/sitemap.xml` y `public/robots.txt`) | Buscadores | Fernando |
+| Dominio definitivo de la web (hoy `sintonia360-ferca.vercel.app`, también en `public/sitemap.xml`, `public/robots.txt` y la imagen para compartir de `index.html`) | Buscadores y redes | Fernando |
 | Cuenta de Resend (u otro proveedor) y dominio verificado desde el que enviar los correos | Recordatorios, avisos y enlaces de acceso | Fernando |
 | Remitente de los correos (dirección y nombre) | Variable `CORREO_REMITENTE` en Vercel | Fernando |
 | Decidir si se usa el modelo de lenguaje en el piloto y quién paga la clave de la API | Variable `AGENDA_MODO` | Fernando |

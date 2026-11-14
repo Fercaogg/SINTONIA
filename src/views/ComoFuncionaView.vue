@@ -6,6 +6,7 @@ import { RouterLink } from 'vue-router'
 import { llamar } from '@/lib/api'
 import LayoutPublico from '@/components/layout/LayoutPublico.vue'
 import Pendiente from '@/components/comun/Pendiente.vue'
+import TablaQuienVe from '@/components/portada/TablaQuienVe.vue'
 const config = ref<Record<string, { valor: string }>>({})
 
 onMounted(async () => {
@@ -53,41 +54,8 @@ const quienVe = [
 
       <section class="mb-10" aria-labelledby="quien">
         <h2 id="quien" class="font-display text-xl font-semibold mb-3">Quién ve qué</h2>
-        <!-- Móvil: una tarjeta por dato -->
-        <ul class="space-y-3 sm:hidden">
-          <li v-for="fila in quienVe" :key="fila.dato" class="card p-4">
-            <p class="font-semibold text-surface-900 mb-2">{{ fila.dato }}</p>
-            <dl class="grid grid-cols-[auto,1fr] gap-x-3 gap-y-1 text-sm">
-              <dt class="texto-suave">Tú</dt><dd>{{ fila.tu }}</dd>
-              <dt class="texto-suave">Tu tutor/a</dt><dd>{{ fila.tutor }}</dd>
-              <dt class="texto-suave">Dirección</dt><dd>{{ fila.direccion }}</dd>
-              <dt class="texto-suave">Investigación</dt><dd>{{ fila.investigacion }}</dd>
-            </dl>
-          </li>
-        </ul>
-        <div class="card overflow-x-auto hidden sm:block" tabindex="0" role="region" aria-label="Tabla de quién ve qué">
-          <table class="w-full text-sm text-left">
-            <caption class="sr-only">Quién puede ver cada dato</caption>
-            <thead class="bg-surface-100 text-surface-800">
-              <tr>
-                <th scope="col" class="p-3 font-semibold">Dato</th>
-                <th scope="col" class="p-3 font-semibold">Tú (estudiante)</th>
-                <th scope="col" class="p-3 font-semibold">Tu tutor/a</th>
-                <th scope="col" class="p-3 font-semibold">Dirección del máster</th>
-                <th scope="col" class="p-3 font-semibold">Investigación</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="fila in quienVe" :key="fila.dato" class="border-t border-surface-200 align-top">
-                <th scope="row" class="p-3 font-medium text-surface-900">{{ fila.dato }}</th>
-                <td class="p-3">{{ fila.tu }}</td>
-                <td class="p-3">{{ fila.tutor }}</td>
-                <td class="p-3">{{ fila.direccion }}</td>
-                <td class="p-3">{{ fila.investigacion }}</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
+        <p class="texto-suave mb-4">Pasa por un dato (o tócalo en el móvil) para ver de un vistazo quién lo ve.</p>
+        <TablaQuienVe :filas="quienVe" />
         <p class="text-sm texto-suave mt-3">
           Estas reglas no dependen solo de la aplicación: están escritas en la propia base de datos, que se niega a entregar un dato a quien no le corresponde.
         </p>

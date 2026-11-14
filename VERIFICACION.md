@@ -1,13 +1,13 @@
 # Verificación
 
-Cómo se comprueba cada criterio de aceptación del encargo y qué resultado dio la última ejecución (13 de noviembre de 2026, rama `fase-3-publico`).
+Cómo se comprueba cada criterio de aceptación del encargo y qué resultado dio la última ejecución (13 de noviembre de 2026, rama `fase-4-diseno`).
 
 ## Resumen de las comprobaciones automáticas
 
 | Orden | Resultado |
 |---|---|
 | `npm test` (lógica, base de datos y R) | 343 tests superados, 0 fallidos |
-| `npm run test:e2e` (navegador, móvil y escritorio) | 78 recorridos superados, 0 fallidos, con la aplicación compilada y sus cabeceras de seguridad (CSP incluida) |
+| `npm run test:e2e` (navegador, móvil y escritorio) | 88 recorridos superados, 0 fallidos, con la aplicación compilada y sus cabeceras de seguridad (CSP incluida) |
 | `npm run test:demo` (demostración, accesibilidad de todas las pantallas) | 26 comprobaciones superadas, 0 fallidas, en móvil a 360 px y en escritorio |
 | `npm run rendimiento` | Check-in listo en 1,9 s en un móvil con conexión 3G y procesador lento |
 | `npm run typecheck` y `npm run build` | Sin errores |

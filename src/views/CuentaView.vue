@@ -135,7 +135,7 @@ const { t } = useTerminos()
         <button v-if="!perfil?.retirado" type="button" class="btn-secondary justify-start text-left" @click="confirmando = 'retirar'">
           Retirarme del estudio y conservar mis respuestas anteriores (sin mi nombre)
         </button>
-        <button type="button" class="btn-secondary justify-start text-left !text-red-700 !border-red-700" @click="confirmando = 'borrar'">
+        <button type="button" class="btn-secondary justify-start text-left !text-red-700 !border-red-700 dark:!text-red-300 dark:!border-red-400" @click="confirmando = 'borrar'">
           Retirarme y borrar todos mis datos y mi cuenta
         </button>
       </div>

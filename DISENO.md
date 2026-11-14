@@ -266,3 +266,89 @@ En la Fase 2, todo lo anterior se convertirá en:
 - la configuración de Tailwind (`brand`, `surface`), con los mismos nombres que WORKWELL360, para poder copiar componentes con cambios mínimos.
 
 Ninguna pantalla de SINTONÍA escribirá un color directamente: todas usarán estos tokens.
+
+---
+
+## 11. Rediseño de la web pública (Fase 4 del encargo de blindaje)
+
+Fernando delegó el diseño ("decide la mejor opción; si no me gusta, lo cambio", 14/11/2026). Por eso no se presentaron dos direcciones: se aplicó una sola, descrita aquí.
+
+### 11.1. La idea: dos ondas que entran en sintonía
+
+Una sola idea visual recorre la portada: dos ondas, la del estudiante (verde `#34C6A3`) y la del tutor/a (azul marino `#0A4A6C`).
+
+| Momento | Dónde | Qué explica |
+|---|---|---|
+| Las ondas se separan o se juntan al mover las dos miradas | Demostración del inicio | Que el desajuste es una distancia entre dos miradas |
+| Al leer los tres pasos, las ondas pasan de desfasadas a alineadas | "Cómo funciona" | Que la agenda acerca las dos miradas |
+| Las ondas, ya en sintonía, con "En sintonía." | Cierre, antes del pie | El final de la historia |
+
+Componente: `src/components/portada/OndasSintonia.vue`. El desfase se dibuja moviendo (transform) la onda del tutor/a; nada más se anima.
+
+### 11.2. Composición editorial
+
+- **Inicio a dos columnas desiguales (7/5):** titular grande (hasta 72 px), entradilla, un dato duro ("Unos 60 segundos a la semana. Sin notas, sin rankings.") y la demostración, que es el propio producto.
+- **Cada apartado tiene su composición**, sin repetir ninguna:
+
+| Apartado | Composición |
+|---|---|
+| Cifras | Banda azul marino a sangre, números grandes |
+| El problema | Columnas 4/8, primer párrafo en tamaño de titular |
+| Cómo funciona | Panel fijo con las ondas y pasos numerados 01, 02, 03 |
+| Para cada perfil | Pestañas |
+| Puente al doctorado | Recorrido horizontal de tres tramos |
+| Privacidad y ética | Una afirmación grande y su desarrollo |
+| Para quién es | Banda azul marino, solo tipografía y filetes |
+| Dirección | Dos tarjetas idénticas |
+| Preguntas | Título fijo a la izquierda, lista desplegable a la derecha |
+| Contacto | Dos columnas: texto y formulario |
+| Cierre | Ondas en sintonía y titular centrado |
+
+- **Tipografía:** Fira Sans (la de WORKWELL360) con más escala y tracking negativo en los titulares; números tabulares en las cifras.
+
+### 11.3. Qué se aplica de la skill de Emil Kowalski
+
+| Principio | Dónde |
+|---|---|
+| Cada animación tiene un propósito; si se ve muy a menudo, no se anima | Ondas (explican), preguntas que llegan una a una (explican), candado (dato protegido). Los menús y las pestañas no se animan: cambian al instante |
+| Curvas fuertes: `ease-out` para entrar, `ease-in-out` para moverse en pantalla, nunca `ease-in` | Tokens `--ease-out` y `--ease-in-out` en `tokens.css` |
+| Duraciones cortas: microinteracciones de 160 ms, interfaz de 220 ms, entrada del inicio de 420 ms | Tokens `--dur-micro`, `--dur-ui`, `--dur-entrada` |
+| Botones que se hunden al pulsar (`scale(0.97)`) | `.btn-primary`, `.btn-secondary`, `.btn-danger` |
+| Solo transform y opacity en lo que se mueve | Ondas, entrada del inicio, preguntas y candado. Los cambios de color al pasar el ratón no mueven nada |
+| Escalonado corto (60 ms) | Las tres preguntas de la demostración |
+| Nada aparece desde `scale(0)` | El candado entra desde `scale(0.9)` |
+| Reducir movimiento: menos movimiento, no menos información | Con `prefers-reduced-motion`, todo se ve en su estado final |
+
+### 11.4. Qué se aplica de la skill de Taste
+
+| Principio | Dónde |
+|---|---|
+| La primera pantalla dice qué es, para quién y un dato duro | Inicio |
+| Mostrar el producto de verdad, no un adorno | La demostración del inicio es SINTONÍA funcionando |
+| El inicio entra una sola vez; uno o dos "momentos" por página | Entrada del inicio; el momento es "Cómo funciona" |
+| Nada se mueve por hacer scroll, salvo el momento dentro de su apartado | Solo las ondas de "Cómo funciona" |
+| Un solo sistema: un par de botones, un estilo de tarjeta, un radio | Tokens de WORKWELL360 |
+| Bordes iguales a izquierda y derecha; todo en la misma retícula (1180 px) | Todas las secciones |
+| Titulares que nombran cosas; botones con verbo | "Tengo un código", "Ver la demostración", "Leer la investigación" |
+| Nada de violeta | El tipo "Congreso" del calendario pasa de violeta a `#0e7490` |
+| Controles de 44 px como mínimo | Toda la web |
+
+### 11.5. Lo que manda el encargo sobre las skills
+
+| La skill dice | Se hace | Por qué |
+|---|---|---|
+| Taste: fotografías reales o de archivo en cada pantalla | Ninguna fotografía | El encargo prohíbe fotos de stock; la "foto" es el propio producto |
+| Taste: una sección por pantalla, como mucho dos | Secciones de altura natural | Prima la lectura cómoda y el contenido real; en el móvil sería imposible |
+| Taste: efectos y escenas en páginas de tecnología | Ninguno | El encargo pide movimiento con propósito |
+| Taste: nada aparece al hacer scroll | Solo los números de las cifras cuentan hasta su valor la primera vez que se ven | Lo pide el encargo ("contadores animados con datos reales") |
+| Emil: muelles y gestos | No se usan | No hay gestos en esta web |
+
+### 11.6. Modo oscuro
+
+Según la preferencia del sistema (`prefers-color-scheme`). Los neutros se invierten (fondo `#09181F`, tarjetas `#0E2530`, texto `#EAF3F6`); el azul marino `#0A4A6C` de las bandas y el verde `#34C6A3` no cambian; el verde de los enlaces se aclara a `#5FE0C8` para mantener el contraste. Las clases `bg-papel` (tarjetas) y `bg-marino` (bandas fijas) sustituyen a `bg-white` y `bg-surface-900`.
+
+### 11.7. Otros
+
+- **Logotipo:** sobre fondo claro, el "ÍA" usa `#248a73` (contraste suficiente); sobre azul marino o en oscuro, `#34C6A3`.
+- **Imagen para compartir** (`public/og.png`, 1200 × 630): las dos ondas, el nombre y el titular sobre `#0A4A6C`. Se regenera con `node scripts/generar-og.mjs`.
+- **Cambio de página:** fundido corto con View Transitions donde el navegador lo admite.

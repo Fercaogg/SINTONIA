@@ -12,7 +12,7 @@ defineProps<{ miembro: MiembroDireccion }>()
 <template>
   <article class="card p-6 h-full flex flex-col" :aria-labelledby="`dir-${miembro.iniciales}`">
     <div class="flex items-center gap-4">
-      <span class="w-14 h-14 rounded-full bg-surface-900 text-white font-display text-lg font-semibold flex items-center justify-center shrink-0" aria-hidden="true">
+      <span class="w-14 h-14 rounded-full bg-marino text-white font-display text-lg font-semibold flex items-center justify-center shrink-0" aria-hidden="true">
         {{ miembro.iniciales }}
       </span>
       <div class="min-w-0">

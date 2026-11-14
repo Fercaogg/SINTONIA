@@ -55,20 +55,28 @@
 
 @layer components {
   .card {
-    @apply bg-white border border-surface-200;
+    @apply bg-papel border border-surface-200;
     border-radius: var(--radius-md);
     box-shadow: var(--shadow-card);
     transition: box-shadow 0.3s ease, transform 0.3s ease;
   }
 
+  /* Botones (skill de Emil Kowalski): responden al instante al pasar el
+     ratón y se hunden un poco al pulsar. Solo se animan color y transform. */
   .btn-primary {
     @apply inline-flex items-center justify-center gap-2 px-[18px] py-[10px] min-h-tactil
-           text-white font-medium text-base transition-all duration-200 ease-out;
-    background-color: var(--color-accion);
+           text-white font-medium text-base;
+    background-color: var(--color-accion-fondo);
     border-radius: var(--radius-md);
+    transition: background-color var(--dur-micro) ease, transform var(--dur-micro) var(--ease-out);
   }
   .btn-primary:hover:not(:disabled) {
-    background-color: var(--color-accion-hover);
+    background-color: var(--color-accion-fondo-hover);
+  }
+  .btn-primary:active:not(:disabled),
+  .btn-secondary:active:not(:disabled),
+  .btn-danger:active:not(:disabled) {
+    transform: scale(0.97);
   }
   .btn-primary:disabled {
     @apply opacity-50 cursor-not-allowed;
@@ -76,7 +84,8 @@
 
   .btn-secondary {
     @apply inline-flex items-center justify-center gap-2 px-[18px] py-[10px] min-h-tactil
-           bg-transparent font-medium text-base border transition-all duration-200;
+           bg-transparent font-medium text-base border;
+    transition: background-color var(--dur-micro) ease, transform var(--dur-micro) var(--ease-out);
     color: var(--color-accion);
     border-color: var(--color-accion);
     border-radius: var(--radius-md);
@@ -87,7 +96,8 @@
 
   .btn-danger {
     @apply inline-flex items-center justify-center gap-2 px-[18px] py-[10px] min-h-tactil
-           bg-red-700 text-white font-medium text-base transition-all duration-200;
+           bg-red-700 text-white font-medium text-base;
+    transition: background-color var(--dur-micro) ease, transform var(--dur-micro) var(--ease-out);
     border-radius: var(--radius-md);
   }
   .btn-danger:hover:not(:disabled) {
@@ -103,7 +113,7 @@
   }
 
   .input-field {
-    @apply w-full px-4 py-3 bg-white text-base transition-all duration-200 outline-none min-h-tactil;
+    @apply w-full px-4 py-3 bg-papel text-base transition-all duration-200 outline-none min-h-tactil;
     border: 1px solid var(--color-border);
     border-radius: var(--radius-md);
     color: var(--color-heading);
@@ -170,7 +180,7 @@
     color: var(--color-heading);
   }
   .sidebar-link.active {
-    background-color: var(--color-accion);
+    background-color: var(--color-accion-fondo);
     color: #ffffff;
   }
 
@@ -183,7 +193,7 @@
     @apply bg-white/10 text-white;
   }
   .sidebar-link-oscuro.active {
-    @apply bg-white text-surface-900;
+    @apply bg-papel text-surface-900;
   }
 
   .aviso-error {
@@ -217,5 +227,36 @@
 
   .solo-lector {
     @apply sr-only;
+  }
+}
+
+/* Modo oscuro: avisos y etiquetas con colores propios (contraste AA). */
+@media (prefers-color-scheme: dark) {
+  .aviso-error {
+    background-color: rgba(185, 28, 28, 0.18);
+    border-color: rgba(248, 113, 113, 0.45);
+    color: #fecaca;
+  }
+  .aviso-pendiente {
+    background-color: rgba(180, 83, 9, 0.2);
+    border-color: rgba(251, 191, 36, 0.4);
+    color: #fde68a;
+  }
+  .badge-amber {
+    background-color: rgba(180, 83, 9, 0.25);
+    color: #fde68a;
+  }
+}
+
+/* Cambio de página suave (View Transitions), solo un fundido corto. */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: var(--dur-ui);
+  animation-timing-function: var(--ease-out);
+}
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation: none;
   }
 }

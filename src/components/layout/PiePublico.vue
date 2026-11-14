@@ -16,7 +16,7 @@ const ENLACES = [
 </script>
 
 <template>
-  <footer class="border-t border-surface-200 bg-white">
+  <footer class="border-t border-surface-200 bg-papel">
     <div class="max-w-[1100px] mx-auto px-4 sm:px-6 py-8 grid gap-6 sm:grid-cols-[1fr_auto] text-sm">
       <div class="space-y-2">
         <p class="text-surface-900 font-medium">{{ AUTORIA }}</p>

@@ -59,12 +59,12 @@ export interface Entrada {
 
 // Colores solo decorativos (la etiqueta y el icono siempre acompañan al color).
 export const TIPOS: Record<TipoCalendario, { etiqueta: string; icono: string; color: string }> = {
-  tutoria: { etiqueta: 'Tutoría', icono: 'chat', color: '#1d7060' },
+  tutoria: { etiqueta: 'Tutoría', icono: 'chat', color: 'rgb(var(--rgb-b900))' },
   entrega: { etiqueta: 'Entrega de documentación', icono: 'document', color: '#b45309' },
-  congreso: { etiqueta: 'Congreso', icono: 'users', color: '#6d28d9' },
-  evento: { etiqueta: 'Seminario o evento', icono: 'star', color: '#0A4A6C' },
+  congreso: { etiqueta: 'Congreso', icono: 'users', color: '#0e7490' },
+  evento: { etiqueta: 'Seminario o evento', icono: 'star', color: 'rgb(var(--rgb-s900))' },
   plazo: { etiqueta: 'Plazo', icono: 'clock', color: '#b91c1c' },
-  otro: { etiqueta: 'Otro', icono: 'bulb', color: '#5A6B75' },
+  otro: { etiqueta: 'Otro', icono: 'bulb', color: 'rgb(var(--rgb-s600))' },
   convocatoria: { etiqueta: 'Convocatoria', icono: 'graduation', color: '#248a73' },
 }
 

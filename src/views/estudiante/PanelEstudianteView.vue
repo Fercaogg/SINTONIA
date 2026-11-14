@@ -53,7 +53,7 @@ const { t } = useTerminos()
     <AvisoError v-else-if="error" :mensaje="error" />
     <template v-else-if="datos">
       <section v-if="cuestionarioPendiente" class="card p-5 sm:p-6 mb-4 flex flex-col sm:flex-row sm:items-center gap-4 bg-brand-50 border-brand-200" aria-labelledby="t-cuest">
-        <div class="w-12 h-12 rounded-2xl bg-white flex items-center justify-center shrink-0">
+        <div class="w-12 h-12 rounded-2xl bg-papel flex items-center justify-center shrink-0">
           <AppIcon name="document" :size="24" class="text-surface-900" />
         </div>
         <div class="flex-1">
@@ -68,7 +68,7 @@ const { t } = useTerminos()
       <section v-else class="card p-5 sm:p-6 flex flex-col sm:flex-row sm:items-center gap-4" aria-labelledby="t-semana">
         <div
           class="w-12 h-12 rounded-2xl flex items-center justify-center shrink-0"
-          :class="datos.respuesta ? 'bg-brand-100 text-surface-900' : 'bg-surface-900 text-white'"
+          :class="datos.respuesta ? 'bg-brand-100 text-surface-900' : 'bg-marino text-white'"
         >
           <AppIcon :name="datos.respuesta ? 'check' : 'checkin'" :size="24" />
         </div>

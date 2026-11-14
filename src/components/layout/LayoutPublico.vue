@@ -17,7 +17,7 @@ function volver() {
 <template>
   <div class="min-h-screen flex flex-col">
     <BandaEntorno />
-    <header class="bg-white border-b border-surface-200">
+    <header class="bg-papel border-b border-surface-200">
       <div class="max-w-3xl mx-auto px-4 py-4 flex items-center justify-between gap-3">
         <RouterLink to="/" class="text-xl" aria-label="SINTONÍA, inicio"><AppLogo /></RouterLink>
         <button type="button" class="btn-secondary text-sm" @click="volver">

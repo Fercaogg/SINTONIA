@@ -59,7 +59,7 @@ const { t } = useTerminos()
         <section v-else class="card p-5 sm:p-6 flex flex-col sm:flex-row sm:items-center gap-4" aria-labelledby="t-semana">
           <div
             class="w-12 h-12 rounded-2xl flex items-center justify-center shrink-0"
-            :class="respondidos === datos.estudiantes.length ? 'bg-brand-100 text-surface-900' : 'bg-surface-900 text-white'"
+            :class="respondidos === datos.estudiantes.length ? 'bg-brand-100 text-surface-900' : 'bg-marino text-white'"
           >
             <AppIcon :name="respondidos === datos.estudiantes.length ? 'check' : 'checkin'" :size="24" />
           </div>

@@ -27,7 +27,7 @@ function mover(delta: number) {
         :aria-controls="`panel-${p.clave}`"
         :tabindex="activa === i ? 0 : -1"
         class="px-4 min-h-tactil rounded-full border text-sm font-medium"
-        :class="activa === i ? 'bg-surface-900 text-white border-surface-900' : 'bg-white text-surface-800 border-surface-200 hover:border-surface-800'"
+        :class="activa === i ? 'bg-marino text-white border-marino' : 'bg-papel text-surface-800 border-surface-200 hover:border-surface-800'"
         @click="activa = i"
       >
         {{ p.nombre }}

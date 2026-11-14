@@ -115,28 +115,28 @@ const resumenAccesible = computed(() =>
         <!-- Cuadrícula y eje -->
         <g>
           <template v-for="m in marcas" :key="m">
-            <line :x1="M.izq" :x2="ANCHO - M.der" :y1="y(m)" :y2="y(m)" stroke="#E3EAEA" stroke-width="1" />
-            <text :x="M.izq - 8" :y="y(m) + 4" text-anchor="end" font-size="12" fill="#5A6B75">{{ formato(m) }}</text>
+            <line :x1="M.izq" :x2="ANCHO - M.der" :y1="y(m)" :y2="y(m)" style="stroke: var(--color-border)" stroke-width="1" />
+            <text :x="M.izq - 8" :y="y(m) + 4" text-anchor="end" font-size="12" style="fill: var(--color-body)">{{ formato(m) }}</text>
           </template>
-          <text v-for="(s, i) in semanas" :key="s" :x="x(i)" :y="ALTO - 8" text-anchor="middle" font-size="12" fill="#5A6B75">S{{ s }}</text>
+          <text v-for="(s, i) in semanas" :key="s" :x="x(i)" :y="ALTO - 8" text-anchor="middle" font-size="12" style="fill: var(--color-body)">S{{ s }}</text>
         </g>
 
         <!-- Columna resaltada al pasar el ratón -->
-        <rect v-if="activa !== null" :x="x(activa) - banda / 2" :y="M.arr" :width="banda" :height="altoUtil" fill="#F0F4F3" />
+        <rect v-if="activa !== null" :x="x(activa) - banda / 2" :y="M.arr" :width="banda" :height="altoUtil" style="fill: var(--color-surface-alt)" />
 
         <!-- Barras -->
         <g v-if="tipo === 'barras'">
           <template v-for="(v, i) in series[0].valores" :key="i">
-            <path v-if="v !== null && v > min" :d="barra(i, v)" :fill="series[0].color" />
+            <path v-if="v !== null && v > min" :d="barra(i, v)" :style="{ fill: series[0].color }" />
           </template>
         </g>
 
         <!-- Líneas y marcadores -->
         <g v-else>
           <g v-for="s in series" :key="s.nombre">
-            <polyline v-for="(t, k) in tramos(s.valores)" :key="k" :points="t" fill="none" :stroke="s.color" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" />
+            <polyline v-for="(t, k) in tramos(s.valores)" :key="k" :points="t" fill="none" :style="{ stroke: s.color }" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" />
             <template v-for="(v, i) in s.valores" :key="i">
-              <circle v-if="v !== null" :cx="x(i)" :cy="y(v)" r="4" :fill="s.color" stroke="#FFFFFF" stroke-width="2" />
+              <circle v-if="v !== null" :cx="x(i)" :cy="y(v)" r="4" :style="{ fill: s.color, stroke: 'var(--color-white)' }" stroke-width="2" />
             </template>
           </g>
         </g>
@@ -150,7 +150,7 @@ const resumenAccesible = computed(() =>
             :text-anchor="tipo === 'barras' ? 'middle' : 'start'"
             font-size="12"
             font-weight="600"
-            fill="#0A4A6C"
+            style="fill: var(--color-heading)"
           >{{ formato(f.v) }}</text>
         </template>
 
@@ -169,7 +169,7 @@ const resumenAccesible = computed(() =>
 
       <div
         v-if="activa !== null"
-        class="absolute top-0 pointer-events-none bg-white border border-surface-200 shadow-card rounded-md px-3 py-2 text-xs text-surface-900 whitespace-nowrap"
+        class="absolute top-0 pointer-events-none bg-papel border border-surface-200 shadow-card rounded-md px-3 py-2 text-xs text-surface-900 whitespace-nowrap"
         :style="{ left: `${(x(activa) / ANCHO) * 100}%`, transform: activa > semanas.length / 2 ? 'translateX(-105%)' : 'translateX(5%)' }"
         role="presentation"
       >

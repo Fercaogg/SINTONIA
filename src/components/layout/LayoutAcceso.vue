@@ -11,7 +11,7 @@ import BandaEntorno from '@/components/comun/BandaEntorno.vue'
   <div class="min-h-screen flex flex-col">
     <BandaEntorno />
     <div class="flex-1 flex">
-      <div class="hidden lg:flex w-1/2 bg-surface-900 relative overflow-hidden items-center justify-center p-12">
+      <div class="hidden lg:flex w-1/2 bg-marino relative overflow-hidden items-center justify-center p-12">
         <div class="absolute inset-0" aria-hidden="true">
           <div class="absolute top-20 left-20 w-64 h-64 bg-brand-500/20 rounded-full blur-3xl" />
           <div class="absolute bottom-20 right-20 w-80 h-80 bg-brand-400/10 rounded-full blur-3xl" />

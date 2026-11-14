@@ -14,7 +14,7 @@ test('un estudiante se registra con su código, acepta el consentimiento y llega
 
   await page.goto('/')
   await sinRayasLargas(page)
-  await page.getByRole('link', { name: 'Tengo un código' }).click()
+  await page.getByRole('link', { name: 'Tengo un código' }).first().click()
 
   await page.getByLabel('Código de acceso').fill(codigo.toLowerCase())
   await page.getByLabel('Tu nombre').fill('Lucía Prueba')

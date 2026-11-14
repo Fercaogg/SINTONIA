@@ -58,7 +58,7 @@ async function enviar() {
 
     <div class="card p-6 mb-6 bg-brand-50 border-brand-200">
       <div class="flex items-start gap-4">
-        <div class="w-11 h-11 rounded-xl bg-white flex items-center justify-center flex-shrink-0">
+        <div class="w-11 h-11 rounded-xl bg-papel flex items-center justify-center flex-shrink-0">
           <AppIcon name="heart" :size="22" class="text-surface-900" />
         </div>
         <div>
