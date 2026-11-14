@@ -4,11 +4,12 @@
 // tutor/a, que empiezan desfasadas (la demostración del inicio), se alinean
 // al leer "Cómo funciona" y terminan en sintonía en el cierre.
 // Cada apartado tiene una composición distinta.
-import { ref } from 'vue'
+import { defineAsyncComponent, ref } from 'vue'
 import { RouterLink, useRoute } from 'vue-router'
 import { useSesion } from '@/stores/sesion'
 import { INICIO_ROL } from '@/lib/tipos'
 import { modoDemo } from '@/lib/supabase'
+import { useVisibleUnaVez } from '@/lib/movimiento'
 import { ANTECEDENTE, AUTOR, DATOS_CLAVE, DIRECCION, PARA_QUIEN, REFERENCIAS } from '@/contenido/portada'
 import AppLogo from '@/components/comun/AppLogo.vue'
 import AppIcon from '@/components/comun/AppIcon.vue'
@@ -17,8 +18,11 @@ import AccesosDemo from '@/components/comun/AccesosDemo.vue'
 import PiePublico from '@/components/layout/PiePublico.vue'
 import DemoSintonia from '@/components/portada/DemoSintonia.vue'
 import CifraAnimada from '@/components/portada/CifraAnimada.vue'
+// El efecto del fondo se carga aparte, sin retrasar la primera pantalla.
+const CampoSintonia = defineAsyncComponent(() => import('@/components/portada/CampoSintonia.vue'))
 import ComoFuncionaOndas from '@/components/portada/ComoFuncionaOndas.vue'
 import OndasSintonia from '@/components/portada/OndasSintonia.vue'
+import TituloEnSintonia from '@/components/portada/TituloEnSintonia.vue'
 import PestanasPerfiles from '@/components/portada/PestanasPerfiles.vue'
 import TarjetaDireccion from '@/components/portada/TarjetaDireccion.vue'
 import PreguntasFrecuentes from '@/components/portada/PreguntasFrecuentes.vue'
@@ -27,6 +31,9 @@ import FormularioContacto from '@/components/portada/FormularioContacto.vue'
 const sesion = useSesion()
 const route = useRoute()
 const menuAbierto = ref(false)
+// Cierre: las ondas se juntan la primera vez que se ve.
+const cierre = ref<HTMLElement | null>(null)
+const cierreVisto = useVisibleUnaVez(cierre)
 const CITADAS = REFERENCIAS.filter((r) => ['colomo2025', 'dekleijn2012', 'winner1980', 'slade2013'].includes(r.clave))
 
 const SECCIONES = [
@@ -89,8 +96,9 @@ const PUENTE = [
       </p>
 
       <!-- 1. Inicio: titular grande a la izquierda, la demostración (el producto) a la derecha -->
-      <section class="lg:min-h-[calc(100svh-4.5rem)] flex items-center py-12 sm:py-16">
-        <div class="max-w-[1180px] w-full mx-auto px-4 sm:px-6 grid gap-12 lg:grid-cols-[7fr_5fr] items-center">
+      <section class="relative overflow-hidden lg:min-h-[calc(100svh-4.5rem)] flex items-center pt-12 pb-20 sm:pt-16 sm:pb-24">
+        <CampoSintonia />
+        <div class="relative z-10 max-w-[1180px] w-full mx-auto px-4 sm:px-6 grid gap-12 lg:grid-cols-[7fr_5fr] items-center">
           <div class="entrada">
             <p class="text-xs font-semibold uppercase tracking-[0.18em] text-brand-900 mb-5">Tutoría de TFM, TFG y tesis</p>
             <h1 class="font-display text-[2.75rem] leading-[1.02] sm:text-6xl lg:text-7xl font-bold tracking-tight text-surface-900">
@@ -251,10 +259,12 @@ const PUENTE = [
       </section>
 
       <!-- Cierre: las dos ondas, por fin, en sintonía -->
-      <section class="bg-papel border-t border-surface-200" aria-labelledby="t-cierre">
+      <section ref="cierre" class="bg-papel border-t border-surface-200" aria-labelledby="t-cierre">
         <div class="max-w-[1180px] mx-auto px-4 sm:px-6 pt-16 pb-14 text-center">
-          <OndasSintonia :desfase="0" :alto="80" />
-          <h2 id="t-cierre" class="mt-8 font-display text-4xl sm:text-6xl font-bold tracking-tight text-surface-900">En sintonía.</h2>
+          <div style="--ondas-duracion: 1100ms"><OndasSintonia :desfase="cierreVisto ? 0 : 1" :alto="80" /></div>
+          <div class="mt-8 font-display text-4xl sm:text-6xl font-bold tracking-tight text-surface-900">
+            <TituloEnSintonia id="t-cierre" texto="En sintonía." />
+          </div>
           <p class="mt-4 text-lg texto-suave max-w-xl mx-auto">Acompañar el trabajo académico, sin vigilar.</p>
           <div class="mt-8 flex flex-col sm:flex-row gap-3 justify-center">
             <RouterLink v-if="!modoDemo" to="/registro" class="btn-primary px-6 py-3">Tengo un código</RouterLink>

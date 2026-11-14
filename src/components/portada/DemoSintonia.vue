@@ -3,7 +3,8 @@
 // ondas se separan o se juntan en tiempo real; si la diferencia es de 2
 // puntos o más, aparecen tres preguntas de ejemplo, una tras otra.
 // Sin llamadas a ninguna API y sin guardar nada.
-import { computed, ref } from 'vue'
+import { computed, ref, watchEffect } from 'vue'
+import { desfasePortada } from '@/lib/sintonia-estado'
 import { compararMiradas } from '@/lib/demo-portada'
 import OndasSintonia from './OndasSintonia.vue'
 
@@ -11,6 +12,8 @@ const estudiante = ref(4)
 const tutor = ref(2)
 const resultado = computed(() => compararMiradas(estudiante.value, tutor.value))
 const desfase = computed(() => Math.abs(estudiante.value - tutor.value) / 4)
+// El campo de ondas del fondo del inicio reacciona a lo mismo.
+watchEffect(() => (desfasePortada.value = desfase.value))
 </script>
 
 <template>
@@ -39,7 +42,7 @@ const desfase = computed(() => Math.abs(estudiante.value - tutor.value) / 4)
     </div>
 
     <!-- Altura mínima fija: el resultado cambia sin mover lo de alrededor (sin saltos de maquetación). -->
-    <div class="mt-5 rounded-lg p-4 min-h-[12.5rem]" :class="resultado.desajuste ? 'bg-brand-50 border border-brand-200' : 'bg-surface-100 border border-transparent'" aria-live="polite">
+    <div class="mt-5 rounded-lg p-4 min-h-[15.5rem]" :class="resultado.desajuste ? 'bg-brand-50 border border-brand-200' : 'bg-surface-100 border border-transparent'" aria-live="polite">
       <template v-if="resultado.desajuste">
         <p class="font-medium text-surface-900">
           {{ resultado.diferencia }} puntos de diferencia: hay desajuste. Si esa semana les toca en el sorteo, los dos recibirán estas preguntas:

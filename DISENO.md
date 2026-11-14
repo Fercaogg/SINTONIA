@@ -352,3 +352,21 @@ Según la preferencia del sistema (`prefers-color-scheme`). Los neutros se invie
 - **Logotipo:** sobre fondo claro, el "ÍA" usa `#248a73` (contraste suficiente); sobre azul marino o en oscuro, `#34C6A3`.
 - **Imagen para compartir** (`public/og.png`, 1200 × 630): las dos ondas, el nombre y el titular sobre `#0A4A6C`. Se regenera con `node scripts/generar-og.mjs`.
 - **Cambio de página:** fundido corto con View Transitions donde el navegador lo admite.
+
+### 11.8. El efecto del inicio: "campo de sintonía"
+
+A petición de Fernando ("que se mueva y sea una pasada", 14/11/2026), el inicio tiene el único efecto de la página, como permite la skill de Taste en una web de software (`src/components/portada/CampoSintonia.vue`):
+
+- **Qué es:** un campo de hilos de luz en WebGL, a sangre detrás del inicio, en dos familias: verde (estudiante) y azul marino o azul claro en oscuro (tutor/a).
+- **Qué cuenta:** cuando las dos miradas de la demostración se separan, la familia del tutor/a se desfasa, se inclina y vibra; cuando coinciden, todo se ordena en una sola corriente. El puntero deja una onda suave. Los cambios se suavizan con un "muelle" (skill de Emil Kowalski) para que nada salte.
+- **Lectura:** detrás del titular, el campo se calma casi del todo.
+- **Cuidados:**
+  - un solo lienzo, que solo se dibuja mientras se ve;
+  - se para al cambiar de pestaña;
+  - botón "Pausar el fondo" (WCAG 2.2.2);
+  - con "reducir movimiento", o en aparatos sin aceleración gráfica, es un fotograma quieto;
+  - si los fotogramas van lentos, baja la resolución y, si sigue igual, se queda quieto;
+  - se carga aparte, sin retrasar la primera pantalla;
+  - sin WebGL, no aparece y la portada sigue igual.
+- **Segundo momento (cierre):** el titular "En sintonía." llega en dos copias, verde y azul, separadas como las dos miradas, y se funde en una sola al verse. Las ondas del cierre se juntan a la vez.
+- **Medido:** Lighthouse en móvil, 91 en rendimiento, 100 en accesibilidad, 93 en buenas prácticas y 100 en SEO; sin saltos de maquetación (CLS 0).

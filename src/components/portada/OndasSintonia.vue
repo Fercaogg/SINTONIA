@@ -57,7 +57,7 @@ const transformTutor = computed(() => `translateX(${(d.value * ONDA) / 2}px) sca
 .ondas-tutor {
   transform-origin: 50% 50%;
   transform-box: fill-box;
-  transition: transform 320ms var(--ease-in-out);
+  transition: transform var(--ondas-duracion, 320ms) var(--ease-in-out);
   will-change: transform;
 }
 .ondas-trazo-estudiante {

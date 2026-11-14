@@ -81,3 +81,41 @@ test('la imagen para compartir existe y mide 1200 x 630', async ({ page, request
   const b = await r.body()
   expect([b.readUInt32BE(16), b.readUInt32BE(20)]).toEqual([1200, 630])
 })
+
+test.describe('efecto del inicio (campo de ondas)', () => {
+  test('se dibuja con WebGL, responde a la demostración y se puede pausar', async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: 'no-preference' })
+    await page.goto('/')
+    const campo = page.locator('canvas.campo')
+    await expect(campo).toHaveAttribute('aria-hidden', 'true')
+    const webgl = await campo.getAttribute('data-webgl')
+    test.skip(webgl !== 'true', 'Este navegador de pruebas no tiene WebGL: la portada se ve sin el efecto')
+    // Sin aceleración gráfica (como en este navegador de pruebas), el fondo es un fotograma quieto.
+    test.skip((await campo.getAttribute('data-estado')) === 'quieto', 'Sin aceleración gráfica: el fondo queda quieto, sin botón de pausa')
+    await expect(campo).toHaveAttribute('data-estado', 'en-marcha')
+    const pausa = page.getByRole('button', { name: 'Pausar el fondo' })
+    await pausa.click()
+    await expect(campo).toHaveAttribute('data-estado', 'pausado')
+    await page.getByRole('button', { name: 'Reanudar el fondo' }).click()
+    await expect(campo).toHaveAttribute('data-estado', 'en-marcha')
+  })
+
+  test('con "reducir movimiento" es un fotograma quieto y no hay botón de pausa', async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: 'reduce' })
+    await page.goto('/')
+    const campo = page.locator('canvas.campo')
+    const webgl = await campo.getAttribute('data-webgl')
+    test.skip(webgl !== 'true', 'Sin WebGL en este navegador de pruebas')
+    await expect(campo).toHaveAttribute('data-estado', 'quieto')
+    await expect(page.getByRole('button', { name: /el fondo/ })).toHaveCount(0)
+  })
+
+  test('el titular del cierre queda unido y legible', async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: 'no-preference' })
+    await page.goto('/')
+    const titulo = page.getByRole('heading', { name: 'En sintonía.' })
+    await titulo.scrollIntoViewIfNeeded()
+    await expect(titulo).toHaveAttribute('data-unido', 'true')
+    await expect(titulo.locator('.texto-real')).toHaveCSS('opacity', '1', { timeout: 3000 })
+  })
+})
