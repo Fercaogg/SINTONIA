@@ -43,8 +43,8 @@ Todo lo que SINTONÍA necesita y que no se puede inventar. En la aplicación, ca
 | Dato | Dónde se usa | Quién lo aporta |
 |---|---|---|
 | Proyecto de Supabase y de Vercel para la **demostración** (Fase 5), con `VITE_URL_DEMO` en el real | /demo | Fernando, o Claude con un token de Supabase |
-| **Proyecto real de Supabase en Fráncfort, conectado a Vercel** (hoy la web publicada no tiene base de datos: AUDITORIA C1) | Todo | Fernando, o Claude con un token de Supabase |
-| Confirmar la región de Supabase (y guardar la prueba en VERIFICACION.md) antes de volver a afirmar que los datos están en la UE | /como-funciona | Fernando, con Claude |
+| Volver a escribir en la web que los datos están en la UE (región ya comprobada: Fráncfort) | /como-funciona y preguntas frecuentes | Claude |
+| En Supabase: Site URL y Redirect URLs con la dirección de la web | Enlaces de acceso | Fernando |
 | En Supabase: enlace de acceso de 15 minutos (Authentication > Providers > Email > Email OTP Expiration = 900) y copias de seguridad (según el plan) | Acceso y restauración | Fernando |
 | Dominio definitivo de la web (hoy `sintonia360-ferca.vercel.app`, también en `public/sitemap.xml`, `public/robots.txt` y la imagen para compartir de `index.html`) | Buscadores y redes | Fernando |
 | Cuenta de Resend (u otro proveedor) y dominio verificado desde el que enviar los correos | Recordatorios, avisos y enlaces de acceso | Fernando |

@@ -220,8 +220,8 @@ Al final de cada fase: tests, revisión en el navegador (360 px y escritorio) y 
 
 | Hallazgo | Estado |
 |---|---|
-| C1. Sin base de datos | **Pendiente de ti** (crear el proyecto de Supabase) |
-| C2. Afirmación de la UE | Frase cambiada a "está preparada para..."; se confirmará con C1 |
+| C1. Sin base de datos | Resuelto (14/11/2026): Supabase creado desde Vercel e instalado |
+| C2. Afirmación de la UE | Resuelto: región eu-central-1 (Fráncfort) comprobada |
 | A1. Funciones que no arrancan | Resuelto, con test |
 | A2. Cabeceras de seguridad | Resuelto, con tests (falta la nota de securityheaders.com al publicar) |
 | A3. Región de las funciones | Resuelto: el proyecto de Vercel usa Fráncfort (fra1) desde la próxima publicación |

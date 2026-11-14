@@ -62,4 +62,4 @@ Cómo se comprueba cada criterio de aceptación del encargo y qué resultado dio
 | Ningún "[PENDIENTE]" en páginas públicas; páginas legales enlazadas | `tests/e2e/acceso.spec.ts` | Cumple |
 | robots.txt, sitemap.xml y noindex en páginas privadas | `tests/e2e/seguridad.spec.ts` y `tests/e2e/acceso.spec.ts` | Cumple |
 | npm audit sin vulnerabilidades altas ni críticas | `npm audit` | Cumple (0 altas, 0 críticas; 7 moderadas en herramientas de desarrollo) |
-| Región de Supabase en la UE | Panel de Supabase | **Pendiente**: la web publicada no tiene todavía base de datos (AUDITORIA C1) |
+| Región de Supabase en la UE | Respuesta de api/instalar (servidor de la base de datos) el 14/11/2026 | **Cumple: eu-central-1 (Fráncfort)**. Proyecto `skzpyzawkhwovfbgnuep`, creado desde Vercel |
