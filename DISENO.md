@@ -370,3 +370,17 @@ A petición de Fernando ("que se mueva y sea una pasada", 14/11/2026), el inicio
   - sin WebGL, no aparece y la portada sigue igual.
 - **Segundo momento (cierre):** el titular "En sintonía." llega en dos copias, verde y azul, separadas como las dos miradas, y se funde en una sola al verse. Las ondas del cierre se juntan a la vez.
 - **Medido:** Lighthouse en móvil, 91 en rendimiento, 100 en accesibilidad, 93 en buenas prácticas y 100 en SEO; sin saltos de maquetación (CLS 0).
+
+### 11.9. El interior de la aplicación (paneles)
+
+Segunda pasada con las skills (14/11/2026), centrada en lo que verán estudiantes, tutores y dirección:
+
+- **Tarjeta protagonista** en el inicio del estudiante y del tutor/a (`TarjetaSemana.vue`): azul marino a sangre, la semana o los estudiantes respondidos en grande, un anillo con el avance y las dos ondas de la marca, que se alinean cuando ya está hecho. El interior tiene así la misma identidad que la portada.
+- **Títulos con más carácter** en todas las pantallas (36 px, negrita, tracking negativo) y **cifras grandes** en el resumen de la dirección; las cifras ocultas por anonimato llevan un candado.
+- **Móvil** (skill *mobile-native* de Emil Kowalski): sin destello gris al tocar, sin el retraso de 300 ms, sin seleccionar el texto de los botones al mantenerlos pulsados, campos a 16 px para que el iPhone no amplíe la página, respeto a la muesca (`viewport-fit=cover` y `safe-area`), color de la barra del sistema según el modo claro u oscuro y estados de "pasar el ratón" solo con ratón (`hoverOnlyWhenSupported`).
+- **Movimiento:**
+  - el menú lateral del móvil entra con la curva de los cajones de iOS;
+  - la barra de progreso del check-in crece con `transform`, no con `width`;
+  - los números de la escala se hunden al tocarlos;
+  - las tarjetas con enlace se elevan 2 px al pasar el ratón (Taste);
+  - la navegación del menú, que se usa muchas veces, no se anima (Emil).

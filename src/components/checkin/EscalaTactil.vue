@@ -56,7 +56,7 @@ function teclado(ev: KeyboardEvent) {
         :aria-checked="modelValue === n"
         :aria-label="n === 1 ? `1, ${anclaMin}` : n === 5 ? `5, ${anclaMax}` : String(n)"
         :tabindex="enfocable === n ? 0 : -1"
-        class="rounded-2xl font-semibold border-2 transition-all duration-200 shrink-0 flex items-center justify-center"
+        class="opcion-escala rounded-2xl font-semibold border-2 shrink-0 flex items-center justify-center"
         :class="[
           compacta ? 'w-11 h-11 text-base' : 'w-12 h-12 sm:w-14 sm:h-14 text-lg',
           modelValue === n
@@ -74,3 +74,15 @@ function teclado(ev: KeyboardEvent) {
     </div>
   </div>
 </template>
+
+<style scoped>
+/* Respuesta inmediata al tocar (Emil Kowalski): se hunde al pulsar y la
+   elegida crece un poco. Solo transform, colores y sombra; 160 ms. */
+.opcion-escala {
+  transition: transform var(--dur-micro) var(--ease-out), background-color var(--dur-micro) ease,
+    border-color var(--dur-micro) ease, box-shadow var(--dur-ui) ease;
+}
+.opcion-escala:active {
+  transform: scale(0.94);
+}
+</style>

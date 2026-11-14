@@ -12,6 +12,7 @@ import EstadoCarga from '@/components/comun/EstadoCarga.vue'
 import EstadoCalendario from '@/components/checkin/EstadoCalendario.vue'
 import TarjetaAgenda from '@/components/agenda/TarjetaAgenda.vue'
 import ProximasFechas from '@/components/calendario/ProximasFechas.vue'
+import TarjetaSemana from '@/components/comun/TarjetaSemana.vue'
 import { useTerminos } from '@/lib/terminos'
 
 const sesion = useSesion()
@@ -46,8 +47,8 @@ const { t } = useTerminos()
 
 <template>
   <div class="fade-in max-w-2xl">
-    <h1 class="titulo-pagina">Hola, {{ nombre }}</h1>
-    <p class="texto-suave mt-1 mb-8">Tu check-in semanal te llevará alrededor de un minuto.</p>
+    <h1 class="font-display text-3xl sm:text-4xl font-bold tracking-tight text-surface-900">Hola, {{ nombre }}</h1>
+    <p class="texto-suave mt-2 mb-8">Tu check-in semanal te llevará alrededor de un minuto.</p>
 
     <EstadoCarga v-if="cargando" />
     <AvisoError v-else-if="error" :mensaje="error" />
@@ -65,37 +66,30 @@ const { t } = useTerminos()
 
       <EstadoCalendario v-if="datos.calendario.estado !== 'abierta'" :calendario="datos.calendario" />
 
-      <section v-else class="card p-5 sm:p-6 flex flex-col sm:flex-row sm:items-center gap-4" aria-labelledby="t-semana">
-        <div
-          class="w-12 h-12 rounded-2xl flex items-center justify-center shrink-0"
-          :class="datos.respuesta ? 'bg-brand-100 text-surface-900' : 'bg-marino text-white'"
-        >
-          <AppIcon :name="datos.respuesta ? 'check' : 'checkin'" :size="24" />
-        </div>
-        <div class="flex-1">
-          <h2 id="t-semana" class="font-semibold text-surface-900">
-            {{ datos.respuesta ? `Ya has hecho el check-in de la semana ${datos.calendario.semana}` : `Semana ${datos.calendario.semana} de ${datos.calendario.semanas}` }}
-          </h2>
-          <p class="text-sm texto-suave mt-0.5">
-            {{ datos.respuesta ? 'Puedes cambiarlo' : 'Tienes' }} hasta el {{ hastaCierre(datos.calendario.cierra!) }}.
-          </p>
-        </div>
-        <RouterLink to="/estudiante/checkin" :class="datos.respuesta ? 'btn-secondary' : 'btn-primary'">
-          {{ datos.respuesta ? 'Revisar' : 'Hacer el check-in' }}
-        </RouterLink>
-      </section>
+      <TarjetaSemana
+        v-else
+        etiqueta="Esta semana"
+        :cifra="`Semana ${datos.calendario.semana}`"
+        :titulo="datos.respuesta ? 'Check-in hecho' : 'Te toca el check-in'"
+        :texto="`${datos.respuesta ? 'Puedes cambiarlo' : 'Tienes'} hasta el ${hastaCierre(datos.calendario.cierra!)}.`"
+        :accion="{ to: '/estudiante/checkin', texto: datos.respuesta ? 'Revisar mis respuestas' : 'Hacer el check-in' }"
+        :progreso="datos.calendario.semana! / datos.calendario.semanas"
+        :texto-anillo="`${datos.calendario.semana}/${datos.calendario.semanas}`"
+        :descripcion-anillo="`Semana ${datos.calendario.semana} de ${datos.calendario.semanas} del estudio`"
+        :hecho="!!datos.respuesta"
+      />
 
       <TarjetaAgenda class="mt-4" :agenda="agenda" :otra-persona="t('Tu tutor/a')" />
 
       <ProximasFechas class="mt-4" />
 
       <div class="grid sm:grid-cols-2 gap-4 mt-4">
-        <RouterLink to="/estudiante/historial" class="card p-5 hover:shadow-elevated no-underline">
+        <RouterLink to="/estudiante/historial" class="card tarjeta-enlace p-5 no-underline">
           <AppIcon name="history" :size="22" class="text-surface-900 mb-2" />
           <p class="font-semibold text-surface-900">Mi histórico</p>
           <p class="text-sm texto-suave mt-0.5">Tus respuestas de semanas anteriores.</p>
         </RouterLink>
-        <RouterLink to="/estudiante/apoyo" class="card p-5 hover:shadow-elevated no-underline">
+        <RouterLink to="/estudiante/apoyo" class="card tarjeta-enlace p-5 no-underline">
           <AppIcon name="heart" :size="22" class="text-surface-900 mb-2" />
           <p class="font-semibold text-surface-900">Necesito apoyo</p>
           <p class="text-sm texto-suave mt-0.5">Avisar a la dirección del máster, solo si tú quieres.</p>

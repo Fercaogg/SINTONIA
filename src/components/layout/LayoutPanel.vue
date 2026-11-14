@@ -95,7 +95,7 @@ async function salir() {
 
       <aside
         id="menu-lateral"
-        class="fixed lg:sticky top-0 left-0 z-50 h-screen w-64 flex flex-col transition-transform duration-300 lg:translate-x-0"
+        class="fixed lg:sticky top-0 left-0 z-50 h-[100dvh] w-64 flex flex-col menu-lateral lg:translate-x-0"
         :class="[
           menuAbierto ? 'translate-x-0' : '-translate-x-full',
           oscuro ? 'bg-marino' : 'bg-papel border-r border-surface-200/60',
@@ -151,7 +151,7 @@ async function salir() {
       </aside>
 
       <div class="flex-1 min-w-0">
-        <header class="lg:hidden sticky top-0 z-30 bg-white/90 backdrop-blur-md border-b border-surface-200/60 px-4 py-3 flex items-center gap-3">
+        <header class="lg:hidden sticky top-0 z-30 bg-papel/90 backdrop-blur-md border-b border-surface-200/60 px-4 py-3 pl-[max(1rem,env(safe-area-inset-left))] pr-[max(1rem,env(safe-area-inset-right))] flex items-center gap-3">
           <button
             type="button"
             class="p-2 rounded-xl hover:bg-surface-100 min-h-tactil min-w-tactil flex items-center justify-center"

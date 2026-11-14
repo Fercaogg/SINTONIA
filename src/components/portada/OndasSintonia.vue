@@ -8,10 +8,11 @@
 // Con "reducir movimiento", no hay transición: se ve el estado directamente.
 import { computed } from 'vue'
 
-const props = withDefaults(defineProps<{ desfase: number; alto?: number; grosor?: number; etiquetas?: boolean }>(), {
+const props = withDefaults(defineProps<{ desfase: number; alto?: number; grosor?: number; etiquetas?: boolean; sobreOscuro?: boolean }>(), {
   alto: 120,
   grosor: 4,
   etiquetas: false,
+  sobreOscuro: false,
 })
 
 const ANCHO = 600
@@ -38,6 +39,7 @@ const transformTutor = computed(() => `translateX(${(d.value * ONDA) / 2}px) sca
     :viewBox="`0 0 ${ANCHO} 120`"
     preserveAspectRatio="none"
     class="ondas w-full block overflow-hidden"
+    :class="{ 'ondas-oscuro': sobreOscuro }"
     :style="{ height: `${alto}px` }"
     aria-hidden="true"
     focusable="false"
@@ -66,6 +68,11 @@ const transformTutor = computed(() => `translateX(${(d.value * ONDA) / 2}px) sca
 .ondas-trazo-tutor {
   stroke: rgb(var(--rgb-s900));
   opacity: 0.9;
+}
+/* Sobre azul marino, la onda del tutor/a se dibuja en blanco. */
+.ondas-oscuro .ondas-trazo-tutor {
+  stroke: #ffffff;
+  opacity: 0.75;
 }
 @media (prefers-reduced-motion: reduce) {
   .ondas-tutor {

@@ -113,7 +113,7 @@ const { t } = useTerminos()
           :aria-valuemax="items.length"
           aria-label="Preguntas respondidas"
         >
-          <div class="h-full bg-brand-500 rounded-full transition-all duration-500 ease-out" :style="{ width: (respondidas / items.length) * 100 + '%' }" />
+          <div class="barra-avance h-full w-full bg-brand-500 rounded-full" :style="{ transform: `scaleX(${respondidas / items.length})` }" />
         </div>
       </div>
 
@@ -149,3 +149,16 @@ const { t } = useTerminos()
     </form>
   </div>
 </template>
+
+<style scoped>
+/* La barra crece con transform (no con width): sin recalcular la maquetación. */
+.barra-avance {
+  transform-origin: left center;
+  transition: transform 360ms var(--ease-out);
+}
+@media (prefers-reduced-motion: reduce) {
+  .barra-avance {
+    transition: none;
+  }
+}
+</style>

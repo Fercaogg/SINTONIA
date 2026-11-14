@@ -13,6 +13,7 @@ import AvisoError from '@/components/comun/AvisoError.vue'
 import EstadoCalendario from '@/components/checkin/EstadoCalendario.vue'
 import TarjetaAgenda from '@/components/agenda/TarjetaAgenda.vue'
 import ProximasFechas from '@/components/calendario/ProximasFechas.vue'
+import TarjetaSemana from '@/components/comun/TarjetaSemana.vue'
 import { useTerminos } from '@/lib/terminos'
 
 const sesion = useSesion()
@@ -56,23 +57,18 @@ const { t } = useTerminos()
       </EstadoVacio>
       <template v-else>
         <EstadoCalendario v-if="datos.calendario.estado !== 'abierta'" :calendario="datos.calendario" />
-        <section v-else class="card p-5 sm:p-6 flex flex-col sm:flex-row sm:items-center gap-4" aria-labelledby="t-semana">
-          <div
-            class="w-12 h-12 rounded-2xl flex items-center justify-center shrink-0"
-            :class="respondidos === datos.estudiantes.length ? 'bg-brand-100 text-surface-900' : 'bg-marino text-white'"
-          >
-            <AppIcon :name="respondidos === datos.estudiantes.length ? 'check' : 'checkin'" :size="24" />
-          </div>
-          <div class="flex-1">
-            <h2 id="t-semana" class="font-semibold text-surface-900">
-              Semana {{ datos.calendario.semana }}: {{ respondidos }} de {{ datos.estudiantes.length }} {{ t('estudiantes') }} respondidos
-            </h2>
-            <p class="text-sm texto-suave mt-0.5">Hasta el {{ hastaCierre(datos.calendario.cierra!) }}.</p>
-          </div>
-          <RouterLink to="/tutor/checkin" :class="respondidos ? 'btn-secondary' : 'btn-primary'">
-            {{ respondidos ? 'Revisar' : 'Hacer el check-in' }}
-          </RouterLink>
-        </section>
+        <TarjetaSemana
+          v-else
+          :etiqueta="`Semana ${datos.calendario.semana} de ${datos.calendario.semanas}`"
+          :cifra="`${respondidos} de ${datos.estudiantes.length}`"
+          :titulo="respondidos === datos.estudiantes.length ? t('Has respondido sobre todos tus estudiantes') : t('estudiantes respondidos esta semana')"
+          :texto="`Hasta el ${hastaCierre(datos.calendario.cierra!)}. Unos 30 segundos para todos.`"
+          :accion="{ to: '/tutor/checkin', texto: respondidos ? 'Revisar el check-in' : 'Hacer el check-in' }"
+          :progreso="datos.estudiantes.length ? respondidos / datos.estudiantes.length : 0"
+          :texto-anillo="`${respondidos}/${datos.estudiantes.length}`"
+          :descripcion-anillo="t(`${respondidos} de ${datos.estudiantes.length} estudiantes respondidos`)"
+          :hecho="respondidos === datos.estudiantes.length"
+        />
 
         <ProximasFechas class="mt-4" />
 

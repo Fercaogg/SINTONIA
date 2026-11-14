@@ -4,6 +4,8 @@
 
 /** @type {import('tailwindcss').Config} */
 export default {
+  // El hover de Tailwind solo con ratón: en pantallas táctiles no se queda pegado (skill mobile-native).
+  future: { hoverOnlyWhenSupported: true },
   content: ['./index.html', './src/**/*.{vue,ts}'],
   theme: {
     extend: {

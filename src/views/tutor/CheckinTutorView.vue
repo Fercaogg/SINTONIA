@@ -125,7 +125,7 @@ const { t } = useTerminos()
         </li>
       </ul>
 
-      <div class="sticky bottom-0 -mx-4 px-4 py-4 mt-6 bg-surface-50/95 backdrop-blur border-t border-surface-200 lg:static lg:mx-0 lg:px-0 lg:bg-transparent lg:border-0">
+      <div class="sticky bottom-0 -mx-4 px-4 pt-4 pb-[max(1rem,env(safe-area-inset-bottom))] mt-6 bg-surface-50/95 backdrop-blur border-t border-surface-200 lg:static lg:mx-0 lg:px-0 lg:bg-transparent lg:border-0">
         <button type="submit" class="btn-primary w-full py-3.5" :disabled="faltan > 0 || enviando">
           <template v-if="enviando">Enviando...</template>
           <template v-else>{{ yaRespondido ? 'Guardar cambios' : 'Enviar todo' }}</template>

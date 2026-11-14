@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import AppIcon from '@/components/comun/AppIcon.vue'
 // Resumen del máster para la dirección: solo datos agregados y anónimos.
 // La base de datos ya ha suprimido toda cifra calculada sobre menos de 5
 // personas: aquí aparecen como "Datos insuficientes para garantizar el anonimato".
@@ -95,17 +96,17 @@ const filasTabla = computed(() =>
         <div class="stat-card">
           <p class="stat-label">Semana {{ ultima.semana }}: estudiantes que respondieron</p>
           <p v-if="!ultima.tasa_estudiantes.suprimida" class="stat-value">{{ porcentaje(ultima.tasa_estudiantes.valor!) }}</p>
-          <p v-else class="text-sm text-surface-800" data-suprimido="true">{{ SUPRIMIDA }}</p>
+          <p v-else class="text-sm text-surface-800 flex gap-2 mt-2" data-suprimido="true"><AppIcon name="lock" :size="16" class="shrink-0 mt-0.5" />{{ SUPRIMIDA }}</p>
         </div>
         <div class="stat-card">
           <p class="stat-label">Semana {{ ultima.semana }}: tutores que respondieron</p>
           <p v-if="!ultima.tasa_tutores.suprimida" class="stat-value">{{ porcentaje(ultima.tasa_tutores.valor!) }}</p>
-          <p v-else class="text-sm text-surface-800" data-suprimido="true">{{ SUPRIMIDA }}</p>
+          <p v-else class="text-sm text-surface-800 flex gap-2 mt-2" data-suprimido="true"><AppIcon name="lock" :size="16" class="shrink-0 mt-0.5" />{{ SUPRIMIDA }}</p>
         </div>
         <div class="stat-card">
           <p class="stat-label">Semana {{ ultima.semana }}: agendas generadas</p>
           <p v-if="!ultima.agendas.suprimida" class="stat-value">{{ ultima.agendas.valor }}</p>
-          <p v-else class="text-sm text-surface-800" data-suprimido="true">{{ SUPRIMIDA }}</p>
+          <p v-else class="text-sm text-surface-800 flex gap-2 mt-2" data-suprimido="true"><AppIcon name="lock" :size="16" class="shrink-0 mt-0.5" />{{ SUPRIMIDA }}</p>
         </div>
       </section>
 
