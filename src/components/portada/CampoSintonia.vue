@@ -14,7 +14,7 @@
 //     fotograma quieto.
 //   - Sin WebGL, no se dibuja nada y la portada sigue igual.
 //   - Los valores se suavizan con un "muelle" para que nada salte.
-import { onBeforeUnmount, onMounted, ref } from 'vue'
+import { onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { desfasePortada } from '@/lib/sintonia-estado'
 import { prefiereMenosMovimiento } from '@/lib/movimiento'
 import AppIcon from '@/components/comun/AppIcon.vue'
@@ -102,6 +102,7 @@ const u: Record<string, WebGLUniformLocation | null> = {}
 const actual = { desfase: 1, x: 0.7, y: 0.5, fuerza: 0 }
 const objetivo = { x: 0.7, y: 0.5, fuerza: 0 }
 let observador: IntersectionObserver | null = null
+let medidor: ResizeObserver | null = null
 let esquema: MediaQueryList | null = null
 
 function colorCss(nombre: string, porDefecto: [number, number, number]): [number, number, number] {
@@ -130,7 +131,7 @@ function compilar(tipo: number, fuente: string) {
 function iniciar(): boolean {
   const c = lienzo.value
   if (!c) return false
-  gl = c.getContext('webgl', { antialias: false, alpha: false, premultipliedAlpha: false, powerPreference: 'low-power' })
+  gl = c.getContext('webgl', { antialias: false, alpha: true, premultipliedAlpha: false, powerPreference: 'low-power' })
   if (!gl) return false
   const v = compilar(gl.VERTEX_SHADER, VERTICES)
   const f = compilar(gl.FRAGMENT_SHADER, FRAGMENTOS)
@@ -262,10 +263,23 @@ function alCambiarEsquema() {
   if (quieto.value || pausado.value) dibujar(tiempoPausado)
 }
 
+// Quieto, el dibujo también refleja la demostración (sin animar).
+watch(desfasePortada, (v) => {
+  if (!quieto.value || !gl) return
+  actual.desfase = v
+  dibujar(4000)
+})
+
 onMounted(() => {
   if (!iniciar()) return
   disponible.value = true
   actual.desfase = Math.max(0.8, desfasePortada.value)
+  // Si el lienzo cambia de tamaño estando quieto o en pausa, se vuelve a
+  // dibujar (al cambiar de tamaño, el navegador lo borra).
+  medidor = new ResizeObserver(() => {
+    if (quieto.value || pausado.value) dibujar(quieto.value ? 4000 : tiempoPausado)
+  })
+  medidor.observe(lienzo.value!)
   if (prefiereMenosMovimiento() || sinAceleracion()) {
     // Un solo fotograma, ya con el desfase de la demostración.
     quieto.value = true
@@ -290,6 +304,7 @@ onMounted(() => {
 onBeforeUnmount(() => {
   parar()
   observador?.disconnect()
+  medidor?.disconnect()
   document.removeEventListener('visibilitychange', alCambiarVisibilidad)
   esquema?.removeEventListener('change', alCambiarEsquema)
   lienzo.value?.parentElement?.removeEventListener('pointermove', alMoverPuntero)
