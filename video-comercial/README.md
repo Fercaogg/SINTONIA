@@ -1,6 +1,6 @@
 # sintonia-spot
 
-Spot comercial de SINTONÍA: 60 s exactos, 1920×1080, 60 fps. Música del catálogo de HeyGen (se añade con un script, ver abajo). Composición HyperFrames (HTML + GSAP), una escena por archivo.
+Spot comercial de SINTONÍA: 60 s exactos, 1920×1080, 60 fps. Con banda sonora original a 120 BPM, sintetizada a medida (sin licencias de terceros). Composición HyperFrames (HTML + GSAP), una escena por archivo.
 
 ## Requisitos
 
@@ -9,7 +9,19 @@ Spot comercial de SINTONÍA: 60 s exactos, 1920×1080, 60 fps. Música del catá
 
 Comprobar: `npx hyperframes doctor`
 
-## Añadir la música (catálogo HeyGen) y renderizar
+## Música
+
+`assets/music/sintonia-bgm.mp3` es una pista original de 60 s a 120 BPM (La menor → Do mayor), generada por `musica/componer.py` (Python + numpy, sin samples). Cada impacto, whoosh y subida está colocado sobre los cortes de la tabla de abajo. Para regenerarla:
+
+```bash
+python3 musica/componer.py
+```
+
+```bash
+ffmpeg -y -i assets/music/sintonia-bgm.wav -af loudnorm=I=-16:TP=-1.5 -b:a 256k assets/music/sintonia-bgm.mp3
+```
+
+## Alternativa: pista del catálogo HeyGen
 
 Desde esta carpeta (la que contiene `index.html`):
 
@@ -29,7 +41,7 @@ npx hyperframes render --output sintonia-spot.mp4 --fps 60
 - `anadir-musica.mjs` busca una pista, la copia a `assets/music/`, la coloca en `index.html` (60 s, fundido final de 2 s) y comprueba su tempo. Si avisa de que no va a 120 BPM o no te gusta, prueba otra con una descripción distinta: `node anadir-musica.mjs "cinematic tech, 120 BPM, piano and pulse"`. Cada ejecución sustituye la pista anterior.
 - Antes de renderizar puedes revisarla con `npx hyperframes preview`; el Studio muestra la rejilla de golpes de la pista.
 
-## Renderizar sin música
+## Renderizar
 
 Desde esta carpeta (la que contiene `index.html`):
 
@@ -46,7 +58,9 @@ npx hyperframes preview
 ## Estructura
 
 ```
-anadir-musica.mjs           añade la música del catálogo HeyGen
+anadir-musica.mjs           sustituye la música por una del catálogo HeyGen (opcional)
+musica/componer.py          compositor de la banda sonora original
+assets/music/               sintonia-bgm.mp3
 index.html                  raíz: fuentes, GSAP, helpers y las 8 escenas montadas
 assets/js/gsap.min.js       GSAP 3.14.2 (local, sin CDN)
 assets/js/sx.js             helpers compartidos: máscaras, count-up, trazos, cámara, ondas
