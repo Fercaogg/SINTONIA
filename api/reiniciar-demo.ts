@@ -4,7 +4,8 @@
 //
 // Triple seguro para no tocar nunca datos reales:
 //   1. Solo funciona en el proyecto de demostración (MODO_DEMO=true).
-//   2. Usa su propia conexión (DEMO_DATABASE_URL), que no existe en el real.
+//   2. Usa la conexión de la demostración (DEMO_DATABASE_URL o, si toda la
+//      instalación es de demostración, la de la integración de Supabase).
 //   3. La base de datos se niega a vaciarse si no está marcada como
 //      demostración (private.vaciar_demo).
 // Protegida con CRON_SECRET, como las demás tareas.
@@ -21,16 +22,32 @@ export async function GET(request: Request): Promise<Response> {
   if (process.env.MODO_DEMO !== 'true') {
     return Response.json({ ok: true, reiniciada: false, motivo: 'Este proyecto no es la demostración.' })
   }
-  const urlBd = process.env.DEMO_DATABASE_URL
+  // La de demostración: DEMO_DATABASE_URL o, si la instalación entera es de
+  // demostración, la que pone la integración de Supabase en Vercel.
+  const urlBd = process.env.DEMO_DATABASE_URL || process.env.POSTGRES_URL_NON_POOLING
   const url = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL
   const clave = process.env.SUPABASE_SERVICE_ROLE_KEY
   if (!urlBd || !url || !clave) {
     return Response.json({ ok: false, error: 'Faltan DEMO_DATABASE_URL, SUPABASE_URL o SUPABASE_SERVICE_ROLE_KEY' }, { status: 500 })
   }
-  const bd = new pg.Client({ connectionString: urlBd, ssl: { rejectUnauthorized: false } })
+  const conexion = new URL(urlBd)
+  conexion.searchParams.delete('sslmode')
+  const bd = new pg.Client({ connectionString: conexion.toString(), ssl: { rejectUnauthorized: false } })
+  const cliente = clienteServidor(url, clave)
   try {
     await bd.connect()
-    const resumen = await generarDemo({ bd, almacen: crearAlmacenSupabase(clienteServidor(url, clave)), reiniciar: true })
+    // La primera vez la base de datos está vacía: no hay nada que vaciar.
+    const [{ n }] = (await bd.query(`select count(*)::int as n from public.perfiles`)).rows
+    const resumen = await generarDemo({
+      bd,
+      almacen: crearAlmacenSupabase(cliente),
+      reiniciar: n > 0,
+      crearCuenta: async (email, datos, contrasena) => {
+        const { data, error } = await cliente.auth.admin.createUser({ email, password: contrasena, email_confirm: true, user_metadata: datos })
+        if (error || !data.user) throw new Error(`No se pudo crear ${email}: ${error?.message}`)
+        return data.user.id
+      },
+    })
     return Response.json({ ok: true, reiniciada: true, resumen })
   } catch (e) {
     console.error('[reiniciar-demo]', e)

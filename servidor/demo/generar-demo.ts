@@ -49,7 +49,14 @@ function azar(semilla: number) {
 
 const escala = (v: number) => Math.min(5, Math.max(1, Math.round(v)))
 
-export async function generarDemo(opciones: { bd: pg.Client; almacen: Almacen; semilla?: number; reiniciar?: boolean }) {
+/**
+ * Crea una cuenta de acceso con contraseña. En local se inserta en la base de
+ * datos; en Supabase de verdad se usa su API de administración (así la cuenta
+ * queda completa para poder entrar con contraseña).
+ */
+export type CrearCuenta = (email: string, datos: Record<string, string>, contrasena: string) => Promise<string>
+
+export async function generarDemo(opciones: { bd: pg.Client; almacen: Almacen; semilla?: number; reiniciar?: boolean; crearCuenta?: CrearCuenta }) {
   const { bd, almacen } = opciones
   const r = azar(opciones.semilla ?? 2027)
   const q = (sql: string, p: unknown[] = []) => bd.query(sql, p).then((x) => x.rows)
@@ -65,6 +72,11 @@ export async function generarDemo(opciones: { bd: pg.Client; almacen: Almacen; s
   const cuenta = async (email: string, datos: Record<string, string>) => {
     // Como haría el servidor (api/registro) antes de crear la cuenta.
     if (datos.codigo) await q(`insert into private.registros_autorizados (email, codigo, expira_at) values (lower($1), upper($2), now() + interval '15 minutes') on conflict (email) do update set codigo = excluded.codigo, expira_at = excluded.expira_at`, [email, datos.codigo])
+    if (opciones.crearCuenta) {
+      const id = await opciones.crearCuenta(email, datos, CONTRASENA_DEMO)
+      await q(`update auth.users set email_confirmed_at = coalesce(email_confirmed_at, now()) where id = $1`, [id])
+      return id
+    }
     return (await q(
       `insert into auth.users (email, raw_user_meta_data, encrypted_password, email_confirmed_at)
        values ($1, $2, extensions.crypt($3, extensions.gen_salt('bf')), now()) returning id`,

@@ -42,6 +42,7 @@ Todo lo que SINTONÍA necesita y que no se puede inventar. En la aplicación, ca
 
 | Dato | Dónde se usa | Quién lo aporta |
 |---|---|---|
+| **Antes del piloto:** pasar la instalación publicada de demostración a real (vaciarla, `VITE_MODO_DEMO` y `MODO_DEMO` a `false`, dominios `usal.es`) | Todo | Claude, cuando Fernando lo diga |
 | Proyecto de Supabase y de Vercel para la **demostración** (Fase 5), con `VITE_URL_DEMO` en el real | /demo | Fernando, o Claude con un token de Supabase |
 | Volver a escribir en la web que los datos están en la UE (región ya comprobada: Fráncfort) | /como-funciona y preguntas frecuentes | Claude |
 | En Supabase: Site URL y Redirect URLs con la dirección de la web | Enlaces de acceso | Fernando |
