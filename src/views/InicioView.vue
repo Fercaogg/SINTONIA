@@ -4,7 +4,8 @@
 // funciona; las cifras con la demostración; privacidad; cada perfil;
 // Puente; quién lo dirige; dudas y contacto. Retícula de 12 columnas y
 // todos los apartados empiezan con la misma cabecera (CabeceraSeccion).
-import { defineAsyncComponent, ref } from 'vue'
+import { defineAsyncComponent, onBeforeUnmount, onMounted, ref } from 'vue'
+import { alAvanzar, desfasarOndas, sinMovimiento, vCursor, vRevelar } from '@/lib/efectos'
 import { RouterLink, useRoute } from 'vue-router'
 import { useSesion } from '@/stores/sesion'
 import { INICIO_ROL } from '@/lib/tipos'
@@ -51,6 +52,64 @@ const SECCIONES = [
   { id: 'contacto', texto: 'Contacto' },
 ]
 
+const PUENTE_LARGO = 3
+
+// ---------- Movimiento ligado al desplazamiento (DISENO.md 12.1) ----------
+const limitar = (v: number) => Math.min(1, Math.max(0, v))
+const tramo = (v: number, a: number, b: number) => limitar((v - a) / (b - a))
+const progreso = ref<HTMLElement | null>(null)
+const ondasProblema = ref<HTMLElement | null>(null)
+const ondasBanda = ref<HTMLElement | null>(null)
+const banda = ref<HTMLElement | null>(null)
+const puenteLista = ref<HTMLElement | null>(null)
+const puenteRelleno = ref<HTMLElement | null>(null)
+const puenteActivo = ref(sinMovimiento() ? PUENTE_LARGO : 0)
+const ondasCierre = ref<HTMLElement | null>(null)
+const quitar: (() => void)[] = []
+let marcoProgreso = 0
+function pintarProgreso() {
+  marcoProgreso = 0
+  const total = document.documentElement.scrollHeight - window.innerHeight
+  if (progreso.value) progreso.value.style.transform = `scaleX(${limitar(window.scrollY / Math.max(1, total)).toFixed(4)})`
+}
+const pedirProgreso = () => {
+  if (!marcoProgreso) marcoProgreso = requestAnimationFrame(pintarProgreso)
+}
+onMounted(() => {
+  if (sinMovimiento()) return
+  window.addEventListener('scroll', pedirProgreso, { passive: true })
+  // El problema: las dos miradas se acercan algo al leer, sin llegar a coincidir.
+  if (ondasProblema.value) {
+    const el = ondasProblema.value
+    quitar.push(alAvanzar(el, (v) => desfasarOndas(el, 1 - 0.65 * tramo(v, 0.15, 0.6))))
+  }
+  // Banda azul: unas ondas grandes de fondo que se deslizan con el scroll.
+  if (banda.value && ondasBanda.value) {
+    const fondo = ondasBanda.value
+    quitar.push(alAvanzar(banda.value, (v) => (fondo.style.transform = `translate3d(${((0.5 - v) * 260).toFixed(1)}px, 0, 0)`)))
+  }
+  // Puente: la línea se dibuja con el scroll y cada paso se enciende al llegar.
+  if (puenteLista.value) {
+    quitar.push(
+      alAvanzar(puenteLista.value, (v) => {
+        const l = tramo(v, 0.18, 0.55)
+        if (puenteRelleno.value) puenteRelleno.value.style.transform = `scaleY(${l.toFixed(4)})`
+        puenteActivo.value = l >= 0.98 ? PUENTE_LARGO : l >= 0.48 ? 2 : l > 0.02 ? 1 : 0
+      }),
+    )
+  }
+  // Cierre: las ondas coinciden por fin, al ritmo del scroll.
+  if (ondasCierre.value) {
+    const el = ondasCierre.value
+    quitar.push(alAvanzar(el, (v) => desfasarOndas(el, 1 - tramo(v, 0.1, 0.45))))
+  }
+})
+onBeforeUnmount(() => {
+  window.removeEventListener('scroll', pedirProgreso)
+  cancelAnimationFrame(marcoProgreso)
+  quitar.forEach((q) => q())
+})
+
 const ICONOS_PARA_QUIEN = ['graduation', 'flask', 'document', 'building'] as const
 
 const PUENTE = [
@@ -58,6 +117,9 @@ const PUENTE = [
   { titulo: 'Se acerca un plazo', texto: 'Cuando una convocatoria predoctoral o de admisión abre o cierra pronto, SINTONÍA lo tiene en cuenta.' },
   { titulo: 'Se habla en la tutoría', texto: 'La agenda incluye una línea para comentarlo. Es una conversación, no un aviso automático.' },
 ]
+// Estilos en línea siempre aplicados desde código (la CSP no admite atributos style).
+const retraso = (ms: number) => ({ animationDelay: `${ms}ms` })
+const estilo = (e: Record<string, string>) => e
 </script>
 
 <template>
@@ -95,6 +157,9 @@ const PUENTE = [
           </li>
         </ul>
       </nav>
+      <div class="absolute inset-x-0 -bottom-px h-0.5 overflow-hidden" aria-hidden="true">
+        <div ref="progreso" class="h-full origin-left bg-brand-500" :style="estilo({ transform: 'scaleX(0)' })" />
+      </div>
     </header>
 
     <main id="contenido" class="flex-1">
@@ -141,7 +206,7 @@ const PUENTE = [
         <div class="max-w-[1180px] mx-auto px-4 sm:px-6 py-10 sm:py-12 grid gap-8 lg:grid-cols-12 lg:items-start">
           <h2 id="t-para" class="lg:col-span-3 font-display text-2xl font-semibold tracking-tight text-surface-900">Para quién es</h2>
           <ul class="lg:col-span-9 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-            <li v-for="(p, i) in PARA_QUIEN" :key="p.titulo" class="flex gap-3 lg:block">
+            <li v-for="(p, i) in PARA_QUIEN" :key="p.titulo" v-revelar="i" class="flex gap-3 lg:block">
               <span class="h-10 w-10 shrink-0 rounded-lg bg-brand-100 text-brand-900 flex items-center justify-center"><AppIcon :name="ICONOS_PARA_QUIEN[i]" :size="20" /></span>
               <div class="lg:mt-3">
                 <h3 class="font-semibold text-surface-900">{{ p.titulo }}</h3>
@@ -160,7 +225,7 @@ const PUENTE = [
       <!-- 4. El problema -->
       <section id="problema" class="scroll-mt-20 max-w-[1180px] mx-auto px-4 sm:px-6 py-20 sm:py-28" aria-labelledby="t-problema">
         <div class="grid gap-12 lg:grid-cols-12">
-          <div class="lg:col-span-6">
+          <div v-revelar class="lg:col-span-6">
             <p class="text-xs font-semibold uppercase tracking-[0.16em] text-brand-900">01 · Por qué</p>
             <h2 id="t-problema" class="mt-3 font-display text-4xl sm:text-5xl font-semibold tracking-tight text-surface-900">El problema</h2>
             <p class="mt-8 font-display text-2xl sm:text-[1.75rem] leading-snug text-surface-900">
@@ -169,14 +234,14 @@ const PUENTE = [
             </p>
           </div>
           <div class="lg:col-span-5 lg:col-start-8 lg:pt-14">
-            <div class="card p-6" aria-hidden="true">
+            <div ref="ondasProblema" v-revelar="1" v-cursor class="card p-6" aria-hidden="true">
               <OndasSintonia :desfase="0.7" :alto="80" :grosor="3" />
               <div class="mt-3 flex justify-between text-xs font-medium text-surface-800">
                 <span class="inline-flex items-center gap-1.5"><span class="h-1 w-4 rounded-full bg-brand-500" />Una mirada</span>
                 <span class="inline-flex items-center gap-1.5"><span class="h-1 w-4 rounded-full bg-surface-900" />Otra mirada</span>
               </div>
             </div>
-            <div class="mt-8 space-y-5 text-lg leading-relaxed">
+            <div v-revelar="2" class="mt-8 space-y-5 text-lg leading-relaxed">
               <p>
                 Y esa relación importa: cómo percibe el estudiante la relación con su tutor/a se ha relacionado con la nota final, con lo que cree
                 que el tutor/a aporta a su aprendizaje y con su satisfacción (de Kleijn et al., 2012).
@@ -198,7 +263,7 @@ const PUENTE = [
             Tres pasos cada semana. Nadie sube su trabajo y nadie pone notas.
           </CabeceraSeccion>
           <ol class="grid gap-6 lg:grid-cols-3">
-            <li v-for="(p, i) in PASOS" :key="p.titulo" class="rounded-2xl border border-surface-200 bg-surface-50 p-5 sm:p-6 flex flex-col">
+            <li v-for="(p, i) in PASOS" :key="p.titulo" v-revelar="i" v-cursor="'inclinar'" class="rounded-2xl border border-surface-200 bg-surface-50 p-5 sm:p-6 flex flex-col">
               <IlustracionPaso :paso="(i + 1) as 1 | 2 | 3" />
               <p class="mt-6 font-display text-sm font-semibold tabular-nums text-brand-900" aria-hidden="true">Paso {{ i + 1 }}</p>
               <h3 class="mt-1 font-display text-2xl font-semibold text-surface-900 flex items-center gap-2">
@@ -212,9 +277,12 @@ const PUENTE = [
       </section>
 
       <!-- 6. Pruébalo: la demostración interactiva y las cifras, sobre azul marino -->
-      <section class="bg-marino text-white" aria-labelledby="t-pruebalo">
-        <div class="max-w-[1180px] mx-auto px-4 sm:px-6 py-20 sm:py-28 grid gap-14 lg:grid-cols-12 lg:items-center">
-          <div class="lg:col-span-5">
+      <section ref="banda" class="relative overflow-hidden bg-marino text-white" aria-labelledby="t-pruebalo">
+        <div class="pointer-events-none absolute -inset-x-40 bottom-10 opacity-25" aria-hidden="true">
+          <div ref="ondasBanda" class="will-change-transform"><OndasSintonia :desfase="0.6" :alto="160" :grosor="2" sobre-oscuro /></div>
+        </div>
+        <div class="relative max-w-[1180px] mx-auto px-4 sm:px-6 py-20 sm:py-28 grid gap-14 lg:grid-cols-12 lg:items-center">
+          <div v-revelar class="lg:col-span-5">
             <p class="text-xs font-semibold uppercase tracking-[0.16em] text-brand-400">03 · Pruébalo</p>
             <h2 id="t-pruebalo" class="mt-3 font-display text-4xl sm:text-5xl font-semibold tracking-tight">Dos miradas, un minuto</h2>
             <p class="mt-5 text-lg leading-relaxed text-white/85">
@@ -224,7 +292,7 @@ const PUENTE = [
               <CifraAnimada v-for="d in DATOS_CLAVE" :key="d.texto" :valor="Number(d.cifra)" :unidad="d.unidad" :texto="d.texto" />
             </div>
           </div>
-          <div class="lg:col-span-6 lg:col-start-7 text-surface-900">
+          <div v-revelar="1" v-cursor class="lg:col-span-6 lg:col-start-7 text-surface-900 rounded-[var(--radius-md)]">
             <DemoSintonia />
           </div>
         </div>
@@ -233,7 +301,7 @@ const PUENTE = [
       <!-- 7. Privacidad y ética -->
       <section id="privacidad" class="scroll-mt-20 max-w-[1180px] mx-auto px-4 sm:px-6 py-20 sm:py-28" aria-labelledby="t-privacidad">
         <div class="grid gap-12 lg:grid-cols-12">
-          <div class="lg:col-span-6">
+          <div v-revelar class="lg:col-span-6">
             <p class="text-xs font-semibold uppercase tracking-[0.16em] text-brand-900">04 · Tus datos</p>
             <h2 id="t-privacidad" class="mt-3 font-display text-4xl sm:text-5xl font-semibold tracking-tight text-surface-900">Privacidad y ética</h2>
             <p class="mt-8 font-display text-3xl sm:text-4xl leading-tight text-surface-900 text-balance">
@@ -247,7 +315,7 @@ const PUENTE = [
             <RouterLink to="/como-funciona" class="btn-secondary mt-9">Ver quién ve cada dato</RouterLink>
           </div>
           <div class="lg:col-span-5 lg:col-start-8 lg:pt-14">
-            <QuienVeBienestar />
+            <div v-revelar="1" v-cursor class="rounded-[var(--radius-md)]"><QuienVeBienestar /></div>
             <p class="mt-6 texto-suave leading-relaxed">
               Las tecnologías no son neutrales: sus decisiones de diseño también deciden quién puede hacer qué (Winner, 1980). Y el uso de datos de
               estudiantes plantea dilemas éticos (Slade y Prinsloo, 2013). SINTONÍA los aborda en el propio diseño: cada dato tiene un destino definido.
@@ -269,19 +337,21 @@ const PUENTE = [
       <!-- 9. Puente al doctorado: un recorrido de tres tramos -->
       <section id="puente" class="scroll-mt-20 max-w-[1180px] mx-auto px-4 sm:px-6 py-20 sm:py-28" aria-labelledby="t-puente">
         <div class="grid gap-12 lg:grid-cols-12">
-          <div class="lg:col-span-5">
+          <div v-revelar class="lg:col-span-5">
             <p class="text-xs font-semibold uppercase tracking-[0.16em] text-brand-900">06 · Doctorado</p>
             <h2 id="t-puente" class="mt-3 font-display text-4xl sm:text-5xl font-semibold tracking-tight text-surface-900">Puente al doctorado</h2>
             <p class="mt-6 text-lg leading-relaxed">
               Si el estudiante lo activa, los plazos de las convocatorias predoctorales y de admisión al doctorado llegan a la tutoría.
             </p>
           </div>
-          <ol class="lg:col-span-6 lg:col-start-7 relative">
+          <ol ref="puenteLista" class="lg:col-span-6 lg:col-start-7 relative">
+            <!-- La línea: un carril gris y su relleno, que se dibuja con el scroll -->
+            <span class="absolute left-6 top-6 bottom-6 w-0.5 -translate-x-1/2 bg-surface-200" aria-hidden="true" />
+            <span ref="puenteRelleno" class="absolute left-6 top-6 bottom-6 w-0.5 -translate-x-1/2 origin-top bg-brand-800" :style="{ transform: `scaleY(${puenteActivo === PUENTE_LARGO ? 1 : 0})` }" aria-hidden="true" />
             <li v-for="(p, i) in PUENTE" :key="p.titulo" class="relative grid grid-cols-[3rem_1fr] gap-x-5 pb-10 last:pb-0">
-              <span v-if="i < PUENTE.length - 1" class="absolute left-6 top-12 bottom-0 w-0.5 -translate-x-1/2 bg-surface-200" aria-hidden="true" />
               <span
-                class="relative z-10 h-12 w-12 rounded-full flex items-center justify-center font-display text-lg font-semibold"
-                :class="i === 2 ? 'bg-brand-800 text-white' : 'bg-marino text-white'"
+                class="paso-puente relative z-10 h-12 w-12 rounded-full flex items-center justify-center font-display text-lg font-semibold"
+                :class="i < puenteActivo ? 'bg-brand-800 text-white encendido' : 'bg-papel text-surface-900 ring-2 ring-surface-200'"
                 aria-hidden="true"
               >{{ i + 1 }}</span>
               <div class="pt-2.5">
@@ -298,9 +368,9 @@ const PUENTE = [
         <div class="max-w-[1180px] mx-auto px-4 sm:px-6 py-20 sm:py-28">
           <CabeceraSeccion id="t-direccion" etiqueta="07 · Equipo" titulo="Dirección" />
           <ul class="grid gap-6 md:grid-cols-2 auto-rows-fr">
-            <li v-for="m in DIRECCION" :key="m.nombre"><TarjetaDireccion :miembro="m" /></li>
+            <li v-for="(m, i) in DIRECCION" :key="m.nombre" v-revelar="i" v-cursor="'inclinar'" class="rounded-[var(--radius-md)]"><TarjetaDireccion :miembro="m" /></li>
           </ul>
-          <div class="mt-10 pt-8 border-t border-surface-200 space-y-1">
+          <div v-revelar class="mt-10 pt-8 border-t border-surface-200 space-y-1">
             <p class="text-base text-surface-900">{{ AUTOR }}</p>
             <p class="text-base texto-suave">Antecedente: {{ ANTECEDENTE }}</p>
           </div>
@@ -310,31 +380,31 @@ const PUENTE = [
       <!-- 11. Preguntas frecuentes -->
       <section id="preguntas" class="scroll-mt-20 max-w-[1180px] mx-auto px-4 sm:px-6 py-20 sm:py-28" aria-labelledby="t-preguntas">
         <div class="grid gap-10 lg:grid-cols-12">
-          <div class="lg:col-span-4 lg:sticky lg:top-28 self-start">
+          <div v-revelar class="lg:col-span-4 lg:sticky lg:top-28 self-start">
             <p class="text-xs font-semibold uppercase tracking-[0.16em] text-brand-900">08 · Dudas</p>
             <h2 id="t-preguntas" class="mt-3 font-display text-4xl sm:text-5xl font-semibold tracking-tight text-surface-900">Preguntas frecuentes</h2>
             <p class="mt-4 texto-suave">Y si no está aquí, <a href="#contacto" class="enlace">escríbenos</a>.</p>
           </div>
-          <div class="lg:col-span-7 lg:col-start-6"><PreguntasFrecuentes /></div>
+          <div v-revelar="1" class="lg:col-span-7 lg:col-start-6"><PreguntasFrecuentes /></div>
         </div>
       </section>
 
       <!-- 12. Contacto -->
       <section id="contacto" class="scroll-mt-20 bg-papel border-y border-surface-200" aria-labelledby="t-contacto">
         <div class="max-w-[1180px] mx-auto px-4 sm:px-6 py-20 sm:py-28 grid gap-10 lg:grid-cols-12">
-          <div class="lg:col-span-4">
+          <div v-revelar class="lg:col-span-4">
             <p class="text-xs font-semibold uppercase tracking-[0.16em] text-brand-900">09 · Escríbenos</p>
             <h2 id="t-contacto" class="mt-3 font-display text-4xl sm:text-5xl font-semibold tracking-tight text-surface-900">Contacto</h2>
             <p class="mt-4 text-lg leading-relaxed">Si te interesa SINTONÍA para tu máster, programa o escuela de doctorado, o tienes cualquier duda.</p>
           </div>
-          <div class="lg:col-span-7 lg:col-start-6"><FormularioContacto /></div>
+          <div v-revelar="1" class="lg:col-span-7 lg:col-start-6"><FormularioContacto /></div>
         </div>
       </section>
 
       <!-- Cierre: las dos ondas, por fin, en sintonía -->
       <section ref="cierre" aria-labelledby="t-cierre">
         <div class="max-w-[1180px] mx-auto px-4 sm:px-6 pt-20 pb-16 text-center">
-          <div class="max-w-2xl mx-auto" style="--ondas-duracion: 1100ms"><OndasSintonia :desfase="cierreVisto ? 0 : 1" :alto="80" /></div>
+          <div ref="ondasCierre" class="max-w-2xl mx-auto" :style="estilo({ '--ondas-duracion': '1100ms' })"><OndasSintonia :desfase="cierreVisto ? 0 : 1" :alto="80" /></div>
           <div class="mt-8 font-display text-4xl sm:text-6xl font-bold tracking-tight text-surface-900">
             <TituloEnSintonia id="t-cierre" texto="En sintonía." />
           </div>
@@ -365,6 +435,25 @@ const PUENTE = [
 </template>
 
 <style scoped>
+/* Puente: cada paso se enciende con un pequeño pulso al llegar la línea. */
+.paso-puente {
+  transition: background-color 300ms ease, color 300ms ease, box-shadow 300ms ease;
+}
+.paso-puente.encendido {
+  animation: encender 420ms var(--ease-out);
+  box-shadow: 0 0 0 6px rgba(52, 198, 163, 0.18);
+}
+@keyframes encender {
+  from {
+    transform: scale(0.82);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .paso-puente.encendido {
+    animation: none;
+  }
+}
+
 .enlace-nav {
   display: inline-flex;
   align-items: center;

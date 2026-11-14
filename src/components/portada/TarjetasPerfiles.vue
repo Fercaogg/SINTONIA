@@ -4,13 +4,14 @@
 // vistazo. Antes eran pestañas: así no hay nada escondido.
 import { PERFILES } from '@/contenido/portada'
 import AppIcon from '@/components/comun/AppIcon.vue'
+import { vCursor, vRevelar } from '@/lib/efectos'
 
 const ICONOS = { estudiante: 'person', tutor: 'users', direccion: 'chart' } as const
 </script>
 
 <template>
   <ul class="grid gap-6 lg:grid-cols-3">
-    <li v-for="p in PERFILES" :key="p.clave" class="card p-6 sm:p-7 flex flex-col">
+    <li v-for="(p, i) in PERFILES" :key="p.clave" v-revelar="i" v-cursor="'inclinar'" class="card p-6 sm:p-7 flex flex-col">
       <div class="flex items-center gap-3">
         <span class="h-11 w-11 shrink-0 rounded-xl bg-brand-100 text-brand-900 flex items-center justify-center"><AppIcon :name="ICONOS[p.clave]" :size="22" /></span>
         <h3 class="font-display text-2xl font-semibold text-surface-900">{{ p.nombre }}</h3>

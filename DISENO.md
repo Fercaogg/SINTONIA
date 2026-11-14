@@ -405,3 +405,13 @@ Sustituye la composición de la portada del apartado 11 (se mantienen tokens, ti
 **Reglas de composición** (skill ui-ux-pro-max, estilo suizo): retícula de 12 columnas en un ancho de 1180 px; todos los apartados empiezan igual (etiqueta numerada, título y, si hay, entradilla en las columnas 8 a 12, componente `CabeceraSeccion`); fondos alternos (claro y papel con bordes) y una sola banda azul marino; tarjetas de altura igual; iconos SVG de la casa, nunca emojis; movimiento solo en la entrada del inicio y en las ondas, y nada con "reducir movimiento".
 
 **Componentes nuevos:** `RecorridoProducto`, `IlustracionPaso`, `QuienVeBienestar`, `TarjetasPerfiles`, `CabeceraSeccion`. Se retiran `PestanasPerfiles` y `ComoFuncionaOndas`.
+
+### 12.1. Movimiento de la portada (de "El problema" hacia abajo)
+
+Motor ligero en `src/lib/efectos.ts`; nada fija ni intercepta el scroll.
+
+- **Aparecer al llegar** (`v-revelar`): cabeceras, tarjetas y bloques suben un poco y aparecen una sola vez, escalonados.
+- **Ratón** (`v-cursor`, solo con ratón): una luz verde sigue al cursor en las tarjetas; las de pasos, perfiles y dirección además se inclinan levemente.
+- **Ligado al desplazamiento:** barra de progreso de lectura bajo la cabecera; las ondas de "El problema" se acercan al leer; en la banda azul, ondas grandes de fondo se deslizan; la línea de Puente se dibuja y cada paso se enciende al llegar; las ondas del cierre coinciden al bajar.
+- **Ilustraciones de "Cómo funciona":** al aparecer, se marcan las respuestas, llegan las preguntas y las ondas del paso 2 se acercan con el scroll.
+- **Reglas:** solo transform y opacity (la luz solo cambia dos variables de una tarjeta); estilos aplicados desde código por la CSP; con "reducir movimiento", todo quieto y en su sitio.

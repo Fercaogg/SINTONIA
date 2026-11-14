@@ -80,6 +80,9 @@ onBeforeUnmount(() => {
   document.removeEventListener('visibilitychange', alCambiarVisibilidad)
   window.clearTimeout(temporizador)
 })
+// Estilos en línea siempre aplicados desde código (la CSP no admite atributos style).
+const retraso = (ms: number) => ({ animationDelay: `${ms}ms` })
+const estilo = (e: Record<string, string>) => e
 </script>
 
 <template>
@@ -124,8 +127,8 @@ onBeforeUnmount(() => {
               </li>
             </ul>
             <div class="relative mt-5 h-10 rounded-lg bg-marino text-white text-sm font-semibold overflow-hidden">
-              <span class="boton-texto absolute inset-0 flex items-center justify-center" style="animation-delay: 3500ms">Enviar</span>
-              <span class="boton-hecho absolute inset-0 flex items-center justify-center gap-1.5 bg-[#1d7060]" style="animation-delay: 3500ms">
+              <span class="boton-texto absolute inset-0 flex items-center justify-center" :style="retraso(3500)">Enviar</span>
+              <span class="boton-hecho absolute inset-0 flex items-center justify-center gap-1.5 bg-[#1d7060]" :style="retraso(3500)">
                 <AppIcon name="check" :size="16" />Enviado
               </span>
             </div>
@@ -150,7 +153,7 @@ onBeforeUnmount(() => {
                 </div>
               </li>
             </ul>
-            <p class="entra mt-4 flex items-center justify-center gap-1.5 text-xs font-medium text-brand-900" style="animation-delay: 3200ms">
+            <p class="entra mt-4 flex items-center justify-center gap-1.5 text-xs font-medium text-brand-900" :style="retraso(3200)">
               <AppIcon name="clock" :size="14" />Hecho en unos 30 segundos
             </p>
           </div>
@@ -159,20 +162,20 @@ onBeforeUnmount(() => {
           <div v-else-if="paso === 2" key="2" class="pantalla px-5 pt-5">
             <p class="text-[0.68rem] font-semibold uppercase tracking-[0.14em] text-brand-900">Estudiante 1</p>
             <p class="mt-1 font-display text-lg font-semibold leading-tight text-surface-900">Dos miradas sobre el avance</p>
-            <div class="mt-6" style="--ondas-duracion: 1600ms">
+            <div class="mt-6" :style="estilo({ '--ondas-duracion': '1600ms' })">
               <OndasSintonia :desfase="desfaseOndas" :alto="96" :grosor="3" />
             </div>
             <div class="mt-4 grid grid-cols-2 gap-2">
-              <div class="entra rounded-xl bg-surface-100 p-3 text-center" style="animation-delay: 300ms">
+              <div class="entra rounded-xl bg-surface-100 p-3 text-center" :style="retraso(300)">
                 <p class="text-[0.65rem] font-medium text-surface-800 flex items-center justify-center gap-1"><span class="h-1 w-3 rounded-full bg-brand-500" />Estudiante</p>
                 <p class="mt-1 font-display text-2xl font-bold text-surface-900">4</p>
               </div>
-              <div class="entra rounded-xl bg-surface-100 p-3 text-center" style="animation-delay: 420ms">
+              <div class="entra rounded-xl bg-surface-100 p-3 text-center" :style="retraso(420)">
                 <p class="text-[0.65rem] font-medium text-surface-800 flex items-center justify-center gap-1"><span class="h-1 w-3 rounded-full bg-surface-900" />Tutor/a</p>
                 <p class="mt-1 font-display text-2xl font-bold text-surface-900">2</p>
               </div>
             </div>
-            <p class="entra mt-4 rounded-xl border border-brand-200 bg-brand-50 p-3 text-xs font-medium leading-snug text-surface-900" style="animation-delay: 2000ms">
+            <p class="entra mt-4 rounded-xl border border-brand-200 bg-brand-50 p-3 text-xs font-medium leading-snug text-surface-900" :style="retraso(2000)">
               2 puntos de diferencia: hay desajuste. Nadie tiene razón: son dos miradas.
             </p>
           </div>
@@ -192,7 +195,7 @@ onBeforeUnmount(() => {
                 <span class="text-xs leading-snug text-surface-900">{{ q }}</span>
               </li>
             </ol>
-            <p class="entra mt-4 flex items-center gap-1.5 text-[0.7rem] texto-suave" style="animation-delay: 2800ms">
+            <p class="entra mt-4 flex items-center gap-1.5 text-[0.7rem] texto-suave" :style="retraso(2800)">
               <AppIcon name="users" :size="14" class="shrink-0" />Estudiante y tutor/a reciben las mismas preguntas.
             </p>
           </div>

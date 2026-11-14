@@ -328,3 +328,51 @@
 .tarjeta-enlace:active {
   transform: scale(0.99);
 }
+
+/* ---------- Efectos de la portada (src/lib/efectos.ts, DISENO.md 12.1) ---------- */
+/* Aparecer al llegar: una vez, desde casi su sitio, escalonado con --retraso. */
+.revelar {
+  opacity: 0;
+  transform: translate3d(0, 28px, 0);
+  transition:
+    opacity 700ms var(--ease-out),
+    transform 800ms var(--ease-out);
+  transition-delay: var(--retraso, 0ms);
+}
+.revelar.revelado {
+  opacity: 1;
+  transform: none;
+}
+/* Luz que sigue al ratón en una tarjeta (y su inclinación, si la tiene). */
+.con-luz {
+  position: relative;
+  isolation: isolate;
+  transition: transform 220ms var(--ease-out), box-shadow 220ms var(--ease-out);
+}
+.con-luz::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  z-index: 1;
+  opacity: 0;
+  background: radial-gradient(420px circle at var(--luz-x, 50%) var(--luz-y, 50%), rgba(52, 198, 163, 0.14), transparent 60%);
+  transition: opacity 260ms ease;
+}
+.con-luz:hover::after {
+  opacity: 1;
+}
+.con-luz:hover {
+  box-shadow: 0 18px 40px -22px rgba(10, 74, 108, 0.35);
+}
+.revelar.revelado.con-luz {
+  transition: transform 220ms var(--ease-out), box-shadow 220ms var(--ease-out), opacity 700ms var(--ease-out);
+}
+@media (prefers-reduced-motion: reduce) {
+  .revelar {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+}
