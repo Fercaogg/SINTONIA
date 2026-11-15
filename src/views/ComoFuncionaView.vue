@@ -65,7 +65,7 @@ const quienVe = [
         <h2 id="derechos" class="font-display text-xl font-semibold mb-3">Tus derechos</h2>
         <p class="text-base leading-relaxed">
           Puedes descargar tus datos, corregir tu nombre, retirarte del estudio y borrar tu cuenta cuando quieras, desde tu panel.
-          SINTONÍA está preparada para guardar los datos en servidores de la Unión Europea (Fráncfort); lo confirmaremos aquí cuando la instalación definitiva esté en marcha.
+          SINTONÍA guarda los datos en servidores de la Unión Europea (Fráncfort, Alemania).
         </p>
       </section>
 

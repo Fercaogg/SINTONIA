@@ -112,7 +112,7 @@ export const PREGUNTAS = [
   },
   {
     pregunta: '¿Dónde están mis datos?',
-    respuesta: 'SINTONÍA está preparada para guardarlos en servidores de la Unión Europea (Fráncfort). Lo confirmaremos aquí cuando la instalación definitiva esté en marcha. El bienestar se guarda cifrado.',
+    respuesta: 'En servidores de la Unión Europea (Fráncfort, Alemania). El bienestar se guarda cifrado.',
   },
   {
     pregunta: '¿Cuánto tiempo me lleva?',

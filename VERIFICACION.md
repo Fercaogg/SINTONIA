@@ -54,7 +54,7 @@ Cómo se comprueba cada criterio de aceptación del encargo y qué resultado dio
 
 | Criterio | Cómo se comprueba | Resultado |
 |---|---|---|
-| Las 6 cabeceras de seguridad | `tests/e2e/seguridad.spec.ts` (presencia y CSP sin `unsafe-inline` ni `unsafe-eval`; ningún recurso bloqueado en ninguna pantalla de ningún perfil) | Cumple en local. La nota de securityheaders.com se comprobará al publicar |
+| Las 6 cabeceras de seguridad | `tests/e2e/seguridad.spec.ts` (presencia y CSP sin `unsafe-inline` ni `unsafe-eval`; ningún recurso bloqueado en ninguna pantalla de ningún perfil) | Cumple en local y en la web publicada (las 7 cabeceras comprobadas el 15/11/2026). securityheaders.com no admite consultas automáticas desde aquí: se puede mirar la nota en el navegador |
 | RLS en todas las tablas y los 5 casos del encargo | `tests/bd/blindaje.test.ts` | Cumple |
 | Códigos de 12 caracteres, caducidad, usos máximos y anulación | `tests/bd/alta.test.ts` | Cumple |
 | Límite de intentos y mensajes que no revelan nada | `servidor/acceso-publico.test.ts`, `tests/bd/alta.test.ts` y `tests/e2e/acceso.spec.ts` | Cumple |
