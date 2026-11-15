@@ -94,5 +94,5 @@ compositions/cierre.html    7 · Cierre (53–60 s)
 
 ## Rejilla de música (120 BPM)
 
-Un golpe cada 0,5 s (60 s = 120 golpes). Las escenas se escriben en el tiempo del corte original de 45 s; `SX.QM()` (en `assets/js/sx.js`, con réplica en `musica/tiempos.py`) añade las pausas de lectura y lleva cada aparición al tiempo de 140 BPM más cercano, conservando su anticipación (una salida 0,25 s antes de un corte sigue 0,25 s antes).
+Un golpe cada 0,5 s (60 s = 120 golpes). Las escenas se escriben en el tiempo del corte original de 45 s; `SX.QM()` (en `assets/js/sx.js`, con réplica en `musica/tiempos.py`) añade las pausas de lectura y lleva cada aparición al golpe más cercano de la música (`BPM` en sx.js), conservando su anticipación (una salida 0,25 s antes de un corte sigue 0,25 s antes).
 
