@@ -22,3 +22,9 @@ export const VERSION = __VERSION_SINTONIA__
  * las hipótesis): mismo criterio, sin atribuirlo al Comité de Ética.
  */
 export const EN_ELABORACION_PROYECTO = 'En elaboración. Se publicará aquí cuando esté disponible.'
+
+/**
+ * Dirección pública de la web. Se cambia en un solo sitio (variable
+ * VITE_URL_SITIO) cuando haya dominio propio.
+ */
+export const URL_SITIO = (import.meta.env.VITE_URL_SITIO as string | undefined)?.replace(/\/$/, '') || 'https://sintonia360-ferca.vercel.app'

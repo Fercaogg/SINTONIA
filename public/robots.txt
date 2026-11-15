@@ -11,6 +11,8 @@ Allow: /consentimiento$
 Allow: /acceso$
 Allow: /registro$
 Allow: /demo/recorrido$
+Allow: /participantes$
+Allow: /kit/
 Allow: /seguridad$
 Allow: /accesibilidad$
 Allow: /novedades$

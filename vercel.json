@@ -7,7 +7,7 @@
   ],
   "rewrites": [
     {
-      "source": "/((?!api/|robots\\.txt$|sitemap\\.xml$|og\\.png$|favicon\\.svg$|assets/|clips/).*)",
+      "source": "/((?!api/|robots\\.txt$|sitemap\\.xml$|og\\.png$|favicon\\.svg$|assets/|clips/|kit/).*)",
       "destination": "/index.html"
     }
   ],
@@ -46,7 +46,7 @@
       ]
     },
     {
-      "source": "/((?!api/|robots\\.txt$|sitemap\\.xml$|og\\.png$|favicon\\.svg$|assets/|$|como-funciona$|acceso$|registro$|privacidad$|aviso-legal$|cookies$|consentimiento$|investigacion$|demo$|demo/recorrido$|seguridad$|accesibilidad$|novedades$|estado$).*)",
+      "source": "/((?!api/|robots\\.txt$|sitemap\\.xml$|og\\.png$|favicon\\.svg$|assets/|$|como-funciona$|acceso$|registro$|privacidad$|aviso-legal$|cookies$|consentimiento$|investigacion$|demo$|demo/recorrido$|participantes$|seguridad$|accesibilidad$|novedades$|estado$).*)",
       "headers": [
         {
           "key": "X-Robots-Tag",

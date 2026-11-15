@@ -13,6 +13,8 @@ declare module 'vue-router' {
     soloSinSesion?: boolean
     rol?: Rol
     titulo?: string
+    /** Pública pero sin buscadores (páginas solo para generar PDF). */
+    sinIndexar?: boolean
   }
 }
 
@@ -29,6 +31,8 @@ const routes: RouteRecordRaw[] = [
   { path: '/aviso-legal', component: () => import('@/views/legal/AvisoLegalView.vue'), meta: { publica: true, titulo: 'Aviso legal' } },
   { path: '/investigacion', component: () => import('@/views/InvestigacionPublicaView.vue'), meta: { publica: true, titulo: 'La investigación' } },
   { path: '/demo', component: () => import('@/views/DemoView.vue'), meta: { publica: true, titulo: 'Demostración' } },
+  { path: '/participantes', component: () => import('@/views/ParticipantesView.vue'), meta: { publica: true, titulo: 'Kit para participantes' } },
+  { path: '/participantes/imprimir/:doc', component: () => import('@/views/ImprimirView.vue'), meta: { publica: true, titulo: 'Documento', sinIndexar: true } },
   { path: '/demo/recorrido', component: () => import('@/views/RecorridoDemoView.vue'), meta: { publica: true, titulo: 'Demostración guiada' } },
   { path: '/cookies', component: () => import('@/views/legal/CookiesView.vue'), meta: { publica: true, titulo: 'Cookies' } },
   { path: '/seguridad', component: () => import('@/views/confianza/SeguridadView.vue'), meta: { publica: true, titulo: 'Seguridad' } },
@@ -157,5 +161,5 @@ router.afterEach((to) => {
     robots.name = 'robots'
     document.head.appendChild(robots)
   }
-  robots.content = to.meta.publica && to.matched[0]?.path !== '/:pathMatch(.*)*' ? 'index, follow' : 'noindex, nofollow'
+  robots.content = to.meta.publica && !to.meta.sinIndexar && to.matched[0]?.path !== '/:pathMatch(.*)*' ? 'index, follow' : 'noindex, nofollow'
 })

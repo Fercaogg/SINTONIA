@@ -8,6 +8,7 @@ const GRUPOS = [
     titulo: 'Proyecto',
     enlaces: [
       { to: '/investigacion', texto: 'La investigación' },
+      { to: '/participantes', texto: 'Kit para participantes' },
       { to: '/novedades', texto: 'Novedades' },
       { to: '/#preguntas', texto: 'Preguntas frecuentes' },
       { to: '/#contacto', texto: 'Contacto' },

@@ -16,6 +16,7 @@
     "demo:servidor": "LOCAL_BD=sintonia_demo node scripts/local/servidor-local.mjs",
     "demo:app": "vite --mode demo",
     "test": "vitest run",
+    "pdf": "node scripts/generar-pdf.mjs",
     "test:bd": "vitest run tests/bd",
     "test:e2e": "playwright test --trace off",
     "sql:unir": "node scripts/unir-sql.mjs",

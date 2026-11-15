@@ -59,6 +59,14 @@ Todo lo que SINTONÍA necesita y que no se puede inventar. En la aplicación, ca
 | Revisión manual de accesibilidad con lectores de pantalla (NVDA o VoiceOver, y TalkBack en el móvil) antes del piloto; al hacerla, actualizar /accesibilidad | /accesibilidad | Fernando (o el servicio de accesibilidad de la USAL), con Claude |
 | Volver a revisar /seguridad y /accesibilidad cuando cambie algo y actualizar su fecha | `src/contenido/confianza.ts` | Claude |
 
+## Credibilidad académica (Fase 3 de las mejoras)
+
+| Dato | Dónde se cambia | Quién lo aporta |
+|---|---|---|
+| Pregunta de investigación, hipótesis H1 a H3, calendario de enero y de mayo y junio de 2027, resolución del Comité de Ética y enlace del preregistro en OSF | `src/contenido/investigacion.ts` (se publica solo al rellenarlo) | Fernando |
+| Revisión del kit para participantes: hoja informativa, consentimiento (texto legal), riesgos y beneficios, base jurídica y conservación de los datos | `src/contenido/participantes.ts`; después, `npm run pdf` para regenerar los PDF | Comité de Ética de la USAL |
+| Publicaciones y difusión (cuando haya alguna) | `src/contenido/investigacion.ts`, lista `PUBLICACIONES` | Fernando |
+
 ## Diseño
 
 | Dato | Dónde se usa | Quién lo aporta |

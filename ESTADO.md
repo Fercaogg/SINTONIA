@@ -30,10 +30,10 @@ En la columna "Qué hay hoy" está lo que he comprobado. En "Qué haré", lo que
 
 | # | Punto | Estado | Qué hay hoy | Qué haré |
 |---|---|---|---|---|
-| 3.1 | /investigacion completa | **A medias** | Hechos: el diseño (mixto, 10 semanas, microensayo con p = 0,5, pretest, postest y 8 a 10 entrevistas) y las 7 referencias aprobadas. Faltan la pregunta CTS, H1 a H3, el resultado del Comité, el enlace de OSF y qué se hace en enero y en mayo y junio de 2027 **(dato tuyo)**: hoy salen con el texto digno | Ordenar la página según la lista y dejar cada hueco listo para rellenarse en un solo sitio. El enlace de OSF solo aparece cuando exista |
-| 3.2 | "Cómo citar SINTONÍA" | **No existe** |  | Bloque en APA 7 con versión y año, y botón para copiar |
-| 3.3 | "Publicaciones y difusión" | **No existe** |  | Lista vacía y oculta que se muestra sola al añadir la primera entrada |
-| 3.4 | Kit para participantes en PDF | **A medias** | Existe /consentimiento, pero su texto es del Comité de Ética y está pendiente. No hay hoja informativa ni PDF descargables | Crear el kit (hoja informativa, consentimiento y preguntas frecuentes) en PDF generado desde la web. Los textos que no existen saldrán con el aviso digno, y el kit irá marcado como pendiente de revisión por el Comité **(dato del Comité)** |
+| 3.1 | /investigacion completa | **Hecho** | Índice y apartados: pregunta, H1 a H3, diseño, garantías (Comité y OSF), calendario, participar, cómo citar y las 7 referencias. Todo el contenido está en `src/contenido/investigacion.ts`: lo que aún no existe (pregunta, hipótesis, Comité, OSF, parte del calendario) sale con el texto digno y se publica solo al rellenarlo allí. El enlace de OSF no aparece hasta que exista | |
+| 3.2 | "Cómo citar SINTONÍA" | **Hecho** | Cita en APA 7 (software) con la versión y el año de la versión actual, y botón para copiar | |
+| 3.3 | "Publicaciones y difusión" | **Hecho** | Lista vacía en `src/contenido/investigacion.ts`; la sección (y su entrada en el índice) aparece sola con la primera entrada. Lo comprueba una prueba | |
+| 3.4 | Kit para participantes en PDF | **Hecho** | /participantes con hoja informativa, consentimiento y preguntas frecuentes, para leer o descargar en PDF (generados desde la web con `npm run pdf`). Cada documento lleva el aviso de borrador del Comité; lo que es del Comité (texto del consentimiento, riesgos y beneficios, base jurídica) sale con el texto digno | |
 
 ## Fase 4. Instituciones, TCUE y empresas
 
@@ -68,10 +68,10 @@ En la columna "Qué hay hoy" está lo que he comprobado. En "Qué haré", lo que
 
 | Estado | Puntos |
 |---|---|
-| Hecho | 9 (Fases 1 y 2 completas, y modo oscuro) |
-| A medias | 8 |
-| No existe | 5 |
+| Hecho | 13 (Fases 1, 2 y 3 completas, y modo oscuro) |
+| A medias | 6 |
+| No existe | 3 |
 
 **Orden propuesto:** las fases en el orden de la lista. Al terminar cada una: pruebas, revisión en móvil (360 px) y escritorio, capturas en docs/capturas y tu visto bueno.
 
-**Fases 1 y 2 terminadas el 15/11/2026.** Pruebas y capturas en docs/capturas (movil y escritorio, prefijos `fase1-` y `fase2-`). Pendiente de tu visto bueno antes de la Fase 3.
+**Fases 1, 2 y 3 terminadas el 15/11/2026.** Pruebas y capturas en docs/capturas (prefijos `fase1-`, `fase2-` y `fase3-`). Pendiente de tu visto bueno antes de la Fase 4.
