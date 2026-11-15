@@ -67,6 +67,13 @@ Todo lo que SINTONÍA necesita y que no se puede inventar. En la aplicación, ca
 | Revisión del kit para participantes: hoja informativa, consentimiento (texto legal), riesgos y beneficios, base jurídica y conservación de los datos | `src/contenido/participantes.ts`; después, `npm run pdf` para regenerar los PDF | Comité de Ética de la USAL |
 | Publicaciones y difusión (cuando haya alguna) | `src/contenido/investigacion.ts`, lista `PUBLICACIONES` | Fernando |
 
+## Instituciones (Fase 4 de las mejoras)
+
+| Dato | Dónde se usa | Quién lo aporta |
+|---|---|---|
+| Servicio de correo (Resend u otro) para que los formularios de contacto y de solicitud de demostración envíen de verdad. Mientras no exista, la web ofrece escribir a ferca@usal.es con el mensaje preparado | /instituciones y portada | Fernando |
+| Volver a generar el dosier y el kit (`npm run pdf`) cuando cambie su contenido | public/dosier y public/kit | Claude |
+
 ## Diseño
 
 | Dato | Dónde se usa | Quién lo aporta |

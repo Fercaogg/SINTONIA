@@ -3,7 +3,7 @@
 //
 // Uso: con la web en marcha (npm run dev o la vista de demostración),
 //   node scripts/generar-pdf.mjs [http://localhost:5173]
-// Escribe en public/kit/. Vuelve a ejecutarlo cuando cambie el contenido.
+// Escribe en public/kit/ y public/dosier/. Vuelve a ejecutarlo cuando cambie el contenido.
 
 import { chromium } from 'playwright'
 import { mkdirSync } from 'node:fs'
@@ -16,6 +16,7 @@ const DOCUMENTOS = [
   { ruta: '/participantes/imprimir/hoja-informativa', salida: 'kit/hoja-informativa.pdf', titulo: 'SINTONÍA: hoja informativa (borrador)' },
   { ruta: '/participantes/imprimir/consentimiento', salida: 'kit/consentimiento.pdf', titulo: 'SINTONÍA: consentimiento informado (borrador)' },
   { ruta: '/participantes/imprimir/preguntas', salida: 'kit/preguntas.pdf', titulo: 'SINTONÍA: preguntas frecuentes' },
+  { ruta: '/dosier/imprimir', salida: 'dosier/sintonia-dosier.pdf', titulo: 'SINTONÍA: dosier' },
 ]
 
 const navegador = await chromium.launch()

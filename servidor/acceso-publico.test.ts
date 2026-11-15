@@ -119,6 +119,22 @@ describe('contacto', () => {
     const { d } = falsas()
     expect((await contacto({ ...MENSAJE, mensaje: 'Hola' }, '1.1.1.1', d)).status).toBe(400)
   })
+
+  it('solicitud de demostración: pide la institución y la pone en el asunto', async () => {
+    const { d, correos } = falsas()
+    const SOLICITUD = { nombre: 'Lucía', email: 'lucia@ejemplo.es', tipo: 'demostracion', institucion: 'Máster de ejemplo', cargo: 'Coordinación' }
+    expect((await contacto(SOLICITUD, '5.5.5.5', d)).status).toBe(200)
+    expect(correos[0].asunto).toBe('SINTONÍA: solicitud de demostración (Máster de ejemplo)')
+    expect(correos[0].texto).toContain('Cargo: Coordinación')
+    expect((await contacto({ ...SOLICITUD, institucion: '' }, '5.5.5.6', d)).status).toBe(400)
+  })
+
+  it('sin servicio de correo, lo dice claramente en lugar de pedir que se reintente', async () => {
+    const { d } = falsas()
+    const r = await contacto(MENSAJE, '6.6.6.6', { ...d, enviador: null })
+    expect(r.status).toBe(503)
+    expect(r.cuerpo.error).toBe(MENSAJES.sinCorreo)
+  })
 })
 
 describe('ipDe', () => {

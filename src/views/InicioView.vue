@@ -421,6 +421,7 @@ const estilo = (e: Record<string, string>) => e
             <p class="text-xs font-semibold uppercase tracking-[0.16em] text-brand-900">11 · Escríbenos</p>
             <h2 id="t-contacto" class="mt-3 font-display text-4xl sm:text-5xl font-semibold tracking-tight text-surface-900">Contacto</h2>
             <p class="mt-4 text-lg leading-relaxed">Si te interesa SINTONÍA para tu máster, programa o escuela de doctorado, o tienes cualquier duda.</p>
+            <p class="mt-4"><RouterLink to="/instituciones" class="enlace">Información para instituciones y solicitud de demostración</RouterLink></p>
           </div>
           <div v-revelar="1" class="lg:col-span-7 lg:col-start-6"><FormularioContacto /></div>
         </div>

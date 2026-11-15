@@ -12,6 +12,9 @@ Allow: /acceso$
 Allow: /registro$
 Allow: /demo/recorrido$
 Allow: /participantes$
+Allow: /instituciones$
+Allow: /hoja-de-ruta$
+Allow: /dosier/
 Allow: /kit/
 Allow: /seguridad$
 Allow: /accesibilidad$

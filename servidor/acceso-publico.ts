@@ -42,6 +42,7 @@ export const MENSAJES = {
   registro: 'No hemos podido completar el registro. Revisa el código y que el correo sea el institucional de la Universidad.',
   demasiados: 'Has hecho demasiados intentos. Espera unos minutos y vuelve a probarlo.',
   servicio: 'No hemos podido enviar el correo. Inténtalo de nuevo en unos minutos.',
+  sinCorreo: 'Ahora mismo el formulario no puede enviar correos. Puedes escribirnos directamente.',
 } as const
 
 const email = z.string().trim().toLowerCase().max(254).pipe(z.email())
@@ -57,12 +58,19 @@ export const esquemaRegistro = z.object({
 
 export const esquemaAcceso = z.object({ email, sitio: trampa })
 
-export const esquemaContacto = z.object({
-  nombre: z.string().trim().min(1).max(120),
-  email,
-  mensaje: z.string().trim().min(10).max(3000),
-  sitio: trampa,
-})
+export const esquemaContacto = z
+  .object({
+    nombre: z.string().trim().min(1).max(120),
+    email,
+    // "demostracion": solicitud de demostración desde /instituciones.
+    tipo: z.enum(['contacto', 'demostracion']).default('contacto'),
+    institucion: z.string().trim().max(200).optional(),
+    cargo: z.string().trim().max(120).optional(),
+    mensaje: z.string().trim().max(3000).default(''),
+    sitio: trampa,
+  })
+  // Un mensaje de contacto necesita texto; una solicitud de demostración, la institución.
+  .refine((c) => (c.tipo === 'demostracion' ? !!c.institucion && c.institucion.length >= 2 : c.mensaje.length >= 10))
 
 const ok = (cuerpo: Record<string, unknown> = {}): Respuesta => ({ status: 200, cuerpo: { ok: true, ...cuerpo } })
 const fallo = (status: number, error: string): Respuesta => ({ status, cuerpo: { ok: false, error } })
@@ -113,15 +121,19 @@ export async function acceso(entrada: unknown, ip: string, d: Dependencias): Pro
 export async function contacto(entrada: unknown, ip: string, d: Dependencias): Promise<Respuesta> {
   const r = esquemaContacto.safeParse(entrada)
   if (!r.success) return fallo(400, MENSAJES.datos)
-  const { nombre, email: correo, mensaje, sitio } = r.data
+  const { nombre, email: correo, mensaje, sitio, tipo, institucion, cargo } = r.data
   if (sitio) return ok()
   if (!(await dentroDelLimite(d, 'contacto', ip, correo))) return fallo(429, MENSAJES.demasiados)
-  if (!d.enviador) return fallo(503, MENSAJES.servicio)
+  // Sin servicio de correo configurado, se dice claramente (no es un fallo pasajero).
+  if (!d.enviador) return fallo(503, MENSAJES.sinCorreo)
+  const demostracion = tipo === 'demostracion'
   try {
     await d.enviador.enviar({
       para: d.correoContacto,
-      asunto: `SINTONÍA: mensaje de ${nombre}`,
-      texto: `Mensaje enviado desde el formulario de contacto de SINTONÍA.\n\nNombre: ${nombre}\nCorreo: ${correo}\n\n${mensaje}\n`,
+      asunto: demostracion ? `SINTONÍA: solicitud de demostración (${institucion})` : `SINTONÍA: mensaje de ${nombre}`,
+      texto: demostracion
+        ? `Solicitud de demostración enviada desde /instituciones.\n\nNombre: ${nombre}\nCorreo: ${correo}\nInstitución: ${institucion}\nCargo: ${cargo || 'No indicado'}\n\n${mensaje || '(Sin mensaje)'}\n`
+        : `Mensaje enviado desde el formulario de contacto de SINTONÍA.\n\nNombre: ${nombre}\nCorreo: ${correo}\n\n${mensaje}\n`,
     })
   } catch {
     return fallo(503, MENSAJES.servicio)

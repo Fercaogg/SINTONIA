@@ -39,9 +39,9 @@ En la columna "Qué hay hoy" está lo que he comprobado. En "Qué haré", lo que
 
 | # | Punto | Estado | Qué hay hoy | Qué haré |
 |---|---|---|---|---|
-| 4.1 | Página /instituciones | **A medias** | No hay página. Sí existen el formulario de contacto (con campo trampa contra programas, límite de intentos y aviso de uso del correo) y la explicación de quién ve qué | Crear /instituciones con el problema, los pasos de implantación (alta del máster, invitación de tutores, códigos para estudiantes y calendario), qué necesita la universidad, datos por perfil y el formulario "Solicitar una demostración" |
-| 4.2 | Dosier de una página en PDF | **No existe** |  | Página imprimible generada desde la web y su PDF descargable. La dirección (Luis y Ana) aparece en igualdad, con los datos ya aprobados |
-| 4.3 | Hoja de ruta (/hoja-de-ruta) | **No existe** |  | Tres columnas: "Hecho" (sacado de lo que existe de verdad), "Durante el piloto (febrero a abril de 2027)" y "Después (TFG y tesis)", solo con lo planificado en el proyecto |
+| 4.1 | Página /instituciones | **Hecho** | /instituciones: el problema, la implantación en 4 pasos (alta del máster, tutores, códigos para estudiantes y calendario, tal como funciona el panel), qué necesita la universidad, qué ve cada perfil, en qué punto está y "Solicitar una demostración" (campo trampa, límite de envíos y aviso de privacidad). Si el servidor no puede enviar correos, ofrece escribir con el mensaje preparado | |
+| 4.2 | Dosier de una página en PDF | **Hecho** | `public/dosier/sintonia-dosier.pdf`, una página A4 generada desde /dosier/imprimir con `npm run pdf`: qué es, cómo funciona, garantías éticas, estado, dirección (Luis y Ana iguales, en orden alfabético) y contacto. Descargable desde /instituciones | |
+| 4.3 | Hoja de ruta (/hoja-de-ruta) | **Hecho** | Tres columnas: "Hecho" (solo lo que funciona), "Durante el piloto" y "Después (TFG y tesis)", solo con lo planificado en el proyecto | |
 
 ## Fase 5. Acabado profesional
 
@@ -68,10 +68,10 @@ En la columna "Qué hay hoy" está lo que he comprobado. En "Qué haré", lo que
 
 | Estado | Puntos |
 |---|---|
-| Hecho | 13 (Fases 1, 2 y 3 completas, y modo oscuro) |
-| A medias | 6 |
-| No existe | 3 |
+| Hecho | 16 (Fases 1 a 4 completas, y modo oscuro) |
+| A medias | 5 |
+| No existe | 1 |
 
 **Orden propuesto:** las fases en el orden de la lista. Al terminar cada una: pruebas, revisión en móvil (360 px) y escritorio, capturas en docs/capturas y tu visto bueno.
 
-**Fases 1, 2 y 3 terminadas el 15/11/2026.** Pruebas y capturas en docs/capturas (prefijos `fase1-`, `fase2-` y `fase3-`). Pendiente de tu visto bueno antes de la Fase 4.
+**Fases 1 a 4 terminadas el 15/11/2026.** Pruebas y capturas en docs/capturas (prefijos `fase1-` a `fase4-`). Pendiente de tu visto bueno antes de la Fase 5.

@@ -16,6 +16,8 @@ export const NOVEDADES: Novedad[] = [
       'Páginas nuevas de seguridad, accesibilidad, novedades y estado de la plataforma.',
       'Demostración guiada de unos 60 segundos: el check-in, la mirada del tutor/a, el desajuste y lo que ve la dirección.',
       'Clips cortos de la demostración para cada perfil, una calculadora del tiempo que pide a un máster y una comparación honesta con otras formas de acompañar.',
+      'Página para instituciones con solicitud de demostración, dosier de una página en PDF y hoja de ruta pública.',
+      'Si el formulario no puede enviar correos, ahora lo dice claramente y ofrece escribir con el mensaje ya preparado.',
       'Página de la investigación ordenada, con "Cómo citar SINTONÍA" en APA 7 y un kit para participantes (hoja informativa, consentimiento y preguntas frecuentes) descargable en PDF.',
       'El mensaje para quien marca un bienestar bajo enlaza al servicio de atención psicológica de la Universidad de Salamanca, gratuito, y recuerda el 112 para urgencias.',
       'La web confirma que los datos se guardan en la Unión Europea (Fráncfort, Alemania).',
