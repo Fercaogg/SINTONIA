@@ -11,6 +11,7 @@
     #ci-div { width: 3px; height: 70px; background: #e3eaea; }
     #ci-url { font-size: 46px; font-weight: 700; color: #1d7060; }
     #ci-foot { top: 730px; font-size: 28px; font-weight: 600; color: #5a6b75; }
+    #ci-credit { top: 990px; font-size: 18px; font-weight: 400; color: #5a6b75; }
   </style>
   <div id="root" data-composition-id="cierre" data-width="1920" data-height="1080">
     <div id="ci-cam">
@@ -26,6 +27,7 @@
         <div id="ci-url"><span class="sx-w"><span class="sx-k">sintonia360-ferca.vercel.app</span></span></div>
       </div>
       <div id="ci-foot" class="ci-center">Máster en Estudios de la Ciencia, la Tecnología y la Innovación · Universidad de Salamanca</div>
+      <div id="ci-credit" class="ci-center">Música: «Inspired», Kevin MacLeod (incompetech.com) · Licencia CC BY 4.0</div>
     </div>
   </div>
   <script>
@@ -58,6 +60,7 @@
       SX.maskIn(tl, ["#ci-word .sx-k", "#ci-url .sx-k"], g(43.5), { d: 0.45, s: 0.08 });
       tl.fromTo("#ci-div", { scaleY: 0 }, { scaleY: 1, duration: 0.3, ease: "power3.out" }, g(43.55));
       tl.fromTo("#ci-foot", { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.4, ease: "power3.out" }, g(43.75));
+      tl.fromTo("#ci-credit", { opacity: 0 }, { opacity: 1, duration: 0.4, ease: "power2.out" }, g(44.0));
 
       window.__timelines["cierre"] = tl;
     })();

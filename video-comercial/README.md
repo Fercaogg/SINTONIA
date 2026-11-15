@@ -1,6 +1,6 @@
 # sintonia-spot
 
-Spot comercial de SINTONÍA: 60 s exactos, 1920×1080, 60 fps. Con banda sonora original a 120 BPM, sintetizada a medida (sin licencias de terceros). Composición HyperFrames (HTML + GSAP), una escena por archivo.
+Spot comercial de SINTONÍA: 60 s exactos, 1920×1080, 60 fps. Con música «Inspired» (Kevin MacLeod, CC BY 4.0) y locución castellana. Composición HyperFrames (HTML + GSAP), una escena por archivo.
 
 ## Requisitos
 
@@ -11,37 +11,29 @@ Comprobar: `npx hyperframes doctor`
 
 ## Música
 
-`assets/music/sintonia-bgm.mp3` es una pista original estilo rage / UK underground: 140 BPM en half-time, Fa menor, −14,5 LUFS. La genera `musica/componer.py` (Python + numpy, sin samples ni melodías de terceros):
+«Inspired», de Kevin MacLeod (incompetech.com), licencia **CC BY 4.0**: gratuita, uso comercial permitido con atribución. El crédito ya aparece al final del vídeo; si publicas el vídeo, añádelo también a la descripción:
 
-- Lead: supersaw de 7 voces desafinadas, abierta en estéreo, bucle de 2 compases con notas repetidas y reverb larga y oscura.
-- Capa frágil: campana FM una octava arriba, doblando el 2.º compás del bucle.
-- 808 largo con glide y saturación fuerte (lo que más pesa); bombo con el 808, clap seca en el 3, hi-hats en corcheas con redobles de tresillos y fusas.
-- Cada aparición del vídeo: golpe de 808 + campana corta o click metálico.
-- Antes de cada sección, corte total de medio compás con solo la cola de reverb; intro de 2 compases con el lead filtrado que se abre.
+> Música: «Inspired», Kevin MacLeod (incompetech.com). Licencia CC BY 4.0: https://creativecommons.org/licenses/by/4.0/
 
-Para regenerarla:
+La pista va a 120 BPM exactos, la misma rejilla del montaje, así que cada aparición cae en un golpe. `assets/music/sintonia-bgm.mp3` son sus primeros 60 s (original en `musica/fuentes/`), con fundido final y nivelada a −15 LUFS:
 
 ```bash
-python3 musica/componer.py
+ffmpeg -y -i musica/fuentes/Inspired-KevinMacLeod.mp3 -t 60 -af "afade=t=out:st=57.5:d=2.5,loudnorm=I=-15:TP=-1.5:LRA=9" -ar 48000 -b:a 256k assets/music/sintonia-bgm.mp3
 ```
 
-```bash
-ffmpeg -y -i assets/music/sintonia-bgm.wav -af loudnorm=I=-15:TP=-1.2:LRA=7 -ar 48000 -b:a 256k assets/music/sintonia-bgm.mp3
-```
+(`musica/componer.py` conserva la versión rage sintetizada como alternativa; si la usas, cambia `BPM = 140` en `assets/js/sx.js` y `musica/tiempos.py`.)
 
 ## Voz
 
-Locución en español generada en local con Kokoro (voz `ef_dora`, `npx hyperframes tts`): una frase por plano, en `assets/voice/vo-01.wav` … `vo-16.wav`, normalizadas a −16 LUFS. La música baja a 0,32 mientras habla la voz (automatización de volumen en `#music`). Para cambiar el texto, edita `LINES` en `musica/voz.py` y ejecuta:
+Voz castellana neutra de Microsoft Edge (`es-ES-AlvaroNeural`), gratuita y sin cuenta, generada con `edge-tts`: una frase por plano en `assets/voice/`, normalizadas a −16 LUFS. La música baja a 0,32 mientras habla la voz (automatización de volumen en `#music`). Para cambiar el texto o la voz (`es-ES-ElviraNeural`, `es-ES-XimenaNeural`), edita `LINES` / `VOICE` en `musica/voz.py` y ejecuta:
 
 ```bash
-pip install kokoro-onnx soundfile
+pip install edge-tts
 ```
 
 ```bash
 python3 musica/voz.py
 ```
-
-El script regenera las frases, las coloca en `index.html` sin que se pisen y reescribe la automatización de la música.
 
 ## Alternativa: pista del catálogo HeyGen
 
@@ -100,8 +92,7 @@ compositions/perfiles.html  6 · Para cada perfil (47–53 s)
 compositions/cierre.html    7 · Cierre (53–60 s)
 ```
 
-## Rejilla de música (140 BPM, half-time)
+## Rejilla de música (120 BPM)
 
-Un tiempo cada 0,4286 s (60 s = 140 tiempos). Las escenas se escriben en el tiempo del corte original de 45 s; `SX.QM()` (en `assets/js/sx.js`, con réplica en `musica/tiempos.py`) añade las pausas de lectura y lleva cada aparición al tiempo de 140 BPM más cercano, conservando su anticipación (una salida 0,25 s antes de un corte sigue 0,25 s antes).
+Un golpe cada 0,5 s (60 s = 120 golpes). Las escenas se escriben en el tiempo del corte original de 45 s; `SX.QM()` (en `assets/js/sx.js`, con réplica en `musica/tiempos.py`) añade las pausas de lectura y lleva cada aparición al tiempo de 140 BPM más cercano, conservando su anticipación (una salida 0,25 s antes de un corte sigue 0,25 s antes).
 
-Entradas de sección (golpe con todo, tras medio compás de corte): 3,857 · 18,000 · 23,143 · 36,857 · 47,143 · 53,143 s.

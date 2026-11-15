@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """
-SINTONÍA · locución del spot (Kokoro local, voz ef_dora, español).
+SINTONÍA · locución del spot (voces neuronales de Microsoft Edge, gratuitas: castellano, es-ES-AlvaroNeural).
 
-1. Genera una frase por plano con `npx hyperframes tts`.
+1. Genera una frase por plano con `edge-tts` (pip install edge-tts).
 2. Recorta silencios y normaliza cada frase (−16 LUFS) → assets/voice/vo-NN.wav
 3. Coloca las frases en index.html (<audio id="vo-NN">) en la entrada de su plano
    y escribe en la música (#music) una automatización de volumen que la baja mientras habla la voz.
@@ -16,7 +16,7 @@ ROOT = os.path.normpath(os.path.join(HERE, ".."))
 sys.path.insert(0, HERE)
 from tiempos import QM  # noqa: E402
 
-VOICE, LEAD_IN = "ef_dora", 0.12
+VOICE, LEAD_IN = "es-ES-AlvaroNeural", 0.12   # alternativas: es-ES-ElviraNeural, es-ES-XimenaNeural
 DUCK, RAMP = 0.32, 0.18          # nivel de la música bajo la voz, rampa en segundos
 
 # (tiempo del corte original de 45 s, texto, velocidad)
@@ -31,7 +31,7 @@ LINES = [
     (22.0, "Si las miradas no coinciden, Sintonía lo detecta.", 1.05),
     (25.0, "Y la tutoría empieza con tres preguntas neutras.", 1.05),
     (28.0, "Tu bienestar solo lo ves tú.", 1.0),
-    (31.0, "Sin notas. Sin rankings. Sin vigilar.", 1.0),
+    (31.0, "Sin notas, sin rankings, sin vigilar.", 1.1),
     (33.0, "Y no deduce emociones.", 1.0),
     (35.0, "Para estudiantes, tutores, dirección e investigación.", 1.05),
     (37.0, "Y un puente al doctorado que activas tú.", 1.0),
@@ -47,9 +47,12 @@ def wav_dur(p):
 os.makedirs(os.path.join(ROOT, "assets", "voice"), exist_ok=True)
 clips = []
 for n, (anchor, text, speed) in enumerate(LINES, 1):
-    raw = os.path.join(ROOT, "assets", "voice", f"vo-{n:02d}.raw.wav")
+    raw = os.path.join(ROOT, "assets", "voice", f"vo-{n:02d}.raw.mp3")
     out = os.path.join(ROOT, "assets", "voice", f"vo-{n:02d}.wav")
-    sh(["npx", "hyperframes", "tts", text, "-v", VOICE, "-s", str(speed), "-o", raw], cwd=ROOT)
+    rate = f"{round((speed - 1) * 100):+d}%"
+    cmd = ["edge-tts", "--voice", VOICE, f"--rate={rate}", "--text", text, "--write-media", raw]
+    if os.environ.get("HTTPS_PROXY"): cmd += ["--proxy", os.environ["HTTPS_PROXY"]]  # entornos con proxy
+    sh(cmd, cwd=ROOT)
     af = ("silenceremove=start_periods=1:start_threshold=-45dB:start_silence=0.02,"
           "areverse,silenceremove=start_periods=1:start_threshold=-45dB:start_silence=0.05,areverse,"
           "highpass=f=90,acompressor=threshold=-20dB:ratio=3:attack=5:release=80,"
