@@ -14,6 +14,8 @@ export const NOVEDADES: Novedad[] = [
     fecha: '2026-11-15',
     cambios: [
       'Páginas nuevas de seguridad, accesibilidad, novedades y estado de la plataforma.',
+      'Demostración guiada de unos 60 segundos: el check-in, la mirada del tutor/a, el desajuste y lo que ve la dirección.',
+      'Clips cortos de la demostración para cada perfil, una calculadora del tiempo que pide a un máster y una comparación honesta con otras formas de acompañar.',
       'El mensaje para quien marca un bienestar bajo enlaza al servicio de atención psicológica de la Universidad de Salamanca, gratuito, y recuerda el 112 para urgencias.',
       'La web confirma que los datos se guardan en la Unión Europea (Fráncfort, Alemania).',
       'Datos públicos comprobados en fuentes oficiales: convocatorias predoctorales y normativa de doctorado.',

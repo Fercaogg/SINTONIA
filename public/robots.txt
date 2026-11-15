@@ -10,6 +10,11 @@ Allow: /demo$
 Allow: /consentimiento$
 Allow: /acceso$
 Allow: /registro$
+Allow: /demo/recorrido$
+Allow: /seguridad$
+Allow: /accesibilidad$
+Allow: /novedades$
+Allow: /estado$
 Disallow: /
 
 Sitemap: https://sintonia360-ferca.vercel.app/sitemap.xml

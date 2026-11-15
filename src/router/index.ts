@@ -29,6 +29,7 @@ const routes: RouteRecordRaw[] = [
   { path: '/aviso-legal', component: () => import('@/views/legal/AvisoLegalView.vue'), meta: { publica: true, titulo: 'Aviso legal' } },
   { path: '/investigacion', component: () => import('@/views/InvestigacionPublicaView.vue'), meta: { publica: true, titulo: 'La investigación' } },
   { path: '/demo', component: () => import('@/views/DemoView.vue'), meta: { publica: true, titulo: 'Demostración' } },
+  { path: '/demo/recorrido', component: () => import('@/views/RecorridoDemoView.vue'), meta: { publica: true, titulo: 'Demostración guiada' } },
   { path: '/cookies', component: () => import('@/views/legal/CookiesView.vue'), meta: { publica: true, titulo: 'Cookies' } },
   { path: '/seguridad', component: () => import('@/views/confianza/SeguridadView.vue'), meta: { publica: true, titulo: 'Seguridad' } },
   { path: '/accesibilidad', component: () => import('@/views/confianza/AccesibilidadView.vue'), meta: { publica: true, titulo: 'Declaración de accesibilidad' } },

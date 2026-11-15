@@ -61,4 +61,10 @@ test('robots.txt y sitemap.xml existen y solo nombran páginas públicas', async
   const mapa = await (await request.get('/sitemap.xml')).text()
   expect(mapa).toContain('<urlset')
   expect(mapa).not.toMatch(/estudiante|tutor|direccion|investigador|cuenta/)
+  // Cada página del mapa del sitio debe estar permitida en robots.txt.
+  const permitidas = (await robots.text()).split('\n').filter((l) => l.startsWith('Allow: ')).map((l) => l.slice(7).trim())
+  for (const [, ruta] of mapa.matchAll(/<loc>https?:\/\/[^/]+(\/[^<]*)<\/loc>/g)) {
+    const ok = permitidas.some((p) => (p.endsWith('$') ? ruta === p.slice(0, -1) : ruta.startsWith(p)))
+    expect(ok, `${ruta} está en el sitemap pero robots.txt no la permite`).toBe(true)
+  }
 })

@@ -21,10 +21,10 @@ En la columna "Qué hay hoy" está lo que he comprobado. En "Qué haré", lo que
 
 | # | Punto | Estado | Qué hay hoy | Qué haré |
 |---|---|---|---|---|
-| 2.1 | Demostración guiada (/demo/recorrido) | **A medias** | En /demo se entra en la demostración real con cuatro perfiles. En la portada hay una demo del desajuste (dos deslizadores y tres preguntas) y un recorrido animado de cuatro pasos. No hay un recorrido guiado de unos 60 segundos en el que el visitante haga el check-in | Crear /demo/recorrido en 4 pasos interactivos (check-in del estudiante, pantalla del tutor/a, desajuste y 3 preguntas, vista de la dirección con solo agregados), con datos ficticios y la banda "Demostración" |
-| 2.2 | Clip en bucle por perfil | **No existe** | No hay vídeos en la web | Grabar 3 clips de la demostración real (WebM y MP4, sin sonido, ligeros) y, con "reducir movimiento", una imagen fija |
-| 2.3 | Calculadora de tiempo | **No existe** | El dato de 60 s y 30 s está en la portada | Crear la calculadora (estudiantes × 60 s + tutores × 30 s), solo cálculo |
-| 2.4 | Comparativa en tres columnas | **No existe** |  | Crear la comparativa sin marcas: tutoría sin seguimiento, SINTONÍA y herramientas que vigilan |
+| 2.1 | Demostración guiada (/demo/recorrido) | **Hecho** | /demo/recorrido en 4 pasos: check-in del estudiante (mismas preguntas y escala que el real), pantalla del tutor/a, desajuste y 3 preguntas (misma regla y banco) y vista de la dirección con cifras inventadas y marcadas. Banda "Demostración", sin llamadas a ninguna API. Enlazada desde la portada y /demo | |
+| 2.2 | Clip en bucle por perfil | **Hecho** | 3 clips grabados de la demostración real (WebM y MP4, sin sonido, de 40 a 100 KB), en las tarjetas de "Para cada perfil". Se cargan y reproducen solo al verse; con "reducir movimiento", imagen fija | |
+| 2.3 | Calculadora de tiempo | **Hecho** | Apartado "04 · Tiempo" de la portada: estudiantes × 60 s + tutores × 30 s, en minutos por semana, con el desglose. Solo cálculo | |
+| 2.4 | Comparativa en tres columnas | **Hecho** | Apartado "06 · Comparación": tutoría sin seguimiento, SINTONÍA y herramientas que vigilan, sin marcas, con una fila de límites de SINTONÍA. Tabla en escritorio y tarjetas en el móvil | |
 
 ## Fase 3. Credibilidad académica
 
@@ -68,10 +68,10 @@ En la columna "Qué hay hoy" está lo que he comprobado. En "Qué haré", lo que
 
 | Estado | Puntos |
 |---|---|
-| Hecho | 5 (Fase 1 completa y modo oscuro) |
-| A medias | 9 |
-| No existe | 8 |
+| Hecho | 9 (Fases 1 y 2 completas, y modo oscuro) |
+| A medias | 8 |
+| No existe | 5 |
 
 **Orden propuesto:** las fases en el orden de la lista. Al terminar cada una: pruebas, revisión en móvil (360 px) y escritorio, capturas en docs/capturas y tu visto bueno.
 
-**Fase 1 terminada el 15/11/2026.** Pruebas, capturas en docs/capturas (movil y escritorio, prefijo `fase1-`) y pendiente de tu visto bueno antes de la Fase 2.
+**Fases 1 y 2 terminadas el 15/11/2026.** Pruebas y capturas en docs/capturas (movil y escritorio, prefijos `fase1-` y `fase2-`). Pendiente de tu visto bueno antes de la Fase 3.

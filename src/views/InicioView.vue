@@ -19,6 +19,8 @@ import BandaEntorno from '@/components/comun/BandaEntorno.vue'
 import AccesosDemo from '@/components/comun/AccesosDemo.vue'
 import PiePublico from '@/components/layout/PiePublico.vue'
 import CabeceraSeccion from '@/components/portada/CabeceraSeccion.vue'
+import CalculadoraTiempo from '@/components/portada/CalculadoraTiempo.vue'
+import ComparativaHonesta from '@/components/portada/ComparativaHonesta.vue'
 import RecorridoProducto from '@/components/portada/RecorridoProducto.vue'
 import IlustracionPaso from '@/components/portada/IlustracionPaso.vue'
 import DemoSintonia from '@/components/portada/DemoSintonia.vue'
@@ -288,6 +290,9 @@ const estilo = (e: Record<string, string>) => e
             <p class="mt-5 text-lg leading-relaxed text-white/85">
               Mueve cómo ven el avance estudiante y tutor/a. Si la diferencia es de 2 puntos o más, aparecen las tres preguntas para la tutoría.
             </p>
+            <RouterLink to="/demo/recorrido" class="mt-6 inline-flex items-center gap-2 min-h-tactil font-semibold text-white underline decoration-brand-400 decoration-2 underline-offset-4 hover:decoration-white">
+              Haz el recorrido guiado, en unos 60 segundos <span aria-hidden="true">→</span>
+            </RouterLink>
             <div aria-label="SINTONÍA en cifras" role="group" class="mt-10 grid grid-cols-2 gap-x-6 gap-y-8 border-t border-white/20 pt-8">
               <CifraAnimada v-for="d in DATOS_CLAVE" :key="d.texto" :valor="Number(d.cifra)" :unidad="d.unidad" :texto="d.texto" />
             </div>
@@ -298,11 +303,23 @@ const estilo = (e: Record<string, string>) => e
         </div>
       </section>
 
+      <!-- 6b. Calculadora de tiempo -->
+      <section id="tiempo" class="scroll-mt-20 bg-papel border-b border-surface-200" aria-labelledby="t-tiempo">
+        <div class="max-w-[1180px] mx-auto px-4 sm:px-6 py-20 sm:py-28 grid gap-12 lg:grid-cols-12 lg:items-center">
+          <div v-revelar class="lg:col-span-5">
+            <p class="text-xs font-semibold uppercase tracking-[0.16em] text-brand-900">04 · Tiempo</p>
+            <h2 id="t-tiempo" class="mt-3 font-display text-4xl sm:text-5xl font-semibold tracking-tight text-surface-900">¿Cuánto tiempo pide a un máster?</h2>
+            <p class="mt-6 text-lg leading-relaxed">Escribe cuántos estudiantes y tutores tiene el máster y mira los minutos de todos, cada semana.</p>
+          </div>
+          <div v-revelar="1" class="lg:col-span-6 lg:col-start-7"><CalculadoraTiempo /></div>
+        </div>
+      </section>
+
       <!-- 7. Privacidad y ética -->
       <section id="privacidad" class="scroll-mt-20 max-w-[1180px] mx-auto px-4 sm:px-6 py-20 sm:py-28" aria-labelledby="t-privacidad">
         <div class="grid gap-12 lg:grid-cols-12">
           <div v-revelar class="lg:col-span-6">
-            <p class="text-xs font-semibold uppercase tracking-[0.16em] text-brand-900">04 · Tus datos</p>
+            <p class="text-xs font-semibold uppercase tracking-[0.16em] text-brand-900">05 · Tus datos</p>
             <h2 id="t-privacidad" class="mt-3 font-display text-4xl sm:text-5xl font-semibold tracking-tight text-surface-900">Privacidad y ética</h2>
             <p class="mt-8 font-display text-3xl sm:text-4xl leading-tight text-surface-900 text-balance">
               Tu bienestar solo lo ves tú. <span class="text-brand-900">La dirección, solo cifras de 5 personas o más.</span>
@@ -324,10 +341,18 @@ const estilo = (e: Record<string, string>) => e
         </div>
       </section>
 
+      <!-- 7b. Comparativa honesta -->
+      <section id="comparativa" class="scroll-mt-20 max-w-[1180px] mx-auto px-4 sm:px-6 pb-20 sm:pb-28" aria-labelledby="t-comparativa">
+        <CabeceraSeccion id="t-comparativa" etiqueta="06 · Comparación" titulo="Entre no saber nada y vigilarlo todo">
+          Tres formas de acompañar un trabajo académico, comparadas con honestidad. Sin marcas.
+        </CabeceraSeccion>
+        <div v-revelar><ComparativaHonesta /></div>
+      </section>
+
       <!-- 8. Para cada perfil: las tres personas, una junto a otra -->
       <section id="perfiles" class="scroll-mt-20 bg-papel border-y border-surface-200" aria-labelledby="t-perfiles">
         <div class="max-w-[1180px] mx-auto px-4 sm:px-6 py-20 sm:py-28">
-          <CabeceraSeccion id="t-perfiles" etiqueta="05 · Quién hace qué" titulo="Para cada perfil">
+          <CabeceraSeccion id="t-perfiles" etiqueta="07 · Quién hace qué" titulo="Para cada perfil">
             Qué hace cada persona, cuánto tiempo le lleva, qué ve y qué no ve.
           </CabeceraSeccion>
           <TarjetasPerfiles />
@@ -338,7 +363,7 @@ const estilo = (e: Record<string, string>) => e
       <section id="puente" class="scroll-mt-20 max-w-[1180px] mx-auto px-4 sm:px-6 py-20 sm:py-28" aria-labelledby="t-puente">
         <div class="grid gap-12 lg:grid-cols-12">
           <div v-revelar class="lg:col-span-5">
-            <p class="text-xs font-semibold uppercase tracking-[0.16em] text-brand-900">06 · Doctorado</p>
+            <p class="text-xs font-semibold uppercase tracking-[0.16em] text-brand-900">08 · Doctorado</p>
             <h2 id="t-puente" class="mt-3 font-display text-4xl sm:text-5xl font-semibold tracking-tight text-surface-900">Puente al doctorado</h2>
             <p class="mt-6 text-lg leading-relaxed">
               Si el estudiante lo activa, los plazos de las convocatorias predoctorales y de admisión al doctorado llegan a la tutoría.
@@ -366,7 +391,7 @@ const estilo = (e: Record<string, string>) => e
       <!-- 10. Dirección: dos tarjetas idénticas -->
       <section id="direccion" class="scroll-mt-20 bg-papel border-y border-surface-200" aria-labelledby="t-direccion">
         <div class="max-w-[1180px] mx-auto px-4 sm:px-6 py-20 sm:py-28">
-          <CabeceraSeccion id="t-direccion" etiqueta="07 · Equipo" titulo="Dirección" />
+          <CabeceraSeccion id="t-direccion" etiqueta="09 · Equipo" titulo="Dirección" />
           <ul class="grid gap-6 md:grid-cols-2 auto-rows-fr">
             <li v-for="(m, i) in DIRECCION" :key="m.nombre" v-revelar="i" v-cursor="'inclinar'" class="rounded-[var(--radius-md)]"><TarjetaDireccion :miembro="m" /></li>
           </ul>
@@ -381,7 +406,7 @@ const estilo = (e: Record<string, string>) => e
       <section id="preguntas" class="scroll-mt-20 max-w-[1180px] mx-auto px-4 sm:px-6 py-20 sm:py-28" aria-labelledby="t-preguntas">
         <div class="grid gap-10 lg:grid-cols-12">
           <div v-revelar class="lg:col-span-4 lg:sticky lg:top-28 self-start">
-            <p class="text-xs font-semibold uppercase tracking-[0.16em] text-brand-900">08 · Dudas</p>
+            <p class="text-xs font-semibold uppercase tracking-[0.16em] text-brand-900">10 · Dudas</p>
             <h2 id="t-preguntas" class="mt-3 font-display text-4xl sm:text-5xl font-semibold tracking-tight text-surface-900">Preguntas frecuentes</h2>
             <p class="mt-4 texto-suave">Y si no está aquí, <a href="#contacto" class="enlace">escríbenos</a>.</p>
           </div>
@@ -393,7 +418,7 @@ const estilo = (e: Record<string, string>) => e
       <section id="contacto" class="scroll-mt-20 bg-papel border-y border-surface-200" aria-labelledby="t-contacto">
         <div class="max-w-[1180px] mx-auto px-4 sm:px-6 py-20 sm:py-28 grid gap-10 lg:grid-cols-12">
           <div v-revelar class="lg:col-span-4">
-            <p class="text-xs font-semibold uppercase tracking-[0.16em] text-brand-900">09 · Escríbenos</p>
+            <p class="text-xs font-semibold uppercase tracking-[0.16em] text-brand-900">11 · Escríbenos</p>
             <h2 id="t-contacto" class="mt-3 font-display text-4xl sm:text-5xl font-semibold tracking-tight text-surface-900">Contacto</h2>
             <p class="mt-4 text-lg leading-relaxed">Si te interesa SINTONÍA para tu máster, programa o escuela de doctorado, o tienes cualquier duda.</p>
           </div>

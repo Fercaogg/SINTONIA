@@ -38,6 +38,7 @@ const ICONOS = { estudiante: 'person', tutor: 'users', direccion: 'chart', inves
             <li class="flex gap-2"><AppIcon name="history" :size="18" class="mt-0.5 shrink-0 text-brand-900" />Se reinicia cada noche: puedes probarlo todo.</li>
             <li class="flex gap-2"><AppIcon name="person" :size="18" class="mt-0.5 shrink-0 text-brand-900" />Solo nombres inventados.</li>
           </ul>
+          <RouterLink to="/demo/recorrido" class="btn-primary mt-8 px-6 py-3">¿Primera vez? Haz el recorrido guiado (60 s)</RouterLink>
           <div class="mt-10"><OndasSintonia :desfase="0.6" :alto="70" /></div>
         </div>
 
