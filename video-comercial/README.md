@@ -29,6 +29,20 @@ python3 musica/componer.py
 ffmpeg -y -i assets/music/sintonia-bgm.wav -af loudnorm=I=-15:TP=-1.2:LRA=7 -ar 48000 -b:a 256k assets/music/sintonia-bgm.mp3
 ```
 
+## Voz
+
+Locución en español generada en local con Kokoro (voz `ef_dora`, `npx hyperframes tts`): una frase por plano, en `assets/voice/vo-01.wav` … `vo-16.wav`, normalizadas a −16 LUFS. La música baja a 0,32 mientras habla la voz (automatización de volumen en `#music`). Para cambiar el texto, edita `LINES` en `musica/voz.py` y ejecuta:
+
+```bash
+pip install kokoro-onnx soundfile
+```
+
+```bash
+python3 musica/voz.py
+```
+
+El script regenera las frases, las coloca en `index.html` sin que se pisen y reescribe la automatización de la música.
+
 ## Alternativa: pista del catálogo HeyGen
 
 Desde esta carpeta (la que contiene `index.html`):
@@ -68,6 +82,9 @@ npx hyperframes preview
 ```
 anadir-musica.mjs           sustituye la música por una del catálogo HeyGen (opcional)
 musica/componer.py          compositor de la banda sonora original
+musica/voz.py               genera y coloca la locución
+musica/tiempos.py           réplica de la rejilla de tiempos (SX.QM)
+assets/voice/               locución, una frase por plano
 assets/music/               sintonia-bgm.mp3
 index.html                  raíz: fuentes, GSAP, helpers y las 8 escenas montadas
 assets/js/gsap.min.js       GSAP 3.14.2 (local, sin CDN)
