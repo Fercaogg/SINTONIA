@@ -131,6 +131,8 @@ export function crearServidor({ baseDeDatos = 'sintonia_local', urlApp = 'http:/
   }
 
   async function auth(req, res, ruta, url) {
+    // Comprobación de salud (página /estado), como la de Supabase.
+    if (ruta === '/auth/v1/health' && req.method === 'GET') return responder(res, 200, { name: 'GoTrue', description: 'local' })
     if (ruta === '/auth/v1/otp' && req.method === 'POST') {
       const { email, data, create_user } = await leerCuerpo(req)
       let u = await usuarioPorEmail(email)

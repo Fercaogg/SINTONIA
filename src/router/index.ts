@@ -30,6 +30,10 @@ const routes: RouteRecordRaw[] = [
   { path: '/investigacion', component: () => import('@/views/InvestigacionPublicaView.vue'), meta: { publica: true, titulo: 'La investigación' } },
   { path: '/demo', component: () => import('@/views/DemoView.vue'), meta: { publica: true, titulo: 'Demostración' } },
   { path: '/cookies', component: () => import('@/views/legal/CookiesView.vue'), meta: { publica: true, titulo: 'Cookies' } },
+  { path: '/seguridad', component: () => import('@/views/confianza/SeguridadView.vue'), meta: { publica: true, titulo: 'Seguridad' } },
+  { path: '/accesibilidad', component: () => import('@/views/confianza/AccesibilidadView.vue'), meta: { publica: true, titulo: 'Declaración de accesibilidad' } },
+  { path: '/novedades', component: () => import('@/views/confianza/NovedadesView.vue'), meta: { publica: true, titulo: 'Novedades' } },
+  { path: '/estado', component: () => import('@/views/confianza/EstadoView.vue'), meta: { publica: true, titulo: 'Estado de la plataforma' } },
   { path: '/consentimiento/aceptar', component: () => import('@/views/acceso/ConsentimientoView.vue'), meta: { titulo: 'Consentimiento informado' } },
   {
     path: '/estudiante',

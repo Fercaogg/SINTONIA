@@ -46,7 +46,7 @@
       ]
     },
     {
-      "source": "/((?!api/|robots\\.txt$|sitemap\\.xml$|og\\.png$|favicon\\.svg$|assets/|$|como-funciona$|acceso$|registro$|privacidad$|aviso-legal$|cookies$|consentimiento$|investigacion$|demo$).*)",
+      "source": "/((?!api/|robots\\.txt$|sitemap\\.xml$|og\\.png$|favicon\\.svg$|assets/|$|como-funciona$|acceso$|registro$|privacidad$|aviso-legal$|cookies$|consentimiento$|investigacion$|demo$|seguridad$|accesibilidad$|novedades$|estado$).*)",
       "headers": [
         {
           "key": "X-Robots-Tag",

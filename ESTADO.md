@@ -12,10 +12,10 @@ En la columna "Qué hay hoy" está lo que he comprobado. En "Qué haré", lo que
 
 | # | Punto | Estado | Qué hay hoy | Qué haré |
 |---|---|---|---|---|
-| 1.1 | Página /seguridad | **A medias** | No hay página /seguridad. Las piezas existen en otros sitios: la región está confirmada en Supabase (eu-central-1, Fráncfort) y ya se dice en /como-funciona; el bienestar se guarda cifrado con la clave en Supabase Vault; la tabla "Quién ve qué" está en /como-funciona; el borrado se pide desde Mi cuenta | Crear /seguridad reuniendo todo, con "Última revisión" y enlaces. Copias de seguridad: dependen del plan de Supabase, que no puedo comprobar desde aquí **(dato tuyo)**; mientras tanto, texto digno |
-| 1.2 | Declaración de accesibilidad (/accesibilidad) | **No existe** | Sí hay base para escribirla: revisión automática (axe) sin errores en todas las páginas públicas y del panel, en claro y en oscuro, y Lighthouse 100 en accesibilidad en la portada | Crear la página con el nivel real (WCAG 2.2 AA, "parcialmente conforme" mientras no haya una revisión manual completa), limitaciones conocidas y contacto ferca@usal.es |
-| 1.3 | Página /novedades | **No existe** | El historial de git tiene 44 cambios con fecha desde el 12/11/2026; la versión es la 0.1.0 | Crear la página con el historial real agrupado por fecha y versión, una línea por mejora |
-| 1.4 | Página /estado | **No existe** | No hay ninguna comprobación de salud del servidor | Crear `api/estado` (comprueba la función y la base de datos sin datos personales) y la página /estado que la consulta. Sin servicios externos |
+| 1.1 | Página /seguridad | **Hecho** | /seguridad: región en la UE (comprobada), cifrado, quién accede a qué (enlace a "Quién ve qué"), cómo se entra, borrado paso a paso y "Última revisión". Las copias de seguridad salen con el texto digno hasta confirmar el plan de Supabase (PENDIENTES.md) | |
+| 1.2 | Declaración de accesibilidad (/accesibilidad) | **Hecho** | /accesibilidad: "parcialmente conforme" con WCAG 2.2 AA, cómo se ha revisado, qué está pensado, limitaciones conocidas y contacto. La revisión automática incluye ahora también los criterios de WCAG 2.2 | |
+| 1.3 | Página /novedades | **Hecho** | /novedades con versiones 0.1.0 a 0.4.0 sacadas del historial de git; la versión actual es la de package.json (lo comprueba un test) y sale en el pie | |
+| 1.4 | Página /estado | **Hecho** | `api/estado` comprueba servidor, base de datos (función `servicio_estado`, sin datos) y acceso; /estado lo muestra y permite volver a comprobar. Sin servicios externos | |
 
 ## Fase 2. Entender el producto sin explicarlo
 
@@ -68,10 +68,10 @@ En la columna "Qué hay hoy" está lo que he comprobado. En "Qué haré", lo que
 
 | Estado | Puntos |
 |---|---|
-| Hecho | 1 (modo oscuro) |
-| A medias | 10 |
-| No existe | 11 |
+| Hecho | 5 (Fase 1 completa y modo oscuro) |
+| A medias | 9 |
+| No existe | 8 |
 
 **Orden propuesto:** las fases en el orden de la lista. Al terminar cada una: pruebas, revisión en móvil (360 px) y escritorio, capturas en docs/capturas y tu visto bueno.
 
-**Espero tu aprobación de este documento antes de empezar la Fase 1.**
+**Fase 1 terminada el 15/11/2026.** Pruebas, capturas en docs/capturas (movil y escritorio, prefijo `fase1-`) y pendiente de tu visto bueno antes de la Fase 2.

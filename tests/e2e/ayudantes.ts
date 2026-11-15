@@ -69,11 +69,11 @@ export async function salir(page: Page) {
   await page.evaluate(() => localStorage.clear())
 }
 
-/** Revisión automática de accesibilidad (WCAG 2.1 A y AA) con axe. */
+/** Revisión automática de accesibilidad (WCAG 2.0, 2.1 y 2.2, A y AA) con axe. */
 export async function sinErroresDeAccesibilidad(page: Page) {
   // El logotipo queda fuera: las WCAG (1.4.3) no exigen contraste a los logotipos.
   const r = await new AxeBuilder({ page })
-    .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'])
+    .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa'])
     .exclude('[data-logotipo]')
     .analyze()
   expect(r.violations.map((v) => `${v.id}: ${v.help} -> ${v.nodes.map((n) => n.target.join(' ')).join(' | ')}`)).toEqual([])

@@ -51,6 +51,14 @@ Todo lo que SINTONÍA necesita y que no se puede inventar. En la aplicación, ca
 | Proyectos de Supabase (real y demostración) y de Vercel | Publicación (README, apartados 3 y 5) | Fernando |
 | Primera prueba en el proyecto real de Supabase: registro con enlace por correo, borrado de una cuenta de prueba y una semana completa con el cierre automático | Comprobación final antes del piloto | Fernando, con Claude |
 
+## Confianza (Fase 1 de las mejoras)
+
+| Dato | Dónde se usa | Quién lo aporta |
+|---|---|---|
+| Copias de seguridad de la base de datos: frecuencia y cuánto tiempo se guardan (depende del plan de Supabase) | /seguridad, apartado "Copias de seguridad" | Fernando |
+| Revisión manual de accesibilidad con lectores de pantalla (NVDA o VoiceOver, y TalkBack en el móvil) antes del piloto; al hacerla, actualizar /accesibilidad | /accesibilidad | Fernando (o el servicio de accesibilidad de la USAL), con Claude |
+| Volver a revisar /seguridad y /accesibilidad cuando cambie algo y actualizar su fecha | `src/contenido/confianza.ts` | Claude |
+
 ## Diseño
 
 | Dato | Dónde se usa | Quién lo aporta |

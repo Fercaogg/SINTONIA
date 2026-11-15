@@ -131,7 +131,7 @@ test('el investigador crea un máster y códigos', async ({ page }, info) => {
 })
 
 test('las pantallas públicas no se salen por los lados y pasan la revisión de accesibilidad', async ({ page }) => {
-  for (const ruta of ['/', '/como-funciona', '/acceso', '/registro', '/privacidad', '/aviso-legal', '/cookies', '/consentimiento', '/no-existe']) {
+  for (const ruta of ['/', '/como-funciona', '/acceso', '/registro', '/privacidad', '/aviso-legal', '/cookies', '/consentimiento', '/seguridad', '/accesibilidad', '/novedades', '/estado', '/no-existe']) {
     await page.goto(ruta)
     await page.waitForLoadState('networkidle')
     const desborde = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)
@@ -141,7 +141,7 @@ test('las pantallas públicas no se salen por los lados y pasan la revisión de 
 })
 
 test('las páginas públicas nunca muestran "[PENDIENTE]" y enlazan las páginas legales', async ({ page }) => {
-  for (const ruta of ['/', '/como-funciona', '/investigacion', '/privacidad', '/aviso-legal', '/cookies', '/consentimiento', '/acceso', '/registro']) {
+  for (const ruta of ['/', '/como-funciona', '/investigacion', '/privacidad', '/aviso-legal', '/cookies', '/consentimiento', '/acceso', '/registro', '/seguridad', '/accesibilidad', '/novedades', '/estado']) {
     await page.goto(ruta)
     await page.waitForLoadState('networkidle')
     const texto = await page.locator('body').innerText()
@@ -150,8 +150,8 @@ test('las páginas públicas nunca muestran "[PENDIENTE]" y enlazan las páginas
   }
   await page.goto('/como-funciona')
   await expect(page.getByText('En elaboración. Pendiente de revisión por el Comité de Ética de la Universidad de Salamanca.').first()).toBeVisible()
-  const pie = page.getByRole('navigation', { name: 'Información legal' })
-  for (const enlace of ['Privacidad', 'Aviso legal', 'Cookies', 'Consentimiento']) {
+  const pie = page.getByRole('navigation', { name: 'Información del proyecto' })
+  for (const enlace of ['Privacidad', 'Aviso legal', 'Cookies', 'Consentimiento', 'Seguridad', 'Accesibilidad', 'Novedades', 'Estado de la plataforma']) {
     await expect(pie.getByRole('link', { name: enlace })).toBeVisible()
   }
   await expect(page.getByText('Prototipo del Trabajo Fin de Máster de Fernando Martín Vaquero · Universidad de Salamanca')).toBeVisible()
