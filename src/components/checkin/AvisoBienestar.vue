@@ -19,13 +19,14 @@ const urlValida = computed(() => !!props.url && /^https?:\/\//.test(props.url))
         <p class="font-semibold text-surface-900">Gracias por decirlo</p>
         <p class="texto-suave mt-1 leading-relaxed">
           Si te apetece hablar con alguien, el servicio de atención psicológica
-          de la Universidad puede ayudarte. Esta respuesta no se envía a nadie.
+          de la Universidad puede ayudarte, y es gratuito. Esta respuesta no se envía a nadie.
         </p>
         <a v-if="urlValida" :href="url!" target="_blank" rel="noopener" class="btn-secondary text-sm mt-3">
           Servicio de atención psicológica
           <span class="sr-only">(se abre en otra pestaña)</span>
         </a>
         <p v-else class="mt-3"><Pendiente :texto="url" /></p>
+        <p class="texto-suave mt-3 leading-relaxed">Si es una urgencia, llama al 112.</p>
       </div>
     </div>
   </div>

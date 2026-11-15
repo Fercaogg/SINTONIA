@@ -30,13 +30,11 @@ Todo lo que SINTONÍA necesita y que no se puede inventar. En la aplicación, ca
 
 | Dato | Dónde se usa | Dónde se cambia | Quién lo aporta |
 |---|---|---|---|
-| URL oficial del servicio de atención psicológica de la USAL | Mensaje del check-in cuando el bienestar es 1 o 2 | `configuracion > url_servicio_psicologico` | Fernando |
-| Convocatorias (FPU, FPI, contratos predoctorales de la USAL y de la Junta de Castilla y León, admisión al doctorado): organismo, fechas, enlace oficial y estado | Puente al doctorado | Investigación > Convocatorias | Fernando |
+| Convocatorias de 2027 (FPU, FPI, contratos predoctorales de la USAL y de la Junta de Castilla y León, admisión al doctorado): fechas y enlace oficial cuando se publiquen. Las de 2026 ya están comprobadas en docs/FUENTES-OFICIALES.md | Puente al doctorado | Investigación > Convocatorias | Fernando (Claude puede comprobarlas cuando salgan) |
 | Fecha de inicio del piloto y días de apertura y cierre de cada semana | Calendario | Investigación > Calendario del estudio | Fernando |
 | Nombres de los dos másteres del piloto | Alta de másteres | Investigación > Másteres y códigos | Fernando |
 | Dominios de correo admitidos (ahora solo `usal.es`; ¿hay otro para estudiantes?) | Registro | `configuracion > dominios_permitidos` | Fernando |
 | Correo de la persona investigadora que administrará SINTONÍA | Alta inicial | README, apartado 4.1 | Fernando |
-| Revisar la normativa de doctorado antes de usar SINTONÍA con tesis (en especial, la figura del tutor frente a la del director) | Uso con tesis doctorales | NORMATIVA.md, apartado 4 | Fernando |
 
 ## Servicios y despliegue
 

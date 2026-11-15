@@ -3,8 +3,8 @@
 // Así no hace falta copiar ninguna clave secreta: se ejecuta dentro de Vercel.
 //
 //   - Protegida con INSTALAR_SECRETO (Authorization: Bearer ...).
-//   - Solo instala si la base de datos está vacía: si ya hay instalación, no
-//     toca nada.
+//   - Solo instala si la base de datos está vacía. Si ya hay instalación,
+//     solo aplica supabase/actualizaciones.sql (cambios idempotentes).
 //   - Opcional: { "investigador": "correo" } autoriza a esa persona como
 //     investigador (sin duplicados).
 //   - Responde la región del servidor de la base de datos (para comprobar
@@ -47,6 +47,10 @@ export async function POST(request: Request): Promise<Response> {
       const sql = readFileSync(join(process.cwd(), 'supabase', 'instalacion-completa.sql'), 'utf8')
       await bd.query(sql)
       instaladaAhora = true
+    } else {
+      // Ya instalada: se aplican las actualizaciones idempotentes (datos
+      // comprobados después de la instalación, como enlaces oficiales).
+      await bd.query(readFileSync(join(process.cwd(), 'supabase', 'actualizaciones.sql'), 'utf8'))
     }
     if (entrada.data.investigador) {
       await bd.query(

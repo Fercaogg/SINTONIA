@@ -3963,3 +3963,15 @@ revoke all on function public.revocar_codigo(text), public.servicio_limitar(text
 grant execute on function public.revocar_codigo(text) to authenticated;
 grant execute on function public.servicio_limitar(text, jsonb, integer, integer), public.servicio_autorizar_registro(text, text)
   to service_role;
+
+-- ===========================================================================
+-- 20261120000100_servicio_psicologico.sql
+-- ===========================================================================
+
+-- Enlace oficial del servicio de atención psicológica de la USAL (gratuito
+-- para la comunidad universitaria), comprobado el 15/11/2026 en
+-- https://asuntossociales.usal.es/atencion-psicologica/
+-- Solo sustituye el texto provisional: si alguien ya puso otro enlace, se respeta.
+update public.configuracion
+set valor = 'https://asuntossociales.usal.es/atencion-psicologica/', pendiente = false
+where clave = 'url_servicio_psicologico' and valor like '[PENDIENTE%';

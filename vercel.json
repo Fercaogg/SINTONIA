@@ -71,7 +71,7 @@
   ],
   "functions": {
     "api/instalar.ts": {
-      "includeFiles": "supabase/instalacion-completa.sql",
+      "includeFiles": "supabase/*.sql",
       "maxDuration": 120
     },
     "api/reiniciar-demo.ts": {

@@ -47,7 +47,7 @@ Para el apartado CTS: la normativa ya define la tutoría como acompañamiento. S
 
 Para que SINTONÍA sirva también en tesis doctorales:
 
-- **Términos.** Cuando el programa es de doctorado (tipo de trabajo `TESIS`), la interfaz dice "director/a de tesis" en lugar de "tutor/a", "doctorando/a" en lugar de "estudiante" y "codirección" en lugar de "cotutoría". **A revisar:** el Real Decreto 99/2011 distingue entre tutor y director de tesis. SINTONÍA trata como "director/a" a la persona que acompaña la investigación, y con la codirección cabe un segundo director. Si en algún programa el tutor debe participar aparte, puede añadirse como cotutor.
+- **Términos.** Cuando el programa es de doctorado (tipo de trabajo `TESIS`), la interfaz dice "director/a de tesis" en lugar de "tutor/a", "doctorando/a" en lugar de "estudiante" y "codirección" en lugar de "cotutoría". **Revisado el 15/11/2026** (docs/FUENTES-OFICIALES.md, apartado 3): el Real Decreto 99/2011 distingue entre tutor y director de tesis, pero en la USAL, si el director forma parte del programa y tiene contrato con la Universidad, hace también de tutor (Reglamento de Doctorado, art. 13.5). Por eso SINTONÍA trata como "director/a" a quien acompaña la investigación; si el tutor es otra persona, puede añadirse como cotutor. El reglamento admite hasta tres directores (art. 14.5); SINTONÍA, dos.
 - **Puente al doctorado.** La pantalla muestra la normativa oficial del doctorado, y el organismo de la convocatoria de admisión es la Universidad de Salamanca (Escuela de Doctorado "Studii Salamantini"). Los enlaces se cambian en la tabla `enlaces_normativa`.
 
 Normativa de doctorado facilitada (enlaces oficiales, sin leer):

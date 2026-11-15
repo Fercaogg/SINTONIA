@@ -22,9 +22,10 @@ test('el estudiante hace su check-in con 4 toques y un botón, en menos de 60 se
   await grupos.nth(2).getByRole('radio', { name: /^5/ }).click()
   await grupos.nth(3).getByRole('radio', { name: '2' }).click()
 
-  // Bienestar bajo: mensaje amable y enlace al servicio (pendiente de URL).
+  // Bienestar bajo: mensaje amable, enlace oficial al servicio y el 112 para urgencias.
   await expect(page.getByText('Gracias por decirlo')).toBeVisible()
-  await expect(page.getByText('[PENDIENTE: URL oficial del servicio')).toBeVisible()
+  await expect(page.getByRole('link', { name: /Servicio de atención psicológica/ })).toHaveAttribute('href', 'https://asuntossociales.usal.es/atencion-psicologica/')
+  await expect(page.getByText('Si es una urgencia, llama al 112.')).toBeVisible()
 
   // Un único botón de envío.
   const enviar = page.getByRole('button', { name: /^(Enviar|Guardar cambios)$/ })
