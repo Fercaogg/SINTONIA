@@ -9,8 +9,9 @@ El vídeo está hecho con **Remotion**: cada escena es un archivo de texto (cód
 | `STORYBOARD.pdf` | El storyboard aprobado (primera fase). |
 | `LOCUCION.md` | El texto de la voz, frase a frase, con sus tiempos. |
 | `SUBTITULOS.srt` | Los subtítulos en archivo aparte. |
-| `out/sintonia.mp4` | El vídeo horizontal (1920 × 1080). Se crea al exportar. |
-| `out/sintonia-vertical.mp4` | El vídeo vertical (1080 × 1920). Se crea al exportar. |
+| `entrega/` | Los vídeos terminados (horizontal y vertical) y los subtítulos. |
+| `out/sintonia.mp4` | El vídeo horizontal recién exportado. Se crea al exportar. |
+| `out/sintonia-vertical.mp4` | El vídeo vertical recién exportado. Se crea al exportar. |
 
 ## Dónde se cambia cada cosa
 

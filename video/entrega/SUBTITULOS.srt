@@ -1,0 +1,183 @@
+1
+00:00:08,600 --> 00:00:11,560
+Lucía está haciendo su Trabajo Fin de Máster.
+
+2
+00:00:11,600 --> 00:00:13,360
+Cree que va bien.
+
+3
+00:00:13,400 --> 00:00:15,940
+Su tutor cree que va retrasada.
+
+4
+00:00:16,000 --> 00:00:19,013
+Ninguno de los dos lo dice, y cuando por fin lo descubren,
+
+5
+00:00:19,053 --> 00:00:21,350
+quedan pocas semanas para la entrega.
+
+6
+00:00:21,600 --> 00:00:23,321
+Le pasa a muchos estudiantes:
+
+7
+00:00:23,361 --> 00:00:26,990
+la tutoría funciona mejor cuando los dos ven lo mismo.
+
+8
+00:00:28,500 --> 00:00:31,511
+SINTONÍA es muy sencilla: una vez a la semana, Lucía
+
+9
+00:00:31,551 --> 00:00:35,070
+y su tutor cuentan, por separado, cómo ven el trabajo.
+
+10
+00:00:35,200 --> 00:00:36,960
+Un minuto ella.
+
+11
+00:00:37,000 --> 00:00:39,090
+Treinta segundos él.
+
+12
+00:00:40,000 --> 00:00:43,970
+El lunes, en el autobús, Lucía recibe un aviso.
+
+13
+00:00:45,100 --> 00:00:46,980
+Cuatro preguntas, una por pantalla,
+
+14
+00:00:47,020 --> 00:00:49,290
+con botones grandes para el pulgar.
+
+15
+00:00:50,800 --> 00:00:54,160
+La última es solo para ella: cómo se siente.
+
+16
+00:00:54,200 --> 00:00:56,910
+Esa respuesta no la ve nadie más.
+
+17
+00:00:57,000 --> 00:00:59,240
+En menos de un minuto, listo.
+
+18
+00:00:59,300 --> 00:01:02,830
+Y si se queda sin cobertura, se envía sola después.
+
+19
+00:01:04,000 --> 00:01:07,120
+Su tutor hace lo mismo, entre dos clases.
+
+20
+00:01:07,300 --> 00:01:09,999
+Ve a todos sus estudiantes en una sola pantalla
+
+21
+00:01:10,039 --> 00:01:12,020
+y marca cómo los ve avanzar.
+
+22
+00:01:12,400 --> 00:01:14,320
+Treinta segundos.
+
+23
+00:01:16,000 --> 00:01:17,779
+Si las dos miradas no coinciden,
+
+24
+00:01:17,819 --> 00:01:20,053
+SINTONÍA lo detecta con reglas sencillas
+
+25
+00:01:20,093 --> 00:01:24,650
+y les propone a los dos las mismas tres preguntas para su próxima tutoría.
+
+26
+00:01:24,700 --> 00:01:26,540
+Preguntas neutras, sin culpables,
+
+27
+00:01:26,580 --> 00:01:28,640
+para hablar de lo que importa.
+
+28
+00:01:30,500 --> 00:01:32,693
+La víspera, Lucía repasa las preguntas
+
+29
+00:01:32,733 --> 00:01:35,080
+y añade lo que ella quiere tratar.
+
+30
+00:01:37,200 --> 00:01:39,205
+Al salir de la reunión, dos toques:
+
+31
+00:01:39,245 --> 00:01:42,340
+si hablaron de las preguntas y si le sirvieron.
+
+32
+00:01:44,000 --> 00:01:46,562
+SINTONÍA no pone notas, no compara a nadie
+
+33
+00:01:46,602 --> 00:01:48,760
+y no te pide subir tu trabajo.
+
+34
+00:01:48,800 --> 00:01:50,741
+Tu tutor no ve tus respuestas:
+
+35
+00:01:50,781 --> 00:01:53,640
+solo las tres preguntas que compartís.
+
+36
+00:01:53,700 --> 00:01:56,828
+Y la dirección del máster solo ve cómo va el grupo,
+
+37
+00:01:56,868 --> 00:01:58,960
+nunca a una persona concreta.
+
+38
+00:01:59,000 --> 00:02:02,870
+Si algún día necesitas ayuda, un botón te lleva a ella.
+
+39
+00:02:04,000 --> 00:02:05,833
+Además, Lucía ve sus hitos del TFM,
+
+40
+00:02:05,873 --> 00:02:09,204
+acuerda con su tutor desde el primer día qué espera cada uno y,
+
+41
+00:02:09,244 --> 00:02:10,809
+si quiere seguir investigando,
+
+42
+00:02:10,849 --> 00:02:13,660
+recibe avisos de las ayudas para el doctorado.
+
+43
+00:02:17,300 --> 00:02:18,810
+SINTONÍA.
+
+44
+00:02:18,900 --> 00:02:20,759
+Para que estudiante y tutor vayan,
+
+45
+00:02:20,799 --> 00:02:22,880
+por fin, en la misma dirección.
+
+46
+00:02:23,000 --> 00:02:25,250
+Acompañar sin vigilar.
