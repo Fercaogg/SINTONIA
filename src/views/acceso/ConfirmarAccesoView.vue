@@ -39,7 +39,7 @@ onMounted(async () => {
   const token_hash = String(route.query.token_hash || '')
   const tipo = String(route.query.type || 'email') as 'email' | 'signup' | 'magiclink'
   if (!token_hash) {
-    error.value = 'El enlace no es válido.'
+    error.value = 'Este enlace no funciona. Pide uno nuevo desde la pantalla de acceso.'
     return
   }
   const { error: e } = await supabase.auth.verifyOtp({ token_hash, type: tipo })

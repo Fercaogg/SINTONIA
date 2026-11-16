@@ -46,7 +46,7 @@ const { t } = useTerminos()
 
     <EstadoCarga v-if="cargando" />
     <AvisoError v-else-if="error" :mensaje="error" />
-    <EstadoVacio v-else-if="codigos.length === 0" icono="key" titulo="No te quedan códigos libres" texto="Pide más a la persona responsable del estudio." />
+    <EstadoVacio v-else-if="codigos.length === 0" icono="key" titulo="Ya has repartido todos tus códigos" texto="Si necesitas más, escribe a la persona responsable del estudio y te enviará otros." />
     <ul v-else class="grid gap-3 sm:grid-cols-2">
       <li v-for="c in codigos" :key="c.codigo" class="card p-4 flex items-center justify-between gap-3">
         <span class="min-w-0">

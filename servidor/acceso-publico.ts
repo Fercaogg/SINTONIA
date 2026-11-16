@@ -38,9 +38,9 @@ export const LIMITES = {
 } as const
 
 export const MENSAJES = {
-  datos: 'Revisa los datos del formulario.',
+  datos: 'Algún dato del formulario no encaja. Revísalo y vuelve a enviarlo.',
   registro: 'No hemos podido completar el registro. Revisa el código y que el correo sea el institucional de la Universidad.',
-  demasiados: 'Has hecho demasiados intentos. Espera unos minutos y vuelve a probarlo.',
+  demasiados: 'Ha habido demasiados intentos seguidos. Espera unos minutos y vuelve a probarlo.',
   servicio: 'No hemos podido enviar el correo. Inténtalo de nuevo en unos minutos.',
   sinCorreo: 'Ahora mismo el formulario no puede enviar correos. Puedes escribirnos directamente.',
 } as const
