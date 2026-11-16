@@ -33,7 +33,7 @@ export const GUION: EscenaGuion[] = [
     locucion: 'La víspera, Lucía repasa las preguntas y añade lo que ella quiere tratar. Al salir de la reunión, dos toques: si hablaron de las preguntas y si le sirvieron.',
     movimiento: 'La cámara recorre tres momentos de izquierda a derecha: la víspera (Lucía añade su punto), la tutoría vista desde arriba y la salida (dos toques en el móvil).' },
   { n: 8, titulo: 'Acompañar sin vigilar', inicio: 115, fin: 132, textos: ['Sin notas.', 'Sin rankings.', 'Sin subir tu trabajo.', 'Tu bienestar, solo para ti.'],
-    locucion: 'SINTONÍA no pone notas, no compara a nadie y no te pide subir tu trabajo. Tu tutor ve cómo avanza tu TFM, no cómo te sientes. Y la dirección del máster solo ve cómo va el grupo, nunca a una persona concreta. Si algún día necesitas ayuda, un botón te lleva a ella.',
+    locucion: 'SINTONÍA no pone notas, no compara a nadie y no te pide subir tu trabajo. Tu tutor no ve tus respuestas: solo las tres preguntas que compartís. Y la dirección del máster solo ve cómo va el grupo, nunca a una persona concreta. Si algún día necesitas ayuda, un botón te lleva a ella.',
     movimiento: 'La tabla se ilumina fila a fila. Sobre "Cómo se siente" se cierran dos candados. En la columna de la dirección aparece un gráfico de grupo.' },
   { n: 9, titulo: 'Y además', inicio: 132, fin: 144, textos: ['Hitos del TFM.', 'Expectativas claras desde el primer día.', 'Avisos de ayudas para seguir investigando, si te interesa.'],
     locucion: 'Además, Lucía ve sus hitos del TFM, acuerda con su tutor desde el primer día qué espera cada uno y, si quiere seguir investigando, recibe avisos de las ayudas para el doctorado.',

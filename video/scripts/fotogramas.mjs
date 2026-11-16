@@ -1,21 +1,18 @@
-// Dibuja las imágenes fijas del storyboard en out/storyboard/.
-import { bundle } from '@remotion/bundler'
+// Saca imágenes fijas del vídeo en out/storyboard/.
+// Sin argumentos: las del storyboard (scripts/fotogramas.json).
+// Con segundos (por ejemplo: node scripts/fotogramas.mjs 3.5 12): esos instantes.
 import { renderStill, selectComposition } from '@remotion/renderer'
-import { existsSync, mkdirSync } from 'node:fs'
+import { mkdirSync, readFileSync } from 'node:fs'
 import path from 'node:path'
-import { fileURLToPath } from 'node:url'
+import { raiz, browserExecutable, empaquetar } from './comun.mjs'
 
-const raiz = path.join(path.dirname(fileURLToPath(import.meta.url)), '..')
-const navegadorLocal = '/opt/pw-browsers/chromium_headless_shell-1243/chrome-headless-shell-linux64/chrome-headless-shell'
-const browserExecutable = process.env.NAVEGADOR || (existsSync(navegadorLocal) ? navegadorLocal : undefined)
-const solo = process.argv.slice(2)
-
-const serveUrl = await bundle({ entryPoint: path.join(raiz, 'src/index.ts') })
-const composition = await selectComposition({ serveUrl, id: 'Storyboard', browserExecutable })
+const args = process.argv.slice(2)
+const lista = args.length ? args.map((s) => ({ id: `t${s}`, seg: Number(s) })) : JSON.parse(readFileSync(path.join(raiz, 'scripts/fotogramas.json'), 'utf8'))
+const escala = Number(process.env.ESCALA || 1)
+const serveUrl = await empaquetar()
+const composition = await selectComposition({ serveUrl, id: 'Video', browserExecutable })
 mkdirSync(path.join(raiz, 'out/storyboard'), { recursive: true })
-for (let f = 0; f < composition.durationInFrames; f++) {
-  const nombre = String(f + 1).padStart(2, '0')
-  if (solo.length && !solo.includes(nombre)) continue
-  await renderStill({ composition, serveUrl, frame: f, output: path.join(raiz, `out/storyboard/${nombre}.png`), browserExecutable })
-  console.log('fotograma', nombre)
+for (const f of lista) {
+  await renderStill({ composition, serveUrl, frame: Math.round(f.seg * composition.fps), output: path.join(raiz, `out/storyboard/${f.id}.png`), browserExecutable, scale: escala, logLevel: 'error' })
+  console.log('imagen', f.id)
 }

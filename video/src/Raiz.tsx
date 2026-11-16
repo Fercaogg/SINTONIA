@@ -1,19 +1,18 @@
 import React from 'react'
-import { Composition, useCurrentFrame } from 'remotion'
+import { Composition } from 'remotion'
 import '@fontsource/fira-sans/300.css'
 import '@fontsource/fira-sans/400.css'
 import '@fontsource/fira-sans/500.css'
 import '@fontsource/fira-sans/600.css'
 import '@fontsource/fira-sans/700.css'
-import { FOTOGRAMAS } from './storyboard'
-
-// Storyboard: cada fotograma de esta composición es una imagen fija de una escena.
-const Storyboard: React.FC = () => {
-  const f = useCurrentFrame()
-  const F = FOTOGRAMAS[Math.min(f, FOTOGRAMAS.length - 1)].componente
-  return <F />
-}
+import { Video } from './Video'
+import { GUION, FPS, DURACION_TOTAL } from './guion'
 
 export const Raiz: React.FC = () => (
-  <Composition id="Storyboard" component={Storyboard} width={1920} height={1080} fps={30} durationInFrames={FOTOGRAMAS.length} />
+  <>
+    <Composition id="Video" component={Video} width={1920} height={1080} fps={FPS} durationInFrames={DURACION_TOTAL * FPS} defaultProps={{ subtitulos: true }} />
+    {GUION.map((e) => (
+      <Composition key={e.n} id={`Escena${String(e.n).padStart(2, '0')}`} component={Video} width={1920} height={1080} fps={FPS} durationInFrames={(e.fin - e.inicio) * FPS} defaultProps={{ escena: e.n, subtitulos: true }} />
+    ))}
+  </>
 )

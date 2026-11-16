@@ -17,8 +17,7 @@ execFileSync('node', [path.join(raiz, 'scripts/fotogramas.mjs')], { stdio: 'inhe
 mkdirSync(path.join(raiz, 'out'), { recursive: true })
 buildSync({ entryPoints: [path.join(raiz, 'src/guion.ts')], outfile: path.join(raiz, 'out/guion.mjs'), format: 'esm' })
 const { GUION, DURACION_TOTAL } = await import(pathToFileURL(path.join(raiz, 'out/guion.mjs')).href)
-const fuente = readFileSync(path.join(raiz, 'src/storyboard.tsx'), 'utf8')
-const fotogramas = [...fuente.matchAll(/id: '(\d+)', escena: (\d+)(?:, pie: '([^']*)')?/g)].map((m) => ({ id: m[1], escena: Number(m[2]), pie: m[3] }))
+const fotogramas = JSON.parse(readFileSync(path.join(raiz, 'scripts/fotogramas.json'), 'utf8'))
 
 const img = (id) => 'data:image/png;base64,' + readFileSync(path.join(raiz, `out/storyboard/${id}.png`)).toString('base64')
 const reloj = (s) => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`
