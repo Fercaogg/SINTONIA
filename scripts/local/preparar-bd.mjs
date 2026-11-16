@@ -48,7 +48,7 @@ const [codTutor] = await como(inv, `select public.crear_codigos($1, 'tutor', 1, 
 const [codDir] = await como(inv, `select public.crear_codigos($1, 'direccion', 1, null, 'Dirección de ejemplo') as r`, [master])
 const tutora = await cuenta('tutora@usal.es', { codigo: codTutor, nombre: 'Tutora de ejemplo' })
 await cuenta('direccion@usal.es', { codigo: codDir, nombre: 'Dirección de ejemplo' })
-const codsEst = await como(inv, `select public.crear_codigos($1, 'estudiante', 6, $2) as r`, [master, tutora])
+const codsEst = await como(inv, `select public.crear_codigos($1, 'estudiante', 8, $2) as r`, [master, tutora])
 if (process.env.LOCAL_CODIGOS_ARCHIVO) mkdirSync(dirname(process.env.LOCAL_CODIGOS_ARCHIVO), { recursive: true })
 if (process.env.LOCAL_CODIGOS_ARCHIVO) writeFileSync(process.env.LOCAL_CODIGOS_ARCHIVO, JSON.stringify({ estudiante: codsEst.slice(1) }))
 const ana = await cuenta('ana@usal.es', { codigo: codsEst[0], nombre: 'Ana de ejemplo' })

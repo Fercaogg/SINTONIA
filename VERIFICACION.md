@@ -75,4 +75,5 @@ Cómo se comprueba cada criterio de aceptación del encargo y qué resultado dio
 | 404 de verdad | `curl` a una dirección inventada en la web publicada; `tests/paginas.test.ts` | Cumple: código 404, "Esta página no está en sintonía" y noindex. Las pantallas de la aplicación siguen respondiendo 200 |
 | Imagen y etiquetas para compartir por página | `tests/e2e/seguridad.spec.ts`, `tests/paginas.test.ts` y `curl` a la web publicada | Cumple |
 | Cabeceras de seguridad en la web publicada | `curl -I` el 16/11/2026 | Cumple: CSP sin `unsafe-inline`, HSTS con preload, X-Frame-Options, nosniff, Referrer-Policy, Permissions-Policy y COOP |
+| Casos extremos | `tests/e2e/casos-extremos.spec.ts`: un nombre de 120 caracteres (el máximo) con palabras muy largas, en las pantallas del estudiante y de la tutora | Cumple: nada se sale por los lados a 360 px ni en escritorio |
 | Dependencias | `npm audit --omit=dev` | 0 vulnerabilidades en lo que se publica (7 moderadas solo en herramientas de desarrollo) |
