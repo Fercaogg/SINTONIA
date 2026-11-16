@@ -21,7 +21,7 @@ const Ciudad: React.FC<{ x: number }> = ({ x }) => (
 // Momentos de la escena 4 (en segundos desde que empieza).
 const AVISO = 1.9 // llega el aviso
 const TOCA_AVISO = 4.2
-const TOQUES = [8.6, 11.0, 13.2, 17.2] // cuándo toca cada respuesta
+const TOQUES = [7.4, 8.9, 10.4, 16.4] // cuándo toca cada respuesta
 const INICIO_CRONO = 5.6
 
 // 4. Lunes, 8:15, en el autobús.
@@ -66,8 +66,8 @@ export const E04: React.FC = () => {
       <Caja x={600} y={110} style={{ opacity: cambio }}><Crono>{reloj(crono)}</Crono></Caja>
       <Caja x={960} y={280} style={{ display: 'grid', gap: 44 }}>
         <Entra en={6.2} x={40} y={0}><Linea size={68}>Una pregunta por pantalla.</Linea></Entra>
-        <Entra en={11.4} x={40} y={0}><Linea size={68}>Con una mano.</Linea></Entra>
-        <Entra en={20.6} x={40} y={0}><Linea size={68}>Aunque no haya cobertura.</Linea></Entra>
+        <Entra en={8.6} x={40} y={0}><Linea size={68}>Con una mano.</Linea></Entra>
+        <Entra en={20.2} x={40} y={0}><Linea size={68}>Aunque no haya cobertura.</Linea></Entra>
       </Caja>
     </Escena>
   )
@@ -98,8 +98,8 @@ const Caminante: React.FC<{ size: number; t: number }> = ({ size, t }) => {
 }
 
 // 5. El tutor, entre dos clases.
-const FILAS = [2.6, 3.9, 5.2, 6.5, 7.8]
-const ENVIAR = 9.2
+const FILAS = [4.0, 4.8, 5.6, 6.4, 7.2]
+const ENVIAR = 8.3
 export const E05: React.FC = () => {
   const t = useT()
   const pasillo = -((t * 120) % 340)
@@ -118,8 +118,8 @@ export const E05: React.FC = () => {
         <div style={{ position: 'absolute', left: 400, top: 110 }}><Caminante size={440} t={t} /></div>
       </Entra></Caja>
       <Caja x={110} y={710} w={1100}>
-        <Entra en={3.6}><Frase size={64}>Todos sus estudiantes.</Frase></Entra>
-        <Entra en={9.6}><Frase size={64}>Una pantalla. 30 segundos.</Frase></Entra>
+        <Entra en={3.9}><Frase size={64}>Todos sus estudiantes.</Frase></Entra>
+        <Entra en={8.9}><Frase size={64}>Una pantalla. 30 segundos.</Frase></Entra>
       </Caja>
       <Caja x={1350} y={70}><Entra en={0.7} y={90} dur={0.8}><Movil w={420}><PantallaTutor toques={ESTUDIANTES.map((_, i) => toque(t, FILAS[i]))} enviar={rampa(t, ENVIAR, ENVIAR + 0.3)} /></Movil></Entra></Caja>
       <Caja x={1690} y={110}><Entra en={1.4}><Crono>{reloj(crono)}</Crono></Entra></Caja>

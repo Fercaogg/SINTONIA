@@ -10,7 +10,7 @@ const args = process.argv.slice(2)
 const lista = args.length ? args.map((s) => ({ id: `t${s}`, seg: Number(s) })) : JSON.parse(readFileSync(path.join(raiz, 'scripts/fotogramas.json'), 'utf8'))
 const escala = Number(process.env.ESCALA || 1)
 const serveUrl = await empaquetar()
-const composition = await selectComposition({ serveUrl, id: 'Video', browserExecutable })
+const composition = await selectComposition({ serveUrl, id: process.env.COMP || 'Video', browserExecutable })
 mkdirSync(path.join(raiz, 'out/storyboard'), { recursive: true })
 for (const f of lista) {
   await renderStill({ composition, serveUrl, frame: Math.round(f.seg * composition.fps), output: path.join(raiz, `out/storyboard/${f.id}.png`), browserExecutable, scale: escala, logLevel: 'error' })

@@ -3,7 +3,7 @@ import { interpolateColors } from 'remotion'
 import { Escena, Caja, Tarjeta, Frase, Etiqueta, Punto, onda, COLOR_LUCIA, COLOR_TUTOR } from '../componentes/Base'
 import { Nombre, PIEZA_ARRIBA, PIEZA_CENTRO, PIEZA_ABAJO } from '../componentes/Logo'
 import { BustoLucia, BustoTutor } from '../componentes/Figuras'
-import { Entra, useT, rampa, mezcla, VAIVEN } from '../anim'
+import { Entra, useT, rampa, mezcla, VAIVEN, VentanaActual } from '../anim'
 import { AZUL, VERDE, FONDO, BORDE, GRIS, PIZARRA, GRIS_CLARO } from '../marca'
 
 // El símbolo, pieza a pieza: cada una entra con su propio avance (0 a 1).
@@ -27,16 +27,17 @@ export const E01: React.FC = () => {
   const calma = 1 - rampa(t, 1.8, 3.5, VAIVEN) // las ondas se van calmando
   const acorde = rampa(t, 1.2, 3.2, VAIVEN) // y sus ritmos se igualan
   const lineas = 1 - rampa(t, 3.5, 3.9)
-  const arriba = rampa(t, 3.5, 4.3)
-  const abajo = rampa(t, 3.6, 4.4)
+  const abre = rampa(t, 7.1, 7.9, VAIVEN) // al final, el símbolo se abre en sus dos mitades
+  const arriba = rampa(t, 3.5, 4.3) * (1 - abre)
+  const abajo = rampa(t, 3.6, 4.4) * (1 - abre)
   return (
     <Escena>
       <svg width={1920} height={1080} style={{ position: 'absolute' }} fill="none" strokeLinecap="round">
         <path d={onda(0, mezcla(0, 800, cabeza), 538, 78 * calma, mezcla(300, 230, acorde), -t * 2.4)} stroke={COLOR_LUCIA} strokeWidth={12} opacity={lineas} />
         <path d={onda(1920, mezcla(1920, 1120, cabeza), 282, 60 * calma, mezcla(150, 230, acorde), t * 4.2)} stroke={COLOR_TUTOR} strokeWidth={12} opacity={lineas} />
-        <SimboloAnimado x={760} y={210} size={400} arriba={arriba} abajo={abajo} centro={rampa(t, 4.3, 5.0)} desdeArriba={260} desdeAbajo={-260} colorArriba={interpolateColors(arriba, [0, 1], [PIZARRA, AZUL])} />
+        <SimboloAnimado x={760} y={210} size={400} arriba={arriba} abajo={abajo} centro={rampa(t, 4.3, 5.0) * (1 - rampa(t, 6.9, 7.3))} desdeArriba={abre > 0 ? 900 : 260} desdeAbajo={abre > 0 ? -900 : -260} colorArriba={interpolateColors(arriba, [0, 1], [PIZARRA, AZUL])} />
       </svg>
-      <Caja x={0} y={690} w={1920} style={{ textAlign: 'center' }}><Entra en={5.2} dur={0.8}><Nombre size={128} /></Entra></Caja>
+      <Caja x={0} y={690} w={1920} style={{ textAlign: 'center' }}><Entra en={5.2} dur={0.8} fuera={6.9}><Nombre size={128} /></Entra></Caja>
     </Escena>
   )
 }
@@ -62,6 +63,7 @@ const Portatil: React.FC = () => (
 // 2. El problema.
 export const E02: React.FC = () => {
   const t = useT()
+  const ventana = React.useContext(VentanaActual) // en vertical, el calendario va en su propia ventana
   const choque = t > 13.2 && t < 13.9 ? Math.sin((t - 13.2) * 40) * 7 * (1 - (t - 13.2) / 0.7) : 0
   return (
     <Escena>
@@ -90,7 +92,7 @@ export const E02: React.FC = () => {
       <Caja x={1090} y={700} w={700} h={10} style={{ background: '#D5DEE2', borderRadius: 10, opacity: rampa(t, 0.6, 1.1) }} />
       <Caja x={1090} y={750} w={700} style={{ textAlign: 'center' }}><Entra en={5.8}><Frase size={56}>Él cree que va retrasada.</Frase></Entra></Caja>
       {/* Calendario: las semanas pasan hasta la entrega */}
-      <Caja x={810} y={300} w={300}><Entra en={8.8} escala={0.92}>
+      <Caja x={810} y={300} w={300} style={{ display: ventana === 0 || ventana === 1 ? 'none' : undefined }}><Entra en={8.8} escala={0.92}>
         <Tarjeta style={{ overflow: 'hidden' }}>
           <div style={{ background: AZUL, color: '#fff', fontSize: 26, fontWeight: 600, padding: '12px 0', textAlign: 'center' }}>Junio</div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7,1fr)', gap: 6, padding: 16 }}>
@@ -105,7 +107,7 @@ export const E02: React.FC = () => {
         </Tarjeta>
       </Entra></Caja>
       <Caja x={0} y={856} w={1920} style={{ textAlign: 'center' }}>
-        <Entra en={7.6} style={{ display: 'inline-block' }}><Etiqueta style={{ fontSize: 44, fontWeight: 700, padding: '14px 40px' }}>Y nadie lo dice a tiempo.</Etiqueta></Entra>
+        <Entra en={8.3} style={{ display: 'inline-block' }}><Etiqueta style={{ fontSize: 44, fontWeight: 700, padding: '14px 40px' }}>Y nadie lo dice a tiempo.</Etiqueta></Entra>
       </Caja>
     </Escena>
   )
@@ -114,25 +116,25 @@ export const E02: React.FC = () => {
 // 3. La idea.
 export const E03: React.FC = () => {
   const t = useT()
-  const vuelta = rampa(t, 2.2, 8.6, (n) => n) // el reloj da una vuelta: un minuto
+  const vuelta = rampa(t, 1.6, 7.0, (n) => n) // el reloj da una vuelta: un minuto
   const largo = 2 * Math.PI * 205
   const seg = Math.round(vuelta * 60)
-  const trazo = rampa(t, 0, 1.4, VAIVEN) * 1920
+  const p = rampa(t, 0.15, 1.6, VAIVEN) // las dos barras de la escena anterior se estiran y bajan
   return (
     <Escena>
       <svg width={1920} height={1080} style={{ position: 'absolute' }} fill="none" strokeLinecap="round">
-        <path d={onda(0, trazo, 770, 34, 420, -t * 1.2, 'no')} stroke={COLOR_LUCIA} strokeWidth={14} />
-        <path d={onda(0, trazo, 840, 34, 300, 2 - t * 1.9, 'no')} stroke={COLOR_TUTOR} strokeWidth={14} />
+        <path d={onda(mezcla(200, 0, p), mezcla(659, 1920, p), mezcla(175, 770, p), 34 * p, 420, -t * 1.2, 'no')} stroke={COLOR_LUCIA} strokeWidth={mezcla(26, 14, p)} />
+        <path d={onda(mezcla(1160, 0, p), mezcla(1412, 1920, p), mezcla(175, 840, p), 34 * p, 300, 2 - t * 1.9, 'no')} stroke={COLOR_TUTOR} strokeWidth={mezcla(26, 14, p)} />
       </svg>
       <Caja x={150} y={190} w={900}>
-        <Entra en={0.4}><Frase size={124}>Un minuto</Frase></Entra>
-        <Entra en={0.6}><Frase size={124}>a la semana.</Frase></Entra>
+        <Entra en={0.9}><Frase size={124}>Un minuto</Frase></Entra>
+        <Entra en={1.1}><Frase size={124}>a la semana.</Frase></Entra>
         <div style={{ display: 'flex', gap: 20, marginTop: 50 }}>
-          <Entra en={8.4}><Etiqueta><Punto color={COLOR_LUCIA} /> Lucía: un minuto</Etiqueta></Entra>
-          <Entra en={9.8}><Etiqueta><Punto color={COLOR_TUTOR} /> Su tutor: treinta segundos</Etiqueta></Entra>
+          <Entra en={7.2}><Etiqueta><Punto color={COLOR_LUCIA} /> Lucía: un minuto</Etiqueta></Entra>
+          <Entra en={9.0}><Etiqueta><Punto color={COLOR_TUTOR} /> Su tutor: treinta segundos</Etiqueta></Entra>
         </div>
       </Caja>
-      <Caja x={1240} y={140}><Entra en={1.0} escala={0.9}>
+      <Caja x={1240} y={140}><Entra en={1.3} escala={0.9}>
         <svg width={460} height={460} viewBox="0 0 460 460">
           <circle cx="230" cy="230" r="205" fill="#fff" stroke={BORDE} strokeWidth="18" />
           {vuelta > 0 ? <circle cx="230" cy="230" r="205" fill="none" stroke={VERDE} strokeWidth="18" strokeLinecap="round" strokeDasharray={`${largo * vuelta} ${largo}`} transform="rotate(-90 230 230)" /> : null}

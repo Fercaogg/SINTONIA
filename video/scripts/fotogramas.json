@@ -1,14 +1,65 @@
 [
-  { "id": "01", "escena": 1, "seg": 7 },
-  { "id": "02", "escena": 2, "seg": 23 },
-  { "id": "03", "escena": 3, "seg": 38.5 },
-  { "id": "04", "escena": 4, "seg": 45, "pie": "Llega el aviso" },
-  { "id": "05", "escena": 4, "seg": 57, "pie": "La pregunta que solo ve ella" },
-  { "id": "06", "escena": 4, "seg": 63, "pie": "Final" },
-  { "id": "07", "escena": 5, "seg": 76.5 },
-  { "id": "08", "escena": 6, "seg": 96 },
-  { "id": "09", "escena": 7, "seg": 113.8 },
-  { "id": "10", "escena": 8, "seg": 130.5 },
-  { "id": "11", "escena": 9, "seg": 143 },
-  { "id": "12", "escena": 10, "seg": 154 }
+ {
+  "id": "01",
+  "escena": 1,
+  "seg": 7
+ },
+ {
+  "id": "02",
+  "escena": 2,
+  "seg": 23
+ },
+ {
+  "id": "03",
+  "escena": 3,
+  "seg": 38.5
+ },
+ {
+  "id": "04",
+  "escena": 4,
+  "seg": 43.5,
+  "pie": "Llega el aviso"
+ },
+ {
+  "id": "05",
+  "escena": 4,
+  "seg": 55.0,
+  "pie": "La pregunta que solo ve ella"
+ },
+ {
+  "id": "06",
+  "escena": 4,
+  "seg": 61.5,
+  "pie": "Final"
+ },
+ {
+  "id": "07",
+  "escena": 5,
+  "seg": 74.5
+ },
+ {
+  "id": "08",
+  "escena": 6,
+  "seg": 88.5
+ },
+ {
+  "id": "09",
+  "escena": 7,
+  "seg": 102.8
+ },
+ {
+  "id": "10",
+  "escena": 8,
+  "seg": 122.0
+ },
+ {
+  "id": "11",
+  "escena": 9,
+  "seg": 134.0
+ },
+ {
+  "id": "12",
+  "escena": 10,
+  "seg": 145.5
+ }
 ]

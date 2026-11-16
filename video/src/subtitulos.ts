@@ -1,8 +1,7 @@
-import { GUION } from './guion'
+import VOZ from './voz.json'
 
-// Subtítulos: se calculan solos a partir de la locución de cada escena.
-// El tiempo de cada frase es proporcional a su longitud. Cuando haya voz grabada,
-// se podrán ajustar a mano con AJUSTES (segundos de inicio por escena y frase).
+// Subtítulos: salen solos de la locución (src/voz.json, que escribe "npm run voz").
+// Cada subtítulo dura lo que dura esa frase en la voz.
 export interface Pista { inicio: number; fin: number; texto: string }
 
 const MAX = 62 // letras por subtítulo, como mucho
@@ -17,17 +16,19 @@ function trocear(frase: string): string[] {
 
 export function pistas(): Pista[] {
   const todas: Pista[] = []
-  for (const e of GUION) {
-    if (e.locucion.startsWith('(')) continue
-    const trozos = e.locucion.split(/(?<=[.?!])\s+/).flatMap(trocear)
-    const total = trozos.reduce((s, x) => s + x.length + 8, 0)
-    let t = e.inicio + 0.4
-    const hueco = e.fin - e.inicio - 0.9
-    for (const x of trozos) {
-      const d = ((x.length + 8) / total) * hueco
-      todas.push({ inicio: t, fin: t + d - 0.08, texto: x })
+  for (const f of VOZ) {
+    const trozos = trocear(f.texto)
+    const total = trozos.reduce((s, x) => s + x.length, 0)
+    let t = f.inicio
+    trozos.forEach((x, i) => {
+      const d = (x.length / total) * f.dur
+      todas.push({ inicio: t, fin: t + d + (i === trozos.length - 1 ? 0.35 : 0), texto: x })
       t += d
-    }
+    })
   }
+  // ningún subtítulo pisa al siguiente
+  todas.forEach((p, i) => { if (todas[i + 1]) p.fin = Math.min(p.fin, todas[i + 1].inicio - 0.04) })
   return todas
 }
+
+export { VOZ }

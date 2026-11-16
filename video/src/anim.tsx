@@ -32,3 +32,9 @@ export const Entra: React.FC<{ en: number; dur?: number; x?: number; y?: number;
     <div style={{ opacity: p * (1 - q), transform: `translate(${(1 - p) * x}px, ${(1 - p) * y - q * 14}px) scale(${mezcla(escala, 1, p)})`, ...style }}>{children}</div>
   )
 }
+
+// Formato del vídeo: horizontal (por defecto) o vertical.
+export const Formato = React.createContext<'horizontal' | 'vertical'>('horizontal')
+export const useVertical = () => React.useContext(Formato) === 'vertical'
+// En vertical, cada escena se dibuja en varias "ventanas"; esto dice en cuál estamos.
+export const VentanaActual = React.createContext(-1)

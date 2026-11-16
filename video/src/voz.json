@@ -1,0 +1,205 @@
+[
+ {
+  "escena": 2,
+  "archivo": "voz/e02-1.wav",
+  "inicio": 8.6,
+  "dur": 2.75,
+  "texto": "Lucía está haciendo su Trabajo Fin de Máster."
+ },
+ {
+  "escena": 2,
+  "archivo": "voz/e02-2.wav",
+  "inicio": 11.6,
+  "dur": 1.44,
+  "texto": "Cree que va bien."
+ },
+ {
+  "escena": 2,
+  "archivo": "voz/e02-3.wav",
+  "inicio": 13.4,
+  "dur": 2.19,
+  "texto": "Su tutor cree que va retrasada."
+ },
+ {
+  "escena": 2,
+  "archivo": "voz/e02-4.wav",
+  "inicio": 16,
+  "dur": 5,
+  "texto": "Ninguno de los dos lo dice, y cuando por fin lo descubren, quedan pocas semanas para la entrega."
+ },
+ {
+  "escena": 2,
+  "archivo": "voz/e02-5.wav",
+  "inicio": 21.6,
+  "dur": 5.04,
+  "texto": "Le pasa a muchos estudiantes: la tutoría funciona mejor cuando los dos ven lo mismo."
+ },
+ {
+  "escena": 3,
+  "archivo": "voz/e03-1.wav",
+  "inicio": 28.5,
+  "dur": 6.22,
+  "texto": "SINTONÍA es muy sencilla: una vez a la semana, Lucía y su tutor cuentan, por separado, cómo ven el trabajo."
+ },
+ {
+  "escena": 3,
+  "archivo": "voz/e03-2.wav",
+  "inicio": 35.2,
+  "dur": 1.44,
+  "texto": "Un minuto ella."
+ },
+ {
+  "escena": 3,
+  "archivo": "voz/e03-3.wav",
+  "inicio": 37,
+  "dur": 1.74,
+  "texto": "Treinta segundos él."
+ },
+ {
+  "escena": 4,
+  "archivo": "voz/e04-1.wav",
+  "inicio": 40,
+  "dur": 3.62,
+  "texto": "El lunes, en el autobús, Lucía recibe un aviso."
+ },
+ {
+  "escena": 4,
+  "archivo": "voz/e04-2.wav",
+  "inicio": 45.1,
+  "dur": 3.84,
+  "texto": "Cuatro preguntas, una por pantalla, con botones grandes para el pulgar."
+ },
+ {
+  "escena": 4,
+  "archivo": "voz/e04-3.wav",
+  "inicio": 50.8,
+  "dur": 3.18,
+  "texto": "La última es solo para ella: cómo se siente."
+ },
+ {
+  "escena": 4,
+  "archivo": "voz/e04-4.wav",
+  "inicio": 54.2,
+  "dur": 2.36,
+  "texto": "Esa respuesta no la ve nadie más."
+ },
+ {
+  "escena": 4,
+  "archivo": "voz/e04-5.wav",
+  "inicio": 57,
+  "dur": 1.89,
+  "texto": "En menos de un minuto, listo."
+ },
+ {
+  "escena": 4,
+  "archivo": "voz/e04-6.wav",
+  "inicio": 59.3,
+  "dur": 3.18,
+  "texto": "Y si se queda sin cobertura, se envía sola después."
+ },
+ {
+  "escena": 5,
+  "archivo": "voz/e05-1.wav",
+  "inicio": 64,
+  "dur": 2.77,
+  "texto": "Su tutor hace lo mismo, entre dos clases."
+ },
+ {
+  "escena": 5,
+  "archivo": "voz/e05-2.wav",
+  "inicio": 67.3,
+  "dur": 4.37,
+  "texto": "Ve a todos sus estudiantes en una sola pantalla y marca cómo los ve avanzar."
+ },
+ {
+  "escena": 5,
+  "archivo": "voz/e05-3.wav",
+  "inicio": 72.4,
+  "dur": 1.57,
+  "texto": "Treinta segundos."
+ },
+ {
+  "escena": 6,
+  "archivo": "voz/e06-1.wav",
+  "inicio": 76,
+  "dur": 8.3,
+  "texto": "Si las dos miradas no coinciden, SINTONÍA lo detecta con reglas sencillas y les propone a los dos las mismas tres preguntas para su próxima tutoría."
+ },
+ {
+  "escena": 6,
+  "archivo": "voz/e06-2.wav",
+  "inicio": 84.7,
+  "dur": 3.59,
+  "texto": "Preguntas neutras, sin culpables, para hablar de lo que importa."
+ },
+ {
+  "escena": 7,
+  "archivo": "voz/e07-1.wav",
+  "inicio": 90.5,
+  "dur": 4.23,
+  "texto": "La víspera, Lucía repasa las preguntas y añade lo que ella quiere tratar."
+ },
+ {
+  "escena": 7,
+  "archivo": "voz/e07-2.wav",
+  "inicio": 97.2,
+  "dur": 4.79,
+  "texto": "Al salir de la reunión, dos toques: si hablaron de las preguntas y si le sirvieron."
+ },
+ {
+  "escena": 8,
+  "archivo": "voz/e08-1.wav",
+  "inicio": 104,
+  "dur": 4.46,
+  "texto": "SINTONÍA no pone notas, no compara a nadie y no te pide subir tu trabajo."
+ },
+ {
+  "escena": 8,
+  "archivo": "voz/e08-2.wav",
+  "inicio": 108.8,
+  "dur": 4.49,
+  "texto": "Tu tutor no ve tus respuestas: solo las tres preguntas que compartís."
+ },
+ {
+  "escena": 8,
+  "archivo": "voz/e08-3.wav",
+  "inicio": 113.7,
+  "dur": 4.97,
+  "texto": "Y la dirección del máster solo ve cómo va el grupo, nunca a una persona concreta."
+ },
+ {
+  "escena": 8,
+  "archivo": "voz/e08-4.wav",
+  "inicio": 119,
+  "dur": 3.52,
+  "texto": "Si algún día necesitas ayuda, un botón te lleva a ella."
+ },
+ {
+  "escena": 9,
+  "archivo": "voz/e09-1.wav",
+  "inicio": 124,
+  "dur": 9.31,
+  "texto": "Además, Lucía ve sus hitos del TFM, acuerda con su tutor desde el primer día qué espera cada uno y, si quiere seguir investigando, recibe avisos de las ayudas para el doctorado."
+ },
+ {
+  "escena": 10,
+  "archivo": "voz/e10-1.wav",
+  "inicio": 137.3,
+  "dur": 1.16,
+  "texto": "SINTONÍA."
+ },
+ {
+  "escena": 10,
+  "archivo": "voz/e10-2.wav",
+  "inicio": 138.9,
+  "dur": 3.63,
+  "texto": "Para que estudiante y tutor vayan, por fin, en la misma dirección."
+ },
+ {
+  "escena": 10,
+  "archivo": "voz/e10-3.wav",
+  "inicio": 143,
+  "dur": 1.9,
+  "texto": "Acompañar sin vigilar."
+ }
+]
