@@ -516,9 +516,11 @@ const estilo = (e: Record<string, string>) => e
 .entrada-2 {
   animation-delay: 80ms;
 }
+/* Empieza casi transparente (no en 0) para que el navegador cuente el
+   titular como pintado desde el primer momento y no retrase la carga. */
 @keyframes entrada {
   from {
-    opacity: 0;
+    opacity: 0.01;
     transform: translateY(10px);
   }
 }
