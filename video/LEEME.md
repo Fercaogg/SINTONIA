@@ -54,7 +54,7 @@ npm run exportar vertical
 ## Si cambias la locución
 
 1. Cambia la frase en `src/guion.ts` (campo `locucion`).
-2. Vuelve a generar la voz. Necesita Piper, que se instala una vez con `pip install piper-tts`:
+2. Vuelve a generar la voz. Necesita edge-tts, que se instala una vez con `pip install edge-tts`, y conexión a internet:
 
 ```bash
 npm run voz
@@ -73,9 +73,10 @@ npm run textos
 - `voz` es en qué segundo de la escena empieza cada frase de la locución.
 - En `src/escenas/`, los números como `en={3.4}` son el segundo (contado desde que empieza esa escena) en que aparece ese elemento.
 
-## Voz y música: sin licencias de terceros
+## Voz, música y subtítulos
 
-- **Voz:** Piper, programa de código abierto, con la voz `es_ES-davefx-medium` (español de España). Sus datos son de dominio público (CC0).
+- **Voz:** Álvaro (`es-ES-AlvaroNeural`), masculina, castellano de España. Se genera con edge-tts, un programa gratuito de Python que usa las voces de "Leer en voz alta" de Microsoft Edge. No necesita cuenta ni clave. Para probar otra voz: `VOZ=es-ES-ElviraNeural npm run voz`.
+- **Subtítulos:** el vídeo no los lleva incrustados; van aparte en `SUBTITULOS.srt`. Para incrustarlos, cambia `SUBTITULOS = false` por `true` en `src/Raiz.tsx` y exporta.
 - **Música:** creada por ordenador para este vídeo con `scripts/musica.py` (`npm run musica`). No usa grabaciones ni muestras de nadie.
 - **Tipografía:** Fira Sans, de uso libre (licencia SIL Open Font).
 

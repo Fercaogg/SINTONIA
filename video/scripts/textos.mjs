@@ -22,7 +22,7 @@ const reloj = (s) => `${Math.floor(s / 60)}:${(s % 60).toFixed(1).padStart(4, '0
 writeFileSync(path.join(raiz, 'SUBTITULOS.srt'), pistas().map((p, i) => `${i + 1}\n${srt(p.inicio)} --> ${srt(p.fin)}\n${p.texto}\n`).join('\n'))
 
 let md = `# Locución de SINTONÍA\n\nDuración total del vídeo: ${reloj(DURACION_TOTAL)} (${DURACION_TOTAL} segundos).\n\n`
-md += `Voz actual: sintética, Piper \`es_ES-davefx-medium\` (español de España, dominio público CC0). Si prefieres grabarla tú, lee cada frase procurando que quepa en su hueco; los tiempos se ajustan en \`src/guion.ts\` (campo \`voz\` de cada escena).\n\n`
+md += `Voz actual: Álvaro (\`es-ES-AlvaroNeural\`), generada con edge-tts, las voces de "Leer en voz alta" de Microsoft Edge. Si prefieres grabarla tú, lee cada frase procurando que quepa en su hueco; los tiempos se ajustan en \`src/guion.ts\` (campo \`voz\` de cada escena).\n\n`
 md += `Música: creada por ordenador para este vídeo con \`scripts/musica.py\`. No usa grabaciones de terceros, así que no tiene licencia ajena.\n`
 for (const e of GUION) {
   md += `\n## Escena ${e.n}. ${e.titulo} (${reloj(e.inicio)} a ${reloj(e.fin)})\n\n`
