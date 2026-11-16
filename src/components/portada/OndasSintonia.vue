@@ -32,6 +32,9 @@ const camino = (() => {
 const d = computed(() => Math.min(1, Math.max(0, props.desfase)))
 // Media longitud de onda de desfase como máximo; la onda del tutor también se aplana un poco.
 const transformTutor = computed(() => `translateX(${(d.value * ONDA) / 2}px) scaleY(${1 - d.value * 0.35})`)
+import { useIdioma } from '@/lib/idioma'
+const { t } = useIdioma()
+
 </script>
 
 <template>
@@ -50,8 +53,8 @@ const transformTutor = computed(() => `translateX(${(d.value * ONDA) / 2}px) sca
     <path :d="camino" fill="none" :stroke-width="grosor" stroke-linecap="round" vector-effect="non-scaling-stroke" class="ondas-trazo-estudiante" />
   </svg>
   <p v-if="etiquetas" class="flex gap-4 text-xs font-medium text-surface-800 mt-2" aria-hidden="true">
-    <span class="inline-flex items-center gap-1.5"><span class="w-4 h-1 rounded-full bg-brand-500" />Estudiante</span>
-    <span class="inline-flex items-center gap-1.5"><span class="w-4 h-1 rounded-full bg-surface-900" />Tutor/a</span>
+    <span class="inline-flex items-center gap-1.5"><span class="w-4 h-1 rounded-full bg-brand-500" />{{ t('Estudiante', 'Student') }}</span>
+    <span class="inline-flex items-center gap-1.5"><span class="w-4 h-1 rounded-full bg-surface-900" />{{ t('Tutor/a', 'Supervisor') }}</span>
   </p>
 </template>
 

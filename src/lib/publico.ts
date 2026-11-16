@@ -28,3 +28,8 @@ export const EN_ELABORACION_PROYECTO = 'En elaboración. Se publicará aquí cua
  * VITE_URL_SITIO) cuando haya dominio propio.
  */
 export const URL_SITIO = (import.meta.env.VITE_URL_SITIO as string | undefined)?.replace(/\/$/, '') || 'https://sintonia360-ferca.vercel.app'
+
+/** Textos dignos en inglés (páginas en /en). */
+export const EN_ELABORACION_EN = 'In preparation. Pending review by the Research Ethics Committee of the Universidad de Salamanca.'
+export const EN_ELABORACION_PROYECTO_EN = 'In preparation. It will be published here when available.'
+export const AUTORIA_EN = "Prototype of Fernando Martín Vaquero's Master's thesis · Universidad de Salamanca"

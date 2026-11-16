@@ -12,7 +12,10 @@ export const NOVEDADES: Novedad[] = [
   {
     version: '0.5.0',
     fecha: '2026-11-16',
-    cambios: ['Logotipo definitivo de SINTONÍA: tres hojas que forman una S, en la web, el icono del navegador y los documentos en PDF.'],
+    cambios: [
+      'Logotipo definitivo de SINTONÍA: tres hojas que forman una S, en la web, el icono del navegador y los documentos en PDF.',
+      'Versión en inglés de las páginas públicas principales.',
+    ],
   },
   {
     version: '0.4.0',

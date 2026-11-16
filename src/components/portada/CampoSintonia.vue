@@ -310,6 +310,8 @@ onBeforeUnmount(() => {
   lienzo.value?.parentElement?.removeEventListener('pointermove', alMoverPuntero)
   gl?.getExtension('WEBGL_lose_context')?.loseContext()
 })
+import { useIdioma } from '@/lib/idioma'
+const { t } = useIdioma()
 </script>
 
 <template>
@@ -328,7 +330,7 @@ onBeforeUnmount(() => {
     @click="alternarPausa"
   >
     <AppIcon :name="pausado ? 'reproducir' : 'pausa'" :size="16" />
-    {{ pausado ? 'Reanudar el fondo' : 'Pausar el fondo' }}
+    {{ pausado ? t('Reanudar el fondo', 'Resume the background') : t('Pausar el fondo', 'Pause the background') }}
   </button>
 </template>
 

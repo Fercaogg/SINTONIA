@@ -24,3 +24,10 @@ export async function enviarAlServidor(funcion: 'registro' | 'acceso' | 'contact
     return { ok: false, error: SIN_CONEXION }
   }
 }
+
+/** Mensaje de error en inglés para las páginas en /en (el servidor responde en español). */
+export function errorEnIngles(status: number | undefined): string {
+  if (status === 400) return 'Please check the details in the form.'
+  if (status === 429) return 'Too many attempts. Please wait a few minutes and try again.'
+  return 'Something went wrong. Please try again in a few minutes.'
+}

@@ -1,8 +1,13 @@
 <script setup lang="ts">
 // Preguntas frecuentes con <details>: se abren con teclado y lector de
 // pantalla sin código extra.
-import { PREGUNTAS } from '@/contenido/portada'
-import { EN_ELABORACION } from '@/lib/publico'
+import { computed } from 'vue'
+import { EN_ELABORACION, EN_ELABORACION_EN } from '@/lib/publico'
+import { useIdioma } from '@/lib/idioma'
+import { useContenido } from '@/lib/contenido'
+const { t } = useIdioma()
+const contenido = useContenido()
+const PREGUNTAS = computed(() => contenido.value.PREGUNTAS)
 </script>
 
 <template>
@@ -14,7 +19,7 @@ import { EN_ELABORACION } from '@/lib/publico'
       </summary>
       <div class="px-5 pb-5 text-base leading-relaxed space-y-2">
         <p>{{ p.respuesta }}</p>
-        <p v-if="'pendiente' in p && p.pendiente" class="italic texto-suave">{{ EN_ELABORACION }}</p>
+        <p v-if="'pendiente' in p && p.pendiente" class="italic texto-suave">{{ t(EN_ELABORACION, EN_ELABORACION_EN) }}</p>
       </div>
     </details>
   </div>

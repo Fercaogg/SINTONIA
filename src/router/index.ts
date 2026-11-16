@@ -17,6 +17,8 @@ declare module 'vue-router' {
     titulo?: string
     /** Pública pero sin buscadores (páginas solo para generar PDF). */
     sinIndexar?: boolean
+    /** Idioma de la página pública (por defecto, español). */
+    idioma?: 'es' | 'en'
   }
 }
 
@@ -37,6 +39,16 @@ const routes: RouteRecordRaw[] = [
   { path: '/hoja-de-ruta', component: () => import('@/views/HojaRutaView.vue'), meta: { publica: true, titulo: 'Hoja de ruta' } },
   { path: '/og/:clave', component: () => import('@/views/ImagenCompartirView.vue'), meta: { publica: true, titulo: 'Imagen para compartir', sinIndexar: true } },
   { path: '/dosier/imprimir', component: () => import('@/views/DosierView.vue'), meta: { publica: true, titulo: 'Dosier', sinIndexar: true } },
+  // Páginas públicas en inglés (Fase 5): mismos componentes, meta.idioma = 'en'.
+  { path: '/en', component: () => import('@/views/InicioView.vue'), meta: { publica: true, idioma: 'en' } },
+  { path: '/en/how-it-works', component: () => import('@/views/ComoFuncionaView.vue'), meta: { publica: true, idioma: 'en', titulo: 'How it works and your data' } },
+  { path: '/en/research', component: () => import('@/views/InvestigacionPublicaView.vue'), meta: { publica: true, idioma: 'en', titulo: 'The research' } },
+  { path: '/en/institutions', component: () => import('@/views/InstitucionesView.vue'), meta: { publica: true, idioma: 'en', titulo: 'For institutions' } },
+  { path: '/en/security', component: () => import('@/views/confianza/SeguridadView.vue'), meta: { publica: true, idioma: 'en', titulo: 'Security' } },
+  { path: '/en/accessibility', component: () => import('@/views/confianza/AccesibilidadView.vue'), meta: { publica: true, idioma: 'en', titulo: 'Accessibility statement' } },
+  { path: '/en/roadmap', component: () => import('@/views/HojaRutaView.vue'), meta: { publica: true, idioma: 'en', titulo: 'Roadmap' } },
+  { path: '/en/status', component: () => import('@/views/confianza/EstadoView.vue'), meta: { publica: true, idioma: 'en', titulo: 'Platform status' } },
+  { path: '/en/changelog', component: () => import('@/views/confianza/NovedadesView.vue'), meta: { publica: true, idioma: 'en', titulo: 'Changelog' } },
   { path: '/participantes', component: () => import('@/views/ParticipantesView.vue'), meta: { publica: true, titulo: 'Kit para participantes' } },
   { path: '/participantes/imprimir/:doc', component: () => import('@/views/ImprimirView.vue'), meta: { publica: true, titulo: 'Documento', sinIndexar: true } },
   { path: '/demo/recorrido', component: () => import('@/views/RecorridoDemoView.vue'), meta: { publica: true, titulo: 'Demostración guiada' } },
@@ -159,6 +171,7 @@ router.afterEach(async () => {
 
 router.afterEach((to) => {
   document.title = to.meta.titulo ? `${to.meta.titulo} · SINTONÍA` : 'SINTONÍA'
+  document.documentElement.lang = to.meta.idioma === 'en' ? 'en' : 'es'
   // Las páginas privadas no deben aparecer en buscadores (también lo dice la
   // cabecera X-Robots-Tag de vercel.json).
   let robots = document.querySelector<HTMLMetaElement>('meta[name="robots"]')
