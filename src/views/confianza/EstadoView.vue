@@ -6,6 +6,8 @@ import { computed, onMounted, ref } from 'vue'
 import LayoutPublico from '@/components/layout/LayoutPublico.vue'
 import AppIcon from '@/components/comun/AppIcon.vue'
 import { CORREO_CONTACTO } from '@/lib/publico'
+import { useIdioma } from '@/lib/idioma'
+const { t, idioma } = useIdioma()
 
 interface Estado {
   ok: boolean
@@ -34,30 +36,30 @@ async function comprobar() {
 }
 onMounted(comprobar)
 
-const PARTES = [
-  { clave: 'servidor', nombre: 'Servidor', texto: 'Las funciones que guardan los check-ins y envían los avisos.' },
-  { clave: 'baseDeDatos', nombre: 'Base de datos', texto: 'Donde se guardan las respuestas.' },
-  { clave: 'acceso', nombre: 'Acceso', texto: 'El inicio de sesión con el enlace del correo.' },
-] as const
+const PARTES = computed(() => [
+  { clave: 'servidor', nombre: t('Servidor', 'Server'), texto: t('Las funciones que guardan los check-ins y envían los avisos.', 'The functions that save check-ins and send alerts.') },
+  { clave: 'baseDeDatos', nombre: t('Base de datos', 'Database'), texto: t('Donde se guardan las respuestas.', 'Where the answers are stored.') },
+  { clave: 'acceso', nombre: t('Acceso', 'Sign-in'), texto: t('El inicio de sesión con el enlace del correo.', 'Signing in with the email link.') },
+] as const)
 
 const resumen = computed(() => {
-  if (sinRespuesta.value) return { ok: false, texto: 'El servidor no responde ahora mismo.' }
+  if (sinRespuesta.value) return { ok: false, texto: t('El servidor no responde ahora mismo.', 'The server is not responding right now.') }
   if (!estado.value) return null
-  return estado.value.ok ? { ok: true, texto: 'Todo funciona con normalidad.' } : { ok: false, texto: 'Hay un problema en una parte de la plataforma.' }
+  return estado.value.ok ? { ok: true, texto: t('Todo funciona con normalidad.', 'Everything is working normally.') } : { ok: false, texto: t('Hay un problema en una parte de la plataforma.', 'There is a problem in part of the platform.') }
 })
 
 const hora = computed(() =>
-  estado.value ? new Date(estado.value.comprobadoEn).toLocaleString('es-ES', { dateStyle: 'long', timeStyle: 'short' }) : '',
+  estado.value ? new Date(estado.value.comprobadoEn).toLocaleString(idioma.value === 'en' ? 'en-GB' : 'es-ES', { dateStyle: 'long', timeStyle: 'short' }) : '',
 )
 </script>
 
 <template>
   <LayoutPublico>
-    <h1 class="titulo-pagina mb-2">Estado de la plataforma</h1>
-    <p class="texto-suave mb-8">Comprobación en directo de las partes de SINTONÍA.</p>
+    <h1 class="titulo-pagina mb-2">{{ t('Estado de la plataforma', 'Platform status') }}</h1>
+    <p class="texto-suave mb-8">{{ t('Comprobación en directo de las partes de SINTONÍA.', 'Live check of the parts of SINTONÍA.') }}</p>
 
     <div aria-live="polite" class="mb-8">
-      <div v-if="!resumen" class="card p-5 texto-suave">Comprobando…</div>
+      <div v-if="!resumen" class="card p-5 texto-suave">{{ t('Comprobando…', 'Checking…') }}</div>
       <div
         v-else
         class="card p-5 flex items-center gap-3"
@@ -70,7 +72,7 @@ const hora = computed(() =>
         ><AppIcon :name="resumen.ok ? 'check' : 'warning'" :size="20" /></span>
         <div>
           <p class="font-display text-lg font-semibold text-surface-900">{{ resumen.texto }}</p>
-          <p v-if="hora" class="text-sm texto-suave">Comprobado el {{ hora }}.</p>
+          <p v-if="hora" class="text-sm texto-suave">{{ t('Comprobado el', 'Checked on') }} {{ hora }}.</p>
         </div>
       </div>
     </div>
@@ -85,18 +87,24 @@ const hora = computed(() =>
           class="shrink-0 inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-sm font-semibold"
           :class="estado[p.clave] === 'ok' ? 'bg-brand-100 text-surface-900' : 'bg-amber-100 text-amber-900'"
         >
-          <AppIcon :name="estado[p.clave] === 'ok' ? 'check' : 'warning'" :size="14" />{{ estado[p.clave] === 'ok' ? 'Funciona' : 'Con problemas' }}
+          <AppIcon :name="estado[p.clave] === 'ok' ? 'check' : 'warning'" :size="14" />{{ estado[p.clave] === 'ok' ? t('Funciona', 'Working') : t('Con problemas', 'Having problems') }}
         </span>
       </li>
     </ul>
 
     <button type="button" class="btn-secondary" :disabled="comprobando" @click="comprobar">
-      <AppIcon name="history" :size="16" />{{ comprobando ? 'Comprobando…' : 'Volver a comprobar' }}
+      <AppIcon name="history" :size="16" />{{ comprobando ? t('Comprobando…', 'Checking…') : t('Volver a comprobar', 'Check again') }}
     </button>
 
     <p class="mt-10 text-sm texto-suave leading-relaxed">
-      Esta página consulta el servidor de SINTONÍA en el momento en que la abres; no usa ningún servicio externo. Si algo no funciona durante más
-      de unos minutos, escríbenos a <a :href="`mailto:${CORREO_CONTACTO}`" class="enlace">{{ CORREO_CONTACTO }}</a>.
+      <template v-if="idioma === 'es'">
+        Esta página consulta el servidor de SINTONÍA en el momento en que la abres; no usa ningún servicio externo. Si algo no funciona durante más
+        de unos minutos, escríbenos a <a :href="`mailto:${CORREO_CONTACTO}`" class="enlace">{{ CORREO_CONTACTO }}</a>.
+      </template>
+      <template v-else>
+        This page checks SINTONÍA's server at the moment you open it; it does not use any external service. If something is not working for more
+        than a few minutes, write to <a :href="`mailto:${CORREO_CONTACTO}`" class="enlace">{{ CORREO_CONTACTO }}</a>.
+      </template>
     </p>
   </LayoutPublico>
 </template>

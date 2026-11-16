@@ -26,24 +26,46 @@ export const BANCO = {
   ],
 } as const
 
+/** El mismo banco, traducido para las páginas en inglés (/en). */
+export const BANCO_EN = {
+  avance: [
+    'Which part of the work do you both consider finished, and which is still open?',
+    'What has been done since the last meeting, and what is left for the next deliverable?',
+    'What criterion will you use to consider a part of the work finished?',
+    'Which part of the work is worth reviewing together in this meeting?',
+  ],
+  siguiente: [
+    'What is the next deliverable, and when is it due?',
+    'What is the concrete next step, and what is needed to take it?',
+    'Which pending decision should be made in order to move on?',
+    'What will each of you do before the next meeting?',
+  ],
+  general: [
+    'Is anything slowing the progress down?',
+    'Which doubts should be cleared up before going on?',
+    'How and when will you keep in touch until the next meeting?',
+  ],
+} as const
+
 export interface ResultadoDemo {
   diferencia: number
   desajuste: boolean
   preguntas: string[]
 }
 
-export function compararMiradas(estudiante: number, tutor: number): ResultadoDemo {
+export function compararMiradas(estudiante: number, tutor: number, idioma: 'es' | 'en' = 'es'): ResultadoDemo {
   const diferencia = Math.abs(estudiante - tutor)
   const desajuste = diferencia >= 2
   if (!desajuste) return { diferencia, desajuste, preguntas: [] }
   const i = estudiante + tutor
+  const banco = idioma === 'en' ? BANCO_EN : BANCO
   return {
     diferencia,
     desajuste,
     preguntas: [
-      BANCO.avance[i % BANCO.avance.length],
-      BANCO.siguiente[(i + 1) % BANCO.siguiente.length],
-      BANCO.general[i % BANCO.general.length],
+      banco.avance[i % banco.avance.length],
+      banco.siguiente[(i + 1) % banco.siguiente.length],
+      banco.general[i % banco.general.length],
     ],
   }
 }

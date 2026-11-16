@@ -1,6 +1,9 @@
 import { defineConfig, loadEnv, type Plugin } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import { readFileSync } from 'node:fs'
+import { resolve } from 'node:path'
+// @ts-expect-error: módulo de Node en JavaScript, sin tipos
+import { escribir, htmlDe, leerPaginas, URL_POR_DEFECTO } from './scripts/paginas-estaticas.mjs'
 import { fileURLToPath, URL } from 'node:url'
 
 /**
@@ -45,6 +48,30 @@ function precargarFuentes(): Plugin {
   }
 }
 
+/**
+ * Una página HTML por cada página pública, con su título, descripción, URL
+ * canónica e imagen para compartir; y sitemap.xml y robots.txt (ver
+ * scripts/paginas-estaticas.mjs). La dirección base sale de VITE_URL_SITIO.
+ */
+function paginasEstaticas(base: string): Plugin {
+  const raiz = fileURLToPath(new URL('.', import.meta.url))
+  let salida = 'dist'
+  return {
+    name: 'sintonia-paginas-estaticas',
+    configResolved(c) {
+      salida = resolve(c.root, c.build.outDir)
+    },
+    // En desarrollo y al compilar, el index.html lleva las etiquetas de la portada.
+    transformIndexHtml(html) {
+      const todas = leerPaginas(raiz)
+      return htmlDe(html, todas.find((p: { ruta: string }) => p.ruta === '/'), todas, base)
+    },
+    closeBundle() {
+      escribir(raiz, salida, base)
+    },
+  }
+}
+
 export default defineConfig(({ mode }) => {
   const env = { ...loadEnv(mode, process.cwd(), 'VITE_'), ...process.env }
   // En local, el servidor que imita Supabase también sirve las funciones de
@@ -52,7 +79,7 @@ export default defineConfig(({ mode }) => {
   const supabaseLocal = env.VITE_SUPABASE_URL && /^http:\/\/localhost:\d+$/.test(env.VITE_SUPABASE_URL) ? env.VITE_SUPABASE_URL : null
   const proxy = supabaseLocal ? { '/api': { target: supabaseLocal, changeOrigin: true, xfwd: true } } : undefined
   return {
-    plugins: [vue(), precargarFuentes()],
+    plugins: [vue(), precargarFuentes(), paginasEstaticas((env.VITE_URL_SITIO || URL_POR_DEFECTO).replace(/\/$/, ''))],
     // NEXT_PUBLIC_: las variables PÚBLICAS que pone la integración de Supabase en Vercel.
     envPrefix: ['VITE_', 'NEXT_PUBLIC_'],
     define: {

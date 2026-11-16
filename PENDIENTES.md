@@ -44,7 +44,7 @@ Todo lo que SINTONÍA necesita y que no se puede inventar. En la aplicación, ca
 | Proyecto de Supabase y de Vercel para la **demostración** (Fase 5), con `VITE_URL_DEMO` en el real | /demo | Fernando, o Claude con un token de Supabase |
 | En Supabase: Site URL y Redirect URLs con la dirección de la web | Enlaces de acceso | Fernando |
 | En Supabase: enlace de acceso de 15 minutos (Authentication > Providers > Email > Email OTP Expiration = 900) y copias de seguridad (según el plan) | Acceso y restauración | Fernando |
-| Dominio definitivo de la web (hoy `sintonia360-ferca.vercel.app`, también en `public/sitemap.xml`, `public/robots.txt` y la imagen para compartir de `index.html`) | Buscadores y redes | Fernando |
+| Dominio definitivo de la web (hoy `sintonia360-ferca.vercel.app`). Todo está preparado: se cambia en un solo sitio (`VITE_URL_SITIO`) y los pasos están en docs/DOMINIO.md | Buscadores, redes y enlaces de acceso | Fernando compra el dominio; Claude hace el cambio |
 | Cuenta de Resend (u otro proveedor) y dominio verificado desde el que enviar los correos | Recordatorios, avisos y enlaces de acceso | Fernando |
 | Remitente de los correos (dirección y nombre) | Variable `CORREO_REMITENTE` en Vercel | Fernando |
 | Decidir si se usa el modelo de lenguaje en el piloto y quién paga la clave de la API | Variable `AGENDA_MODO` | Fernando |
@@ -78,3 +78,12 @@ Todo lo que SINTONÍA necesita y que no se puede inventar. En la aplicación, ca
 
 | Dato | Dónde se usa | Quién lo aporta |
 |---|---|---|
+
+## Acabado profesional (Fase 5 de las mejoras)
+
+| Dato | Dónde se usa | Quién lo aporta |
+|---|---|---|
+| Revisión de la versión en inglés por una persona con inglés nativo o académico (las 9 páginas de /en) | /en | Fernando (o el servicio de idiomas de la USAL) |
+| Traducir los textos legales y el kit para participantes, solo cuando el Comité de Ética apruebe la versión en español | /en (hoy enlazan a la versión en español) | Comité de Ética, después Fernando |
+| Probar cómo se ve un enlace al compartirlo en WhatsApp, LinkedIn y el correo de la USAL, una vez con el dominio definitivo | Imágenes para compartir (public/og) | Fernando |
+

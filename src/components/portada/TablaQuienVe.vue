@@ -3,7 +3,8 @@
 // llegar con el teclado, o al tocarlo en el móvil) se ilumina quién lo ve y
 // se cierra un candado donde no hay acceso. El texto de cada celda sigue
 // siendo la información completa: el color y el icono solo la refuerzan.
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
+import { useIdioma } from '@/lib/idioma'
 import AppIcon from '@/components/comun/AppIcon.vue'
 
 export interface FilaQuienVe {
@@ -16,22 +17,23 @@ export interface FilaQuienVe {
 
 const props = defineProps<{ filas: FilaQuienVe[] }>()
 
-const COLUMNAS = [
-  { clave: 'tu', titulo: 'Tú (estudiante)', corto: 'Tú' },
-  { clave: 'tutor', titulo: 'Tu tutor/a', corto: 'Tu tutor/a' },
-  { clave: 'direccion', titulo: 'Dirección del máster', corto: 'Dirección' },
-  { clave: 'investigacion', titulo: 'Investigación', corto: 'Investigación' },
-] as const
+const { t } = useIdioma()
+const COLUMNAS = computed(() => [
+  { clave: 'tu', titulo: t('Tú (estudiante)', 'You (student)'), corto: t('Tú', 'You') },
+  { clave: 'tutor', titulo: t('Tu tutor/a', 'Your supervisor'), corto: t('Tu tutor/a', 'Your supervisor') },
+  { clave: 'direccion', titulo: t('Dirección del máster', 'Programme directors'), corto: t('Dirección', 'Directors') },
+  { clave: 'investigacion', titulo: t('Investigación', 'Research'), corto: t('Investigación', 'Research') },
+] as const)
 
 type Acceso = 'si' | 'parcial' | 'no'
 function acceso(texto: string): Acceso {
   if (/^No\b/.test(texto)) return 'no'
-  if (/^Sí$/.test(texto)) return 'si'
+  if (/^(Sí|Yes)$/.test(texto)) return 'si'
   return 'parcial'
 }
 
 const activa = ref<number | null>(null)
-const valor = (i: number, c: (typeof COLUMNAS)[number]['clave']) => props.filas[i][c]
+const valor = (i: number, c: 'tu' | 'tutor' | 'direccion' | 'investigacion') => props.filas[i][c]
 </script>
 
 <template>
@@ -60,12 +62,12 @@ const valor = (i: number, c: (typeof COLUMNAS)[number]['clave']) => props.filas[
     </ul>
 
     <!-- Escritorio: tabla -->
-    <div class="card overflow-x-auto hidden sm:block relative" tabindex="0" role="region" aria-label="Tabla de quién ve qué" @mouseleave="activa = null">
+    <div class="card overflow-x-auto hidden sm:block relative" tabindex="0" role="region" :aria-label="t('Tabla de quién ve qué', 'Who sees what table')" @mouseleave="activa = null">
       <table class="w-full text-sm text-left">
-        <caption class="sr-only">Quién puede ver cada dato. Pasa por un dato para resaltarlo.</caption>
+        <caption class="sr-only">{{ t('Quién puede ver cada dato. Pasa por un dato para resaltarlo.', 'Who can see each piece of data. Hover over an item to highlight it.') }}</caption>
         <thead class="bg-surface-100 text-surface-800">
           <tr>
-            <th scope="col" class="p-3 font-semibold">Dato</th>
+            <th scope="col" class="p-3 font-semibold">{{ t('Dato', 'Data') }}</th>
             <th v-for="c in COLUMNAS" :key="c.clave" scope="col" class="p-3 font-semibold">{{ c.titulo }}</th>
           </tr>
         </thead>

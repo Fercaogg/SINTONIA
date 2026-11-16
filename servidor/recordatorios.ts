@@ -59,7 +59,7 @@ export function textoRecordatorio(r: Recordatorio, urlApp: string): { asunto: st
     }
   }
   return {
-    asunto: 'Aún estás a tiempo de hacer el check-in de esta semana',
+    asunto: 'Si te viene bien: el check-in de esta semana sigue abierto',
     texto: `Hola, ${nombre}:\n\nSi te viene bien, todavía puedes hacer ${que} de esta semana, hasta el ${textoCierre(r.cierra)}. Si esta semana no puedes, no pasa nada.\n\n${enlace}${PIE}`,
   }
 }

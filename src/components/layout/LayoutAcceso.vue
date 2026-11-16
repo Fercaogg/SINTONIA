@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import SaltarContenido from '@/components/layout/SaltarContenido.vue'
 // Estructura de las pantallas de acceso: dos columnas en escritorio, con el
 // panel azul marino a la izquierda (WW360 LoginView.vue), y solo el
 // formulario en el móvil.
@@ -9,6 +10,7 @@ import BandaEntorno from '@/components/comun/BandaEntorno.vue'
 
 <template>
   <div class="min-h-screen flex flex-col">
+    <SaltarContenido />
     <BandaEntorno />
     <div class="flex-1 flex">
       <div class="hidden lg:flex w-1/2 bg-marino relative overflow-hidden items-center justify-center p-12">
@@ -40,7 +42,7 @@ import BandaEntorno from '@/components/comun/BandaEntorno.vue'
         </div>
       </div>
 
-      <main id="contenido" class="flex-1 flex items-center justify-center p-4 sm:p-8 lg:p-12">
+      <main id="contenido" tabindex="-1" class="outline-none flex-1 flex items-center justify-center p-4 sm:p-8 lg:p-12">
         <div class="w-full max-w-md">
           <div class="lg:hidden mb-10 text-2xl">
             <RouterLink to="/" aria-label="SINTONÍA, ir al inicio"><AppLogo /></RouterLink>

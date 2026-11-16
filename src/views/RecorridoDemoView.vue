@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import SaltarContenido from '@/components/layout/SaltarContenido.vue'
 // /demo/recorrido: demostración guiada de unos 60 segundos, en 4 pasos.
 //   1. El visitante hace el check-in como estudiante (las mismas preguntas y
 //      la misma escala que el check-in real).
@@ -75,6 +76,7 @@ function empezarDeNuevo() {
 
 <template>
   <div class="min-h-screen flex flex-col">
+    <SaltarContenido />
     <p class="sticky top-0 z-30 bg-amber-100 text-amber-900 text-sm font-semibold text-center px-4 py-2 border-b border-amber-200" role="note">
       Demostración: datos ficticios. No se guarda nada.
     </p>
@@ -85,7 +87,7 @@ function empezarDeNuevo() {
       </div>
     </header>
 
-    <main id="contenido" class="flex-1 w-full max-w-3xl mx-auto px-4 py-8 sm:py-12">
+    <main id="contenido" tabindex="-1" class="outline-none flex-1 w-full max-w-3xl mx-auto px-4 py-8 sm:py-12">
       <!-- Pasos -->
       <nav v-if="paso < PASOS.length" aria-label="Pasos del recorrido" class="mb-8">
         <ol class="grid grid-cols-4 gap-2">

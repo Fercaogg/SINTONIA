@@ -3,6 +3,8 @@
 // aplica la base de datos (RLS), aunque alguien se salte esta comprobación.
 
 import { nextTick } from 'vue'
+import PAGINAS from '@/contenido/paginas.json'
+import { URL_SITIO } from '@/lib/publico'
 import { createRouter, createWebHistory, type RouteRecordRaw } from 'vue-router'
 import { useSesion } from '@/stores/sesion'
 import { INICIO_ROL, necesitaConsentimiento, type Rol } from '@/lib/tipos'
@@ -15,6 +17,8 @@ declare module 'vue-router' {
     titulo?: string
     /** Pública pero sin buscadores (páginas solo para generar PDF). */
     sinIndexar?: boolean
+    /** Idioma de la página pública (por defecto, español). */
+    idioma?: 'es' | 'en'
   }
 }
 
@@ -33,7 +37,18 @@ const routes: RouteRecordRaw[] = [
   { path: '/demo', component: () => import('@/views/DemoView.vue'), meta: { publica: true, titulo: 'Demostración' } },
   { path: '/instituciones', component: () => import('@/views/InstitucionesView.vue'), meta: { publica: true, titulo: 'Para instituciones' } },
   { path: '/hoja-de-ruta', component: () => import('@/views/HojaRutaView.vue'), meta: { publica: true, titulo: 'Hoja de ruta' } },
+  { path: '/og/:clave', component: () => import('@/views/ImagenCompartirView.vue'), meta: { publica: true, titulo: 'Imagen para compartir', sinIndexar: true } },
   { path: '/dosier/imprimir', component: () => import('@/views/DosierView.vue'), meta: { publica: true, titulo: 'Dosier', sinIndexar: true } },
+  // Páginas públicas en inglés (Fase 5): mismos componentes, meta.idioma = 'en'.
+  { path: '/en', component: () => import('@/views/InicioView.vue'), meta: { publica: true, idioma: 'en' } },
+  { path: '/en/how-it-works', component: () => import('@/views/ComoFuncionaView.vue'), meta: { publica: true, idioma: 'en', titulo: 'How it works and your data' } },
+  { path: '/en/research', component: () => import('@/views/InvestigacionPublicaView.vue'), meta: { publica: true, idioma: 'en', titulo: 'The research' } },
+  { path: '/en/institutions', component: () => import('@/views/InstitucionesView.vue'), meta: { publica: true, idioma: 'en', titulo: 'For institutions' } },
+  { path: '/en/security', component: () => import('@/views/confianza/SeguridadView.vue'), meta: { publica: true, idioma: 'en', titulo: 'Security' } },
+  { path: '/en/accessibility', component: () => import('@/views/confianza/AccesibilidadView.vue'), meta: { publica: true, idioma: 'en', titulo: 'Accessibility statement' } },
+  { path: '/en/roadmap', component: () => import('@/views/HojaRutaView.vue'), meta: { publica: true, idioma: 'en', titulo: 'Roadmap' } },
+  { path: '/en/status', component: () => import('@/views/confianza/EstadoView.vue'), meta: { publica: true, idioma: 'en', titulo: 'Platform status' } },
+  { path: '/en/changelog', component: () => import('@/views/confianza/NovedadesView.vue'), meta: { publica: true, idioma: 'en', titulo: 'Changelog' } },
   { path: '/participantes', component: () => import('@/views/ParticipantesView.vue'), meta: { publica: true, titulo: 'Kit para participantes' } },
   { path: '/participantes/imprimir/:doc', component: () => import('@/views/ImprimirView.vue'), meta: { publica: true, titulo: 'Documento', sinIndexar: true } },
   { path: '/demo/recorrido', component: () => import('@/views/RecorridoDemoView.vue'), meta: { publica: true, titulo: 'Demostración guiada' } },
@@ -156,6 +171,7 @@ router.afterEach(async () => {
 
 router.afterEach((to) => {
   document.title = to.meta.titulo ? `${to.meta.titulo} · SINTONÍA` : 'SINTONÍA'
+  document.documentElement.lang = to.meta.idioma === 'en' ? 'en' : 'es'
   // Las páginas privadas no deben aparecer en buscadores (también lo dice la
   // cabecera X-Robots-Tag de vercel.json).
   let robots = document.querySelector<HTMLMetaElement>('meta[name="robots"]')
@@ -165,4 +181,16 @@ router.afterEach((to) => {
     document.head.appendChild(robots)
   }
   robots.content = to.meta.publica && !to.meta.sinIndexar && to.matched[0]?.path !== '/:pathMatch(.*)*' ? 'index, follow' : 'noindex, nofollow'
+  // URL canónica de las páginas públicas (src/contenido/paginas.json), con la
+  // dirección única del sitio (URL_SITIO): así sigue bien al navegar sin recargar.
+  const pagina = (PAGINAS as { ruta: string }[]).find((p) => p.ruta === to.path)
+  let canonica = document.querySelector<HTMLLinkElement>('link[rel="canonical"]')
+  if (pagina) {
+    if (!canonica) {
+      canonica = document.createElement('link')
+      canonica.rel = 'canonical'
+      document.head.appendChild(canonica)
+    }
+    canonica.href = URL_SITIO + (pagina.ruta === '/' ? '/' : pagina.ruta)
+  } else canonica?.remove()
 })

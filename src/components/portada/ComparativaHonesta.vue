@@ -2,64 +2,67 @@
 // Comparativa honesta en tres columnas, sin nombrar marcas ni productos:
 // la tutoría sin seguimiento, SINTONÍA y las herramientas que vigilan.
 // Incluye también los límites de SINTONÍA.
-const COLUMNAS = ['Tutoría sin seguimiento', 'SINTONÍA', 'Herramientas que vigilan'] as const
+import { computed } from 'vue'
+import { useIdioma } from '@/lib/idioma'
+const { t } = useIdioma()
+const COLUMNAS = computed(() => [t('Tutoría sin seguimiento', 'Supervision without follow-up'), t('SINTONÍA', 'SINTONÍA'), t('Herramientas que vigilan', 'Monitoring tools')] as const)
 
-const FILAS: { aspecto: string; valores: [string, string, string] }[] = [
+const FILAS = computed<{ aspecto: string; valores: [string, string, string] }[]>(() => [
   {
-    aspecto: 'Qué se recoge',
+    aspecto: t('Qué se recoge', 'What is collected'),
     valores: [
-      'Nada de forma regular: lo que surja en la tutoría.',
-      'Cuatro respuestas de 1 a 5 del estudiante y una o dos del tutor/a, una vez a la semana.',
-      'Actividad en segundo plano: conexiones, tiempo, clics o entregas.',
+      t('Nada de forma regular: lo que surja en la tutoría.', 'Nothing regular: whatever comes up in the meeting.'),
+      t('Cuatro respuestas de 1 a 5 del estudiante y una o dos del tutor/a, una vez a la semana.', 'Four answers from 1 to 5 from the student and one or two from the supervisor, once a week.'),
+      t('Actividad en segundo plano: conexiones, tiempo, clics o entregas.', 'Background activity: logins, time, clicks or submissions.'),
     ],
   },
   {
-    aspecto: 'Tiempo que pide',
-    valores: ['Ninguno añadido.', 'Unos 60 segundos al estudiante y 30 al tutor/a, a la semana.', 'Ninguno a la vista: se registra sin preguntar.'],
+    aspecto: t('Tiempo que pide', 'Time it takes'),
+    valores: [t('Ninguno añadido.', 'None added.'), t('Unos 60 segundos al estudiante y 30 al tutor/a, a la semana.', 'About 60 seconds for the student and 30 for the supervisor, each week.'), t('Ninguno a la vista: se registra sin preguntar.', 'None visible: it is recorded without asking.')],
   },
   {
-    aspecto: 'Quién ve qué',
+    aspecto: t('Quién ve qué', 'Who sees what'),
     valores: [
-      'Solo lo que cada uno cuenta.',
-      'Cada persona, lo suyo. La dirección, solo cifras de 5 personas o más.',
-      'Quien supervisa suele ver los datos de cada persona.',
+      t('Solo lo que cada uno cuenta.', 'Only what each person shares.'),
+      t('Cada persona, lo suyo. La dirección, solo cifras de 5 personas o más.', 'Each person, their own. Programme directors, only figures for 5 people or more.'),
+      t('Quien supervisa suele ver los datos de cada persona.', 'Whoever oversees usually sees each person\'s data.'),
     ],
   },
   {
-    aspecto: 'El bienestar',
-    valores: ['No se pregunta.', 'Se pregunta, y solo lo ve el propio estudiante.', 'A veces se deduce de la actividad.'],
+    aspecto: t('El bienestar', 'Wellbeing'),
+    valores: [t('No se pregunta.', 'Not asked about.'), t('Se pregunta, y solo lo ve el propio estudiante.', 'Asked about, and only the student sees it.'), t('A veces se deduce de la actividad.', 'Sometimes inferred from activity.')],
   },
   {
-    aspecto: 'Notas, rankings y alertas',
-    valores: ['No.', 'No.', 'Suelen dar puntuaciones, rankings o alertas de riesgo.'],
+    aspecto: t('Notas, rankings y alertas', 'Marks, rankings and alerts'),
+    valores: [t('No.', 'No.'), t('No.', 'No.'), t('Suelen dar puntuaciones, rankings o alertas de riesgo.', 'They often give scores, rankings or risk alerts.')],
   },
   {
-    aspecto: 'Cuándo se nota un desajuste',
+    aspecto: t('Cuándo se nota un desajuste', 'When a mismatch is noticed'),
     valores: [
-      'Cuando ya ha crecido, si alguien lo dice.',
-      'Cada semana, con reglas públicas, y con tres preguntas para hablarlo.',
-      'Según indicadores que no siempre se explican.',
+      t('Cuando ya ha crecido, si alguien lo dice.', 'When it has already grown, if someone mentions it.'),
+      t('Cada semana, con reglas públicas, y con tres preguntas para hablarlo.', 'Every week, with public rules, and with three questions to talk it through.'),
+      t('Según indicadores que no siempre se explican.', 'According to indicators that are not always explained.'),
     ],
   },
   {
-    aspecto: 'Límites',
+    aspecto: t('Límites', 'Limits'),
     valores: [
-      'Depende de la memoria y de que alguien saque el tema.',
-      'No sustituye la tutoría ni mide la calidad del trabajo. Funciona si las dos personas responden.',
-      'Mide actividad, no cómo va el trabajo.',
+      t('Depende de la memoria y de que alguien saque el tema.', 'It depends on memory and on someone raising the topic.'),
+      t('No sustituye la tutoría ni mide la calidad del trabajo. Funciona si las dos personas responden.', 'It does not replace supervision or measure the quality of the work. It works if both people answer.'),
+      t('Mide actividad, no cómo va el trabajo.', 'It measures activity, not how the work is going.'),
     ],
   },
-]
+])
 </script>
 
 <template>
   <!-- Escritorio: tabla de tres columnas -->
   <div class="hidden md:block card overflow-hidden">
     <table class="w-full text-left text-[0.95rem]">
-      <caption class="sr-only">Comparación entre la tutoría sin seguimiento, SINTONÍA y las herramientas que vigilan</caption>
+      <caption class="sr-only">{{ t('Comparación entre la tutoría sin seguimiento, SINTONÍA y las herramientas que vigilan', 'Comparison between supervision without follow-up, SINTONÍA and monitoring tools') }}</caption>
       <thead>
         <tr class="border-b border-surface-200">
-          <th scope="col" class="w-[19%] p-4"><span class="sr-only">Aspecto</span></th>
+          <th scope="col" class="w-[19%] p-4"><span class="sr-only">{{ t('Aspecto', 'Aspect') }}</span></th>
           <th
             v-for="(c, i) in COLUMNAS"
             :key="c"

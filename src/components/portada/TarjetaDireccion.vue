@@ -7,6 +7,8 @@
 import type { MiembroDireccion } from '@/contenido/portada'
 
 defineProps<{ miembro: MiembroDireccion }>()
+import { useIdioma } from '@/lib/idioma'
+const { t } = useIdioma()
 </script>
 
 <template>
@@ -21,24 +23,24 @@ defineProps<{ miembro: MiembroDireccion }>()
       </div>
     </div>
     <dl class="mt-5 grid gap-3 text-sm flex-1">
-      <div><dt class="font-medium text-surface-800">Departamento</dt><dd>{{ miembro.departamento }}</dd></div>
-      <div><dt class="font-medium text-surface-800">Área</dt><dd>{{ miembro.area }}</dd></div>
-      <div v-if="miembro.instituto"><dt class="font-medium text-surface-800">Instituto</dt><dd>{{ miembro.instituto }}</dd></div>
+      <div><dt class="font-medium text-surface-800">{{ t('Departamento', 'Department') }}</dt><dd>{{ miembro.departamento }}</dd></div>
+      <div><dt class="font-medium text-surface-800">{{ t('Área', 'Area') }}</dt><dd>{{ miembro.area }}</dd></div>
+      <div v-if="miembro.instituto"><dt class="font-medium text-surface-800">{{ t('Instituto', 'Institute') }}</dt><dd>{{ miembro.instituto }}</dd></div>
       <div>
-        <dt class="font-medium text-surface-800">Grupos de investigación</dt>
+        <dt class="font-medium text-surface-800">{{ t('Grupos de investigación', 'Research groups') }}</dt>
         <dd><ul class="list-disc pl-5 space-y-0.5"><li v-for="g in miembro.grupos" :key="g">{{ g }}</li></ul></dd>
       </div>
       <div>
-        <dt class="font-medium text-surface-800">Tesis doctoral</dt>
+        <dt class="font-medium text-surface-800">{{ t('Tesis doctoral', 'PhD thesis') }}</dt>
         <dd>"{{ miembro.tesis.titulo }}" ({{ miembro.tesis.universidad }}, {{ miembro.tesis.anio }})</dd>
       </div>
     </dl>
     <p class="mt-5 flex flex-wrap gap-x-4">
       <a :href="miembro.perfil" target="_blank" rel="noopener noreferrer" class="enlace inline-flex items-center min-h-tactil">
-        Perfil USAL<span class="sr-only"> de {{ miembro.nombre }} (se abre en otra pestaña)</span>
+        {{ t('Perfil USAL', 'USAL profile') }}<span class="sr-only">{{ t(` de ${miembro.nombre} (se abre en otra pestaña)`, ` of ${miembro.nombre} (opens in a new tab)`) }}</span>
       </a>
       <a :href="miembro.orcid" target="_blank" rel="noopener noreferrer" class="enlace inline-flex items-center min-h-tactil">
-        ORCID<span class="sr-only"> de {{ miembro.nombre }} (se abre en otra pestaña)</span>
+        ORCID<span class="sr-only">{{ t(` de ${miembro.nombre} (se abre en otra pestaña)`, ` of ${miembro.nombre} (opens in a new tab)`) }}</span>
       </a>
     </p>
   </article>

@@ -68,3 +68,18 @@ test('robots.txt y sitemap.xml existen y solo nombran páginas públicas', async
     expect(ok, `${ruta} está en el sitemap pero robots.txt no la permite`).toBe(true)
   }
 })
+
+test('cada página pública se sirve con su título, URL canónica e imagen para compartir', async ({ request }) => {
+  for (const [ruta, titulo, imagen] of [
+    ['/', 'SINTONÍA: acompañar el trabajo académico, sin vigilar', 'inicio'],
+    ['/seguridad', 'Seguridad · SINTONÍA', 'seguridad'],
+    ['/demo/recorrido', 'Demostración guiada · SINTONÍA', 'recorrido'],
+  ]) {
+    const html = await (await request.get(ruta)).text()
+    expect(html, ruta).toContain(`<title>${titulo}</title>`)
+    expect(html, ruta).toMatch(new RegExp(`<link rel="canonical" href="https://[^"]+${ruta === '/' ? '/' : ruta}" />`))
+    expect(html, ruta).toMatch(new RegExp(`<meta property="og:image" content="https://[^"]+/og/${imagen}\\.png" />`))
+    const png = await request.get(`/og/${imagen}.png`)
+    expect(png.headers()['content-type'], imagen).toContain('image/png')
+  }
+})

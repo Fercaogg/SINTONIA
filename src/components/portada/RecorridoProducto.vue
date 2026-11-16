@@ -15,29 +15,27 @@
 // Valores de ejemplo; las preguntas de la agenda salen del banco real.
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { compararMiradas } from '@/lib/demo-portada'
+import { useIdioma } from '@/lib/idioma'
 import { prefiereMenosMovimiento } from '@/lib/movimiento'
 import AppIcon from '@/components/comun/AppIcon.vue'
 import OndasSintonia from './OndasSintonia.vue'
 
-const PASOS = [
-  { titulo: 'Responde el estudiante', texto: 'Cuatro preguntas de 1 a 5. Unos 60 segundos.', duracion: 5200 },
-  { titulo: 'Responde el tutor/a', texto: 'Una o dos por estudiante. Unos 30 segundos para todos.', duracion: 4600 },
-  { titulo: 'Se comparan las dos miradas', texto: 'Con reglas sencillas y públicas. Sin notas.', duracion: 4400 },
-  { titulo: 'Llega la agenda de la tutoría', texto: 'Las mismas tres preguntas neutras para los dos.', duracion: 5200 },
-] as const
+const { t, idioma } = useIdioma()
+const PASOS = computed(() => [
+  { titulo: t('Responde el estudiante', 'The student answers'), texto: t('Cuatro preguntas de 1 a 5. Unos 60 segundos.', 'Four questions from 1 to 5. About 60 seconds.'), duracion: 5200 },
+  { titulo: t('Responde el tutor/a', 'The supervisor answers'), texto: t('Una o dos por estudiante. Unos 30 segundos para todos.', 'One or two per student. About 30 seconds for all.'), duracion: 4600 },
+  { titulo: t('Se comparan las dos miradas', 'The two perspectives are compared'), texto: t('Con reglas sencillas y públicas. Sin notas.', 'With simple, public rules. No marks.'), duracion: 4400 },
+  { titulo: t('Llega la agenda de la tutoría', 'The meeting agenda arrives'), texto: t('Las mismas tres preguntas neutras para los dos.', 'The same three neutral questions for both.'), duracion: 5200 },
+])
 
-const PREGUNTAS = [
-  { texto: 'Avance', valor: 4 },
-  { texto: 'Siguiente paso', valor: 3 },
-  { texto: 'Apoyo percibido', valor: 4 },
-  { texto: 'Bienestar', valor: 3, privada: true },
-]
-const ESTUDIANTES = [
-  { nombre: 'Estudiante 1', valor: 2 },
-  { nombre: 'Estudiante 2', valor: 4 },
-  { nombre: 'Estudiante 3', valor: 3 },
-]
-const agenda = compararMiradas(4, 2).preguntas
+const PREGUNTAS = computed(() => [
+  { texto: t('Avance', 'Progress'), valor: 4 },
+  { texto: t('Siguiente paso', 'Next step'), valor: 3 },
+  { texto: t('Apoyo percibido', 'Perceived support'), valor: 4 },
+  { texto: t('Bienestar', 'Wellbeing'), valor: 3, privada: true },
+])
+const ESTUDIANTES = computed(() => [1, 2, 3].map((n, i) => ({ nombre: `${t('Estudiante', 'Student')} ${n}`, valor: [2, 4, 3][i] })))
+const agenda = computed(() => compararMiradas(4, 2, idioma.value).preguntas)
 
 const quieto = prefiereMenosMovimiento()
 const paso = ref(0)
@@ -61,7 +59,7 @@ watch(
 )
 
 function siguiente() {
-  paso.value = (paso.value + 1) % PASOS.length
+  paso.value = (paso.value + 1) % PASOS.value.length
 }
 function ir(i: number) {
   paso.value = i
@@ -91,8 +89,8 @@ const estilo = (e: Record<string, string>) => e
     class="recorrido grid gap-8 sm:grid-cols-[17.5rem_1fr] sm:items-center"
     :class="{ pausado, quieto }"
     role="group"
-    aria-roledescription="recorrido"
-    aria-label="Así funciona SINTONÍA, paso a paso (ejemplo)"
+    :aria-roledescription="t('recorrido', 'walkthrough')"
+    :aria-label="t('Así funciona SINTONÍA, paso a paso (ejemplo)', 'How SINTONÍA works, step by step (example)')"
   >
     <!-- El móvil -->
     <div class="mx-auto w-[17.5rem] rounded-[2.6rem] bg-marino p-2.5 shadow-[0_30px_60px_-24px_rgba(10,74,108,0.5)]" aria-hidden="true">
@@ -100,19 +98,19 @@ const estilo = (e: Record<string, string>) => e
         <div class="flex items-center justify-between px-6 pt-3 text-[0.65rem] font-semibold text-surface-900">
           <span>SINTONÍA</span>
           <span class="h-5 w-16 rounded-full bg-marino" />
-          <span class="rounded-full bg-surface-100 px-2 py-0.5 font-medium text-surface-800">Ejemplo</span>
+          <span class="rounded-full bg-surface-100 px-2 py-0.5 font-medium text-surface-800">{{ t('Ejemplo', 'Example') }}</span>
         </div>
 
         <Transition name="pantalla" mode="out-in">
           <!-- 1. El estudiante responde -->
           <div v-if="paso === 0" key="0" class="pantalla px-5 pt-5">
-            <p class="text-[0.68rem] font-semibold uppercase tracking-[0.14em] text-brand-900">Esta semana</p>
-            <p class="mt-1 font-display text-lg font-semibold leading-tight text-surface-900">¿Cómo va el trabajo?</p>
+            <p class="text-[0.68rem] font-semibold uppercase tracking-[0.14em] text-brand-900">{{ t('Esta semana', 'This week') }}</p>
+            <p class="mt-1 font-display text-lg font-semibold leading-tight text-surface-900">{{ t('¿Cómo va el trabajo?', 'How is the work going?') }}</p>
             <ul class="mt-4 space-y-3.5">
               <li v-for="(q, i) in PREGUNTAS" :key="q.texto">
                 <div class="flex items-center justify-between text-xs">
                   <span class="font-medium text-surface-900">{{ q.texto }}</span>
-                  <span v-if="q.privada" class="inline-flex items-center gap-1 text-brand-900"><AppIcon name="lock" :size="12" />Solo tú</span>
+                  <span v-if="q.privada" class="inline-flex items-center gap-1 text-brand-900"><AppIcon name="lock" :size="12" />{{ t('Solo tú', 'Only you') }}</span>
                 </div>
                 <div class="mt-1.5 grid grid-cols-5 gap-1.5">
                   <span v-for="n in 5" :key="n" class="relative h-7 rounded-md bg-surface-100 text-[0.7rem] font-semibold text-surface-800 flex items-center justify-center">
@@ -127,17 +125,17 @@ const estilo = (e: Record<string, string>) => e
               </li>
             </ul>
             <div class="relative mt-5 h-10 rounded-lg bg-marino text-white text-sm font-semibold overflow-hidden">
-              <span class="boton-texto absolute inset-0 flex items-center justify-center" :style="retraso(3500)">Enviar</span>
+              <span class="boton-texto absolute inset-0 flex items-center justify-center" :style="retraso(3500)">{{ t('Enviar', 'Send') }}</span>
               <span class="boton-hecho absolute inset-0 flex items-center justify-center gap-1.5 bg-[#1d7060]" :style="retraso(3500)">
-                <AppIcon name="check" :size="16" />Enviado
+                <AppIcon name="check" :size="16" />{{ t('Enviado', 'Sent') }}
               </span>
             </div>
           </div>
 
           <!-- 2. El tutor/a responde -->
           <div v-else-if="paso === 1" key="1" class="pantalla px-5 pt-5">
-            <p class="text-[0.68rem] font-semibold uppercase tracking-[0.14em] text-brand-900">Tus estudiantes</p>
-            <p class="mt-1 font-display text-lg font-semibold leading-tight text-surface-900">¿Cómo ves el avance?</p>
+            <p class="text-[0.68rem] font-semibold uppercase tracking-[0.14em] text-brand-900">{{ t('Tus estudiantes', 'Your students') }}</p>
+            <p class="mt-1 font-display text-lg font-semibold leading-tight text-surface-900">{{ t('¿Cómo ves el avance?', 'How do you see the progress?') }}</p>
             <ul class="mt-4 space-y-3">
               <li v-for="(e, i) in ESTUDIANTES" :key="e.nombre" class="entra rounded-xl border border-surface-200 p-3" :style="{ animationDelay: `${150 + i * 120}ms` }">
                 <p class="text-xs font-semibold text-surface-900 flex items-center gap-1.5"><AppIcon name="person" :size="13" />{{ e.nombre }}</p>
@@ -154,36 +152,36 @@ const estilo = (e: Record<string, string>) => e
               </li>
             </ul>
             <p class="entra mt-4 flex items-center justify-center gap-1.5 text-xs font-medium text-brand-900" :style="retraso(3200)">
-              <AppIcon name="clock" :size="14" />Hecho en unos 30 segundos
+              <AppIcon name="clock" :size="14" />{{ t('Hecho en unos 30 segundos', 'Done in about 30 seconds') }}
             </p>
           </div>
 
           <!-- 3. Las dos miradas -->
           <div v-else-if="paso === 2" key="2" class="pantalla px-5 pt-5">
-            <p class="text-[0.68rem] font-semibold uppercase tracking-[0.14em] text-brand-900">Estudiante 1</p>
-            <p class="mt-1 font-display text-lg font-semibold leading-tight text-surface-900">Dos miradas sobre el avance</p>
+            <p class="text-[0.68rem] font-semibold uppercase tracking-[0.14em] text-brand-900">{{ t('Estudiante 1', 'Student 1') }}</p>
+            <p class="mt-1 font-display text-lg font-semibold leading-tight text-surface-900">{{ t('Dos miradas sobre el avance', 'Two perspectives on progress') }}</p>
             <div class="mt-6" :style="estilo({ '--ondas-duracion': '1600ms' })">
               <OndasSintonia :desfase="desfaseOndas" :alto="96" :grosor="3" />
             </div>
             <div class="mt-4 grid grid-cols-2 gap-2">
               <div class="entra rounded-xl bg-surface-100 p-3 text-center" :style="retraso(300)">
-                <p class="text-[0.65rem] font-medium text-surface-800 flex items-center justify-center gap-1"><span class="h-1 w-3 rounded-full bg-brand-500" />Estudiante</p>
+                <p class="text-[0.65rem] font-medium text-surface-800 flex items-center justify-center gap-1"><span class="h-1 w-3 rounded-full bg-brand-500" />{{ t('Estudiante', 'Student') }}</p>
                 <p class="mt-1 font-display text-2xl font-bold text-surface-900">4</p>
               </div>
               <div class="entra rounded-xl bg-surface-100 p-3 text-center" :style="retraso(420)">
-                <p class="text-[0.65rem] font-medium text-surface-800 flex items-center justify-center gap-1"><span class="h-1 w-3 rounded-full bg-surface-900" />Tutor/a</p>
+                <p class="text-[0.65rem] font-medium text-surface-800 flex items-center justify-center gap-1"><span class="h-1 w-3 rounded-full bg-surface-900" />{{ t('Tutor/a', 'Supervisor') }}</p>
                 <p class="mt-1 font-display text-2xl font-bold text-surface-900">2</p>
               </div>
             </div>
             <p class="entra mt-4 rounded-xl border border-brand-200 bg-brand-50 p-3 text-xs font-medium leading-snug text-surface-900" :style="retraso(2000)">
-              2 puntos de diferencia: hay desajuste. Nadie tiene razón: son dos miradas.
+              {{ t('2 puntos de diferencia: hay desajuste. Nadie tiene razón: son dos miradas.', '2 points of difference: there is a mismatch. Nobody is right: they are two perspectives.') }}
             </p>
           </div>
 
           <!-- 4. La agenda -->
           <div v-else key="3" class="pantalla px-5 pt-5">
-            <p class="text-[0.68rem] font-semibold uppercase tracking-[0.14em] text-brand-900">Próxima tutoría</p>
-            <p class="mt-1 font-display text-lg font-semibold leading-tight text-surface-900">Agenda para los dos</p>
+            <p class="text-[0.68rem] font-semibold uppercase tracking-[0.14em] text-brand-900">{{ t('Próxima tutoría', 'Next meeting') }}</p>
+            <p class="mt-1 font-display text-lg font-semibold leading-tight text-surface-900">{{ t('Agenda para los dos', 'Agenda for both') }}</p>
             <ol class="mt-4 space-y-2.5">
               <li
                 v-for="(q, i) in agenda"
@@ -196,7 +194,7 @@ const estilo = (e: Record<string, string>) => e
               </li>
             </ol>
             <p class="entra mt-4 flex items-center gap-1.5 text-[0.7rem] texto-suave" :style="retraso(2800)">
-              <AppIcon name="users" :size="14" class="shrink-0" />Estudiante y tutor/a reciben las mismas preguntas.
+              <AppIcon name="users" :size="14" class="shrink-0" />{{ t('Estudiante y tutor/a reciben las mismas preguntas.', 'Student and supervisor receive the same questions.') }}
             </p>
           </div>
         </Transition>
@@ -242,7 +240,7 @@ const estilo = (e: Record<string, string>) => e
         class="mt-2 inline-flex items-center gap-2 rounded-md px-3 min-h-tactil text-sm font-medium text-surface-800 hover:bg-papel/70"
         @click="pausadoUsuario = !pausadoUsuario"
       >
-        <AppIcon :name="pausadoUsuario ? 'reproducir' : 'pausa'" :size="16" />{{ pausadoUsuario ? 'Reanudar el recorrido' : 'Pausar el recorrido' }}
+        <AppIcon :name="pausadoUsuario ? 'reproducir' : 'pausa'" :size="16" />{{ pausadoUsuario ? t('Reanudar el recorrido', 'Resume the walkthrough') : t('Pausar el recorrido', 'Pause the walkthrough') }}
       </button>
     </div>
   </div>

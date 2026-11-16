@@ -47,13 +47,13 @@ En la columna "Qué hay hoy" está lo que he comprobado. En "Qué haré", lo que
 
 | # | Punto | Estado | Qué hay hoy | Qué haré |
 |---|---|---|---|---|
-| 5.1 | Imagen Open Graph por página | **A medias** | Hay una sola imagen (`og.png`, 1200 × 630) para toda la web, puesta en `index.html` | Una imagen por página principal (las dos ondas, el título y #0A4A6C), con sus etiquetas por página, y comprobar cómo se ve al compartir |
-| 5.2 | Preparación para dominio propio | **A medias** | `robots.txt` y `sitemap.xml` existen, pero con `vercel.app` escrito a mano; no hay URL canónica | Dirección base en un solo sitio, URL canónica por página, sitemap generado al publicar y redirección lista. Te explico los pasos para el día que compres el dominio |
-| 5.3 | Modo oscuro | **Hecho** | Sigue la preferencia del sistema; hay una prueba automática de contraste AA en oscuro para las páginas públicas y del panel | Solo revisar las páginas nuevas |
-| 5.4 | Versión en inglés (/en) | **No existe** | Todo está en español | Páginas públicas en inglés bajo /en, con selector de idioma. La aplicación interna sigue en español |
-| 5.5 | Microcopia | **A medias** | El tono general es cercano y sin culpa, pero nunca se ha revisado todo de forma sistemática (errores, estados vacíos, confirmaciones y correos) | Revisión completa, con una lista de cambios |
-| 5.6 | Página 404 propia | **A medias** | Existe, pero es genérica: "Esta página no existe" | Las dos ondas desajustadas, "Esta página no está en sintonía" y un botón al inicio |
-| 5.7 | Lighthouse móvil ≥ 90 y teclado | **A medias** | En la portada: accesibilidad 100, buenas prácticas 96, SEO 100 y rendimiento entre 83 y 93 según la ejecución. No está medido en el resto de páginas. Hay pruebas de teclado en algunas partes (pestañas, check-in), no una navegación completa | Medir todas las páginas públicas en móvil, subir rendimiento a 90 o más de forma estable y añadir una prueba de navegación completa por teclado |
+| 5.1 | Imagen Open Graph por página | **Hecho** | Una imagen propia (1200 × 630, las dos ondas, el título y #0A4A6C) para cada página principal, en español y en inglés, en `public/og` (`node scripts/generar-og.mjs`). Cada página tiene su propio HTML con título, descripción, imagen y URL canónica, para que al compartir el enlace se vea la página correcta | |
+| 5.2 | Preparación para dominio propio | **Hecho** | La dirección se cambia en un solo sitio (`VITE_URL_SITIO`); de ahí salen la URL canónica, las etiquetas para compartir, `robots.txt` y `sitemap.xml`, que se generan al publicar. Los pasos para el día del dominio están en docs/DOMINIO.md | |
+| 5.3 | Modo oscuro | **Hecho** | Sigue la preferencia del sistema. La prueba de contraste AA en oscuro incluye ahora también las páginas nuevas: confianza, instituciones, hoja de ruta, participantes, recorrido, las 9 de /en y la 404 | |
+| 5.4 | Versión en inglés (/en) | **Hecho** | 9 páginas de presentación en /en (inicio, cómo funciona, investigación, instituciones, seguridad, accesibilidad, hoja de ruta, estado y novedades), con selector de idioma en la cabecera y `lang` y `hreflang` correctos. La aplicación interna y los textos legales siguen en español (los legales, hasta que los apruebe el Comité) | |
+| 5.5 | Microcopia | **Hecho** | Revisados errores, estados vacíos, confirmaciones y correos. Cinco textos cambiados para que no culpen ni metan prisa y digan qué hacer después (lista en DECISIONES.md, 16/11/2026) | |
+| 5.6 | Página 404 propia | **Hecho** | Las dos ondas desajustadas, "Esta página no está en sintonía", botón al inicio y otro para avisar del enlace roto. Devuelve el código 404 y no se indexa | |
+| 5.7 | Lighthouse móvil ≥ 90 y teclado | **Hecho** | Medidas las 27 páginas públicas en móvil: rendimiento entre 92 y 99, accesibilidad 100, buenas prácticas 100 en la web publicada y SEO 100 (la 404 no se indexa, como debe ser). El fondo animado del inicio espera a que la página esté lista. Enlace "Saltar al contenido" en todas las páginas y prueba automática de navegación completa con el teclado en 18 páginas, en móvil y escritorio | |
 
 ## Lo que NO se añade (comprobado)
 
@@ -68,10 +68,12 @@ En la columna "Qué hay hoy" está lo que he comprobado. En "Qué haré", lo que
 
 | Estado | Puntos |
 |---|---|
-| Hecho | 16 (Fases 1 a 4 completas, y modo oscuro) |
-| A medias | 5 |
-| No existe | 1 |
+| Hecho | 22 (las cinco fases completas) |
+| A medias | 0 |
+| No existe | 0 |
 
 **Orden propuesto:** las fases en el orden de la lista. Al terminar cada una: pruebas, revisión en móvil (360 px) y escritorio, capturas en docs/capturas y tu visto bueno.
 
 **Fases 1 a 4 terminadas el 15/11/2026.** Pruebas y capturas en docs/capturas (prefijos `fase1-` a `fase4-`). Pendiente de tu visto bueno antes de la Fase 5.
+
+**Fase 5 terminada el 16/11/2026.** Pruebas y capturas en docs/capturas (prefijo `fase5-`). Lo que queda depende de datos tuyos o del Comité: está en PENDIENTES.md.

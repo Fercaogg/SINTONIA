@@ -12,7 +12,15 @@ export const NOVEDADES: Novedad[] = [
   {
     version: '0.5.0',
     fecha: '2026-11-16',
-    cambios: ['Logotipo definitivo de SINTONÍA: tres hojas que forman una S, en la web, el icono del navegador y los documentos en PDF.'],
+    cambios: [
+      'Logotipo definitivo de SINTONÍA: tres hojas que forman una S, en la web, el icono del navegador y los documentos en PDF.',
+      'Versión en inglés de las páginas públicas principales.',
+      'Cada página tiene su propia imagen y descripción al compartir el enlace.',
+      'Página propia para los enlaces que no existen.',
+      'Mensajes de error y avisos revisados para que digan siempre qué hacer después, sin culpa ni prisa.',
+      'Enlace "Saltar al contenido" en todas las páginas y la web entera se puede recorrer solo con el teclado.',
+      'Carga más ligera en móviles: el fondo animado del inicio espera a que la página esté lista.',
+    ],
   },
   {
     version: '0.4.0',

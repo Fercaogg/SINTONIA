@@ -1,6 +1,8 @@
 <script setup lang="ts">
 // Franja superior que avisa de que no se está usando la instalación real.
 // La de demostración aparece si la aplicación o la base de datos lo son.
+import { useIdioma } from '@/lib/idioma'
+const { t } = useIdioma()
 import { computed, onMounted } from 'vue'
 import { entornoLocal, modoDemo } from '@/lib/supabase'
 import { comprobarModoServidor, modoServidor } from '@/lib/demo'
@@ -18,7 +20,7 @@ const malConfigurada = computed(() => modoDemo && modoServidor.value === 'real')
     data-banda-entorno
   >
     <template v-if="malConfigurada">Atención: la aplicación está en modo demostración pero la base de datos es real. Revisa la configuración.</template>
-    <template v-else-if="esDemo">Demostración: todos los datos y nombres son ficticios.</template>
+    <template v-else-if="esDemo">{{ t('Demostración: todos los datos y nombres son ficticios.', 'Demo: all data and names are fictitious.') }}</template>
     <template v-else>Entorno local de desarrollo: no es la instalación real.</template>
   </div>
 </template>

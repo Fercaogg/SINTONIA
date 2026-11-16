@@ -1,56 +1,62 @@
 <script setup lang="ts">
 // Pie de las páginas públicas: enlaces legales, autoría y versión.
+import { computed } from 'vue'
 import { RouterLink } from 'vue-router'
-import { AUTORIA, CORREO_CONTACTO, VERSION } from '@/lib/publico'
+import { useIdioma } from '@/lib/idioma'
+import { AUTORIA, AUTORIA_EN, CORREO_CONTACTO, VERSION } from '@/lib/publico'
 
-const GRUPOS = [
+const { t, ruta, soloEnEspanol } = useIdioma()
+
+const GRUPOS = computed(() => [
   {
-    titulo: 'Proyecto',
+    titulo: t('Proyecto', 'Project'),
     enlaces: [
-      { to: '/investigacion', texto: 'La investigación' },
-      { to: '/instituciones', texto: 'Para instituciones' },
-      { to: '/participantes', texto: 'Kit para participantes' },
-      { to: '/hoja-de-ruta', texto: 'Hoja de ruta' },
-      { to: '/novedades', texto: 'Novedades' },
-      { to: '/#preguntas', texto: 'Preguntas frecuentes' },
-      { to: '/#contacto', texto: 'Contacto' },
+      { to: '/investigacion', texto: t('La investigación', 'The research') },
+      { to: '/instituciones', texto: t('Para instituciones', 'For institutions') },
+      { to: '/participantes', texto: t('Kit para participantes', "Participants' kit") },
+      { to: '/hoja-de-ruta', texto: t('Hoja de ruta', 'Roadmap') },
+      { to: '/novedades', texto: t('Novedades', 'Changelog') },
+      { to: '/#preguntas', texto: t('Preguntas frecuentes', 'FAQ') },
+      { to: '/#contacto', texto: t('Contacto', 'Contact') },
     ],
   },
   {
-    titulo: 'Confianza',
+    titulo: t('Confianza', 'Trust'),
     enlaces: [
-      { to: '/como-funciona', texto: 'Cómo funciona y tus datos' },
-      { to: '/seguridad', texto: 'Seguridad' },
-      { to: '/accesibilidad', texto: 'Accesibilidad' },
-      { to: '/estado', texto: 'Estado de la plataforma' },
+      { to: '/como-funciona', texto: t('Cómo funciona y tus datos', 'How it works and your data') },
+      { to: '/seguridad', texto: t('Seguridad', 'Security') },
+      { to: '/accesibilidad', texto: t('Accesibilidad', 'Accessibility') },
+      { to: '/estado', texto: t('Estado de la plataforma', 'Platform status') },
     ],
   },
   {
-    titulo: 'Legal',
+    titulo: t('Legal', 'Legal'),
     enlaces: [
-      { to: '/privacidad', texto: 'Privacidad' },
-      { to: '/aviso-legal', texto: 'Aviso legal' },
-      { to: '/cookies', texto: 'Cookies' },
-      { to: '/consentimiento', texto: 'Consentimiento' },
+      { to: '/privacidad', texto: t('Privacidad', 'Privacy') },
+      { to: '/aviso-legal', texto: t('Aviso legal', 'Legal notice') },
+      { to: '/cookies', texto: t('Cookies', 'Cookies') },
+      { to: '/consentimiento', texto: t('Consentimiento', 'Consent') },
     ],
   },
-]
+])
 </script>
 
 <template>
   <footer class="border-t border-surface-200 bg-papel">
     <div class="max-w-[1100px] mx-auto px-4 sm:px-6 py-10 grid gap-8 lg:grid-cols-[1fr_auto] text-sm">
       <div class="space-y-2">
-        <p class="text-surface-900 font-medium">{{ AUTORIA }}</p>
-        <p class="texto-suave">Contacto: <a :href="`mailto:${CORREO_CONTACTO}`" class="enlace">{{ CORREO_CONTACTO }}</a></p>
-        <p class="texto-suave">Versión {{ VERSION }}</p>
+        <p class="text-surface-900 font-medium">{{ t(AUTORIA, AUTORIA_EN) }}</p>
+        <p class="texto-suave">{{ t('Contacto', 'Contact') }}: <a :href="`mailto:${CORREO_CONTACTO}`" class="enlace">{{ CORREO_CONTACTO }}</a></p>
+        <p class="texto-suave">{{ t('Versión', 'Version') }} {{ VERSION }}</p>
       </div>
-      <nav aria-label="Información del proyecto" class="grid grid-cols-2 gap-x-8 gap-y-6 sm:grid-cols-3">
+      <nav :aria-label="t('Información del proyecto', 'Project information')" class="grid grid-cols-2 gap-x-8 gap-y-6 sm:grid-cols-3">
         <div v-for="g in GRUPOS" :key="g.titulo">
           <h2 class="text-xs font-semibold uppercase tracking-[0.14em] text-surface-800">{{ g.titulo }}</h2>
           <ul class="mt-1">
             <li v-for="e in g.enlaces" :key="e.to">
-              <RouterLink :to="e.to" class="enlace inline-flex items-center min-h-tactil">{{ e.texto }}</RouterLink>
+              <RouterLink :to="ruta(e.to)" class="enlace inline-flex items-center min-h-tactil" :hreflang="soloEnEspanol(e.to) ? 'es' : undefined"
+                >{{ e.texto }}<span v-if="soloEnEspanol(e.to)" class="texto-suave"> (in Spanish)</span></RouterLink
+              >
             </li>
           </ul>
         </div>

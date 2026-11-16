@@ -221,7 +221,7 @@ async function anular(c: Codigo) {
 
           <section class="card p-5" aria-labelledby="t-lista">
             <h2 id="t-lista" class="font-semibold text-surface-900 mb-4">Códigos de este máster</h2>
-            <EstadoVacio v-if="!codigos.length" icono="key" titulo="Sin códigos" texto="Crea el primero con el formulario de arriba." />
+            <EstadoVacio v-if="!codigos.length" icono="key" titulo="Todavía no hay códigos" texto="Cuando quieras, crea el primero con el formulario de arriba." />
             <div v-else class="relative overflow-x-auto" tabindex="0" role="region" aria-label="Tabla (se puede desplazar)">
               <table class="w-full text-sm text-left">
                 <caption class="sr-only">Códigos de acceso del máster</caption>

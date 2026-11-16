@@ -5,4 +5,5 @@
 export const REVISION_SEGURIDAD = '2026-11-15'
 
 /** Fecha de la declaración de accesibilidad y de la última revisión. */
-export const REVISION_ACCESIBILIDAD = '2026-11-15'
+export const PREPARACION_ACCESIBILIDAD = '2026-11-15'
+export const REVISION_ACCESIBILIDAD = '2026-11-16'
