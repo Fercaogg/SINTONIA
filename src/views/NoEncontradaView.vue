@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import SaltarContenido from '@/components/layout/SaltarContenido.vue'
 // Página 404: las dos ondas, desajustadas, y un camino de vuelta.
 // Las ondas se separan un poco más al entrar y se quedan quietas; con
 // "reducir movimiento", directamente en su sitio.
@@ -16,13 +17,14 @@ const estilo = (e: Record<string, string>) => e
 
 <template>
   <div class="min-h-screen flex flex-col">
+    <SaltarContenido />
     <BandaEntorno />
     <header class="border-b border-surface-200 bg-papel">
       <div class="max-w-3xl mx-auto px-4 py-4">
         <RouterLink to="/" class="text-xl" aria-label="SINTONÍA, inicio"><AppLogo /></RouterLink>
       </div>
     </header>
-    <main id="contenido" class="flex-1 flex items-center">
+    <main id="contenido" tabindex="-1" class="outline-none flex-1 flex items-center">
       <div class="w-full max-w-xl mx-auto px-4 py-16 text-center">
         <div class="mx-auto max-w-md" :style="estilo({ '--ondas-duracion': '1400ms' })" aria-hidden="true">
           <OndasSintonia :desfase="desfase" :alto="110" />

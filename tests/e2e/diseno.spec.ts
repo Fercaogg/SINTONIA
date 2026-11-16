@@ -22,6 +22,22 @@ test.describe('modo oscuro', () => {
       await sinErroresDeAccesibilidad(page)
     }
   })
+
+  test('las páginas nuevas (confianza, instituciones, inglés y 404) también cumplen en oscuro', async ({ page }) => {
+    test.setTimeout(120_000)
+    const rutas = [
+      '/instituciones', '/hoja-de-ruta', '/participantes', '/demo/recorrido', '/seguridad', '/accesibilidad', '/novedades', '/estado',
+      '/en', '/en/how-it-works', '/en/research', '/en/institutions', '/en/security', '/en/accessibility', '/en/roadmap', '/en/status', '/en/changelog',
+      '/no-existe',
+    ]
+    for (const ruta of rutas) {
+      await page.goto(ruta)
+      await page.waitForLoadState('networkidle')
+      const fondo = await page.evaluate(() => getComputedStyle(document.body).backgroundColor)
+      expect(fondo, ruta).toBe('rgb(9, 24, 31)')
+      await sinErroresDeAccesibilidad(page)
+    }
+  })
 })
 
 test('con "reducir movimiento" todo se ve en su estado final', async ({ page }) => {

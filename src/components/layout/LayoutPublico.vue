@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import SaltarContenido from '@/components/layout/SaltarContenido.vue'
 // Estructura de las páginas públicas de lectura (Cómo funciona, privacidad,
 // aviso legal, cookies, consentimiento): cabecera sencilla, contenido y pie.
 import { RouterLink, useRouter } from 'vue-router'
@@ -21,6 +22,7 @@ function volver() {
 
 <template>
   <div class="min-h-screen flex flex-col">
+    <SaltarContenido />
     <BandaEntorno />
     <header class="bg-papel border-b border-surface-200">
       <div class="mx-auto px-4 py-4 flex items-center justify-between gap-3" :class="props.ancho === 'amplio' ? 'max-w-5xl' : 'max-w-3xl'">
@@ -33,7 +35,7 @@ function volver() {
         </div>
       </div>
     </header>
-    <main id="contenido" class="flex-1 w-full min-w-0 mx-auto px-4 py-10 fade-in" :class="props.ancho === 'amplio' ? 'max-w-5xl' : 'max-w-3xl'">
+    <main id="contenido" tabindex="-1" class="outline-none flex-1 w-full min-w-0 mx-auto px-4 py-10 fade-in" :class="props.ancho === 'amplio' ? 'max-w-5xl' : 'max-w-3xl'">
       <slot />
     </main>
     <PiePublico />

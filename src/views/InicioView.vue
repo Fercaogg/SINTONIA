@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import SaltarContenido from '@/components/layout/SaltarContenido.vue'
 // Portada (rediseño del 14/11/2026, DISENO.md apartado 12).
 // Orden por importancia: qué es y probarlo; para quién; por qué; cómo
 // funciona; las cifras con la demostración; privacidad; cada perfil;
@@ -140,6 +141,7 @@ const estilo = (e: Record<string, string>) => e
 
 <template>
   <div class="min-h-screen flex flex-col">
+    <SaltarContenido />
     <BandaEntorno />
     <header class="sticky top-0 z-30 bg-surface-50/95 backdrop-blur-md border-b border-surface-200">
       <div class="max-w-[1180px] mx-auto px-4 sm:px-6 py-3 flex items-center justify-between gap-3">
@@ -179,7 +181,7 @@ const estilo = (e: Record<string, string>) => e
       </div>
     </header>
 
-    <main id="contenido" class="flex-1">
+    <main id="contenido" tabindex="-1" class="outline-none flex-1">
       <p v-if="route.query.borrado" class="aviso-exito max-w-[900px] mx-4 sm:mx-auto mt-6" role="status">
         {{ t('Hemos borrado tu cuenta y todos tus datos. Gracias por haber participado.', 'We have deleted your account and all your data. Thank you for taking part.') }}
       </p>

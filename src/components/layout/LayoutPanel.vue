@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import SaltarContenido from '@/components/layout/SaltarContenido.vue'
 // Estructura de las pantallas con sesión iniciada.
 // Basada en WW360 AppLayout.vue (estudiante y tutor: menú blanco) y
 // AdminLayout.vue (dirección e investigación: menú azul marino).
@@ -87,7 +88,7 @@ async function salir() {
 
 <template>
   <div class="min-h-screen flex flex-col">
-    <a href="#contenido" class="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-[60] btn-primary">Saltar al contenido</a>
+    <SaltarContenido />
     <BandaEntorno />
 
     <div class="flex flex-1">

@@ -133,6 +133,9 @@ function iniciar(): boolean {
   if (!c) return false
   gl = c.getContext('webgl', { antialias: false, alpha: true, premultipliedAlpha: false, powerPreference: 'low-power' })
   if (!gl) return false
+  // Sin tarjeta gráfica (WebGL por software), dibujar cuesta tanto que
+  // bloquearía la página en móviles modestos: mejor no dibujar nada.
+  if (sinAceleracion()) return false
   const v = compilar(gl.VERTEX_SHADER, VERTICES)
   const f = compilar(gl.FRAGMENT_SHADER, FRAGMENTOS)
   if (!v || !f) return false
@@ -270,8 +273,19 @@ watch(desfasePortada, (v) => {
   dibujar(4000)
 })
 
-onMounted(() => {
-  if (!iniciar()) return
+// Se arranca cuando el navegador queda libre, para no competir con la carga
+// de la página (el texto y los botones van primero).
+function cuandoLibre(fn: () => void) {
+  const w = window as Window & { requestIdleCallback?: (cb: () => void, o?: { timeout: number }) => number }
+  if (w.requestIdleCallback) w.requestIdleCallback(fn, { timeout: 2500 })
+  else setTimeout(fn, 600)
+}
+
+let desmontado = false
+onMounted(() => cuandoLibre(montar))
+
+function montar() {
+  if (desmontado || !iniciar()) return
   disponible.value = true
   actual.desfase = Math.max(0.8, desfasePortada.value)
   // Si el lienzo cambia de tamaño estando quieto o en pausa, se vuelve a
@@ -280,7 +294,7 @@ onMounted(() => {
     if (quieto.value || pausado.value) dibujar(quieto.value ? 4000 : tiempoPausado)
   })
   medidor.observe(lienzo.value!)
-  if (prefiereMenosMovimiento() || sinAceleracion()) {
+  if (prefiereMenosMovimiento()) {
     // Un solo fotograma, ya con el desfase de la demostración.
     quieto.value = true
     actual.desfase = desfasePortada.value
@@ -299,9 +313,10 @@ onMounted(() => {
   })
   observador.observe(lienzo.value!)
   arrancar()
-})
+}
 
 onBeforeUnmount(() => {
+  desmontado = true
   parar()
   observador?.disconnect()
   medidor?.disconnect()

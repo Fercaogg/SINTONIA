@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import SaltarContenido from '@/components/layout/SaltarContenido.vue'
 // /demo: entrada a la demostración, con datos ficticios en una instalación
 // totalmente separada de la real (otro proyecto de Supabase y de Vercel) que
 // se reinicia cada noche.
@@ -15,6 +16,7 @@ const ICONOS = { estudiante: 'person', tutor: 'users', direccion: 'chart', inves
 
 <template>
   <div class="min-h-screen flex flex-col">
+    <SaltarContenido />
     <p class="sticky top-0 z-30 bg-amber-100 text-amber-900 text-sm font-semibold text-center px-4 py-2 border-b border-amber-200" role="note" data-banda-demo>
       Demostración: datos ficticios
     </p>
@@ -25,7 +27,7 @@ const ICONOS = { estudiante: 'person', tutor: 'users', direccion: 'chart', inves
       </div>
     </header>
 
-    <main id="contenido" class="flex-1">
+    <main id="contenido" tabindex="-1" class="outline-none flex-1">
       <section class="max-w-[1180px] mx-auto px-4 sm:px-6 py-14 sm:py-20 grid gap-12 lg:grid-cols-[5fr_7fr] items-start">
         <div>
           <p class="text-xs font-semibold uppercase tracking-[0.18em] text-brand-900">Demostración</p>

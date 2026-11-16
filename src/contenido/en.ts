@@ -165,7 +165,7 @@ export const TEMA_HIPOTESIS_EN: Record<string, string> = {
 
 /** Changelog in English (same versions and dates as src/contenido/novedades.ts). */
 export const NOVEDADES_EN: Record<string, string[]> = {
-  '0.5.0': ["SINTONÍA's final logo: three leaves forming an S, on the website, the browser icon and the PDF documents.", 'English version of the main public pages.'],
+  '0.5.0': ["SINTONÍA's final logo: three leaves forming an S, on the website, the browser icon and the PDF documents.", 'English version of the main public pages.', 'Each page has its own image and description when the link is shared.', 'A dedicated page for links that do not exist.', 'Error messages and notices reviewed so they always say what to do next, without blame or hurry.', '"Skip to content" link on every page, and the whole website can be used with the keyboard alone.', 'Lighter loading on phones: the animated home background waits until the page is ready.'],
   '0.4.0': [
     'New pages on security, accessibility, changelog and platform status.',
     'A guided demo of about 60 seconds: the check-in, the supervisor\'s view, the mismatch and what programme directors see.',
