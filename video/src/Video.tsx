@@ -13,8 +13,9 @@ const ESCENAS = [E01, E02, E03, E04, E05, E06, E07, E08, E09, E10]
 const FUNDIDO = 14 // fotogramas que dura el paso de una escena a la siguiente
 
 // Volumen de la música: presente en el logo y en el cierre, baja bajo la voz.
-const MUSICA_SOLA = 0.5
-const MUSICA_BAJO_VOZ = 0.14
+const MUSICA_SOLA = 0.8
+const MUSICA_BAJO_VOZ = 0.22
+const VOLUMEN_VOZ = 1.65
 const ULTIMA_VOZ = VOZ[VOZ.length - 1].inicio + VOZ[VOZ.length - 1].dur
 
 // Cada escena entra fundiéndose sobre la anterior: no hay cortes bruscos.
@@ -135,7 +136,7 @@ export const Video: React.FC<{ escena?: number; subtitulos?: boolean; vertical?:
               const fin = interpolate(t, [DURACION_TOTAL - 1.4, DURACION_TOTAL], [1, 0], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' })
               return (sube + cierre) * fin
             }} />
-            {VOZ.map((v) => <Sequence key={v.archivo} from={Math.round(v.inicio * fps)}><Audio src={staticFile(v.archivo)} /></Sequence>)}
+            {VOZ.map((v) => <Sequence key={v.archivo} from={Math.round(v.inicio * fps)}><Audio src={staticFile(v.archivo)} volume={VOLUMEN_VOZ} /></Sequence>)}
           </>
         ) : null}
       </AbsoluteFill>

@@ -22,7 +22,7 @@ El vídeo está hecho con **Remotion**: cada escena es un archivo de texto (cód
 | Las pantallas del móvil (preguntas, nombres de estudiantes) | `src/componentes/Movil.tsx` |
 | El dibujo y el movimiento de cada escena | `src/escenas/` |
 | Cómo se recoloca cada escena en vertical | `src/Video.tsx` (lista `VENTANAS`) |
-| El volumen de la música | `src/Video.tsx` (`MUSICA_SOLA` y `MUSICA_BAJO_VOZ`) |
+| El volumen de la música y de la voz | `src/Video.tsx` (`MUSICA_SOLA`, `MUSICA_BAJO_VOZ` y `VOLUMEN_VOZ`) |
 | El logo | `../public/brand/` |
 
 ## Cómo se usa
