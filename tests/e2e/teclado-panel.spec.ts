@@ -62,6 +62,8 @@ test.describe('panel con teclado', () => {
         await page.goto(ruta)
         await page.waitForLoadState('networkidle')
         await page.locator('main#contenido').waitFor()
+        const desborde = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)
+        expect(desborde, `${ruta} es más ancha que la pantalla`).toBeLessThanOrEqual(0)
         const paradas = await recorrerConTabulador(page)
         expect(paradas, ruta).toBeGreaterThan(0)
       }
