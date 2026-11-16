@@ -63,3 +63,16 @@ Cómo se comprueba cada criterio de aceptación del encargo y qué resultado dio
 | robots.txt, sitemap.xml y noindex en páginas privadas | `tests/e2e/seguridad.spec.ts` y `tests/e2e/acceso.spec.ts` | Cumple |
 | npm audit sin vulnerabilidades altas ni críticas | `npm audit` | Cumple (0 altas, 0 críticas; 7 moderadas en herramientas de desarrollo) |
 | Región de Supabase en la UE | Respuesta de api/instalar (servidor de la base de datos) el 14/11/2026 | **Cumple: eu-central-1 (Fráncfort)**. Proyecto `skzpyzawkhwovfbgnuep`, creado desde Vercel |
+
+## Mejoras profesionales: Fase 5 (16/11/2026)
+
+| Criterio | Cómo se comprueba | Resultado |
+|---|---|---|
+| Lighthouse móvil ≥ 90 en las 4 categorías | Lighthouse 13 (móvil simulado) en las 27 páginas públicas, compilación local, y en 5 páginas de la web publicada | Cumple. Publicada: rendimiento 94 a 97, accesibilidad, buenas prácticas y SEO 100. En local, buenas prácticas 92 solo por un aviso de la propia prueba (la CSP de producción bloquea la base de datos local) |
+| Navegación completa con teclado | `tests/e2e/teclado.spec.ts` (18 páginas públicas) y `tests/e2e/teclado-panel.spec.ts` (18 pantallas de los 4 perfiles), en móvil y escritorio | Cumple: "Saltar al contenido" primero, foco visible en cada parada, sin trampas de foco |
+| Modo oscuro AA en las páginas nuevas y en el panel | `tests/e2e/diseno.spec.ts` y `tests/e2e/teclado-panel.spec.ts` (axe) | Cumple |
+| Enlaces internos | Recorrido de la web publicada (26 páginas, 30 enlaces internos y PDF) | Cumple: todos responden 200. Los 10 externos (ORCID, DOI, USAL) no se pueden comprobar desde este entorno |
+| 404 de verdad | `curl` a una dirección inventada en la web publicada; `tests/paginas.test.ts` | Cumple: código 404, "Esta página no está en sintonía" y noindex. Las pantallas de la aplicación siguen respondiendo 200 |
+| Imagen y etiquetas para compartir por página | `tests/e2e/seguridad.spec.ts`, `tests/paginas.test.ts` y `curl` a la web publicada | Cumple |
+| Cabeceras de seguridad en la web publicada | `curl -I` el 16/11/2026 | Cumple: CSP sin `unsafe-inline`, HSTS con preload, X-Frame-Options, nosniff, Referrer-Policy, Permissions-Policy y COOP |
+| Dependencias | `npm audit --omit=dev` | 0 vulnerabilidades en lo que se publica (7 moderadas solo en herramientas de desarrollo) |
