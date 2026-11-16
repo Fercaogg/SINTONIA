@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import AppLogo from '@/components/comun/AppLogo.vue'
 // Página solo para generar los PDF (scripts/generar-pdf.mjs): un documento
 // del kit, sin cabecera ni pie, en tamaño A4. No aparece en buscadores.
 import { computed } from 'vue'
@@ -12,7 +13,7 @@ const doc = computed(() => DOCUMENTOS.find((d) => d.clave === route.params.doc)?
 
 <template>
   <main class="imprimir mx-auto max-w-[44rem] bg-white px-8 py-10 text-surface-900">
-    <p class="mb-6 font-display text-xl font-bold text-[#0A4A6C]">SINTON<span class="text-[#248a73]">ÍA</span></p>
+    <p class="mb-6 text-xl"><AppLogo /></p>
     <DocumentoKit v-if="doc" :doc="doc" />
     <p v-else>Documento no encontrado.</p>
   </main>

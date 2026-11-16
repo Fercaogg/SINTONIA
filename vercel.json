@@ -7,7 +7,7 @@
   ],
   "rewrites": [
     {
-      "source": "/((?!api/|robots\\.txt$|sitemap\\.xml$|og\\.png$|favicon\\.svg$|assets/|clips/|kit/|dosier/).*)",
+      "source": "/((?!api/|robots\\.txt$|sitemap\\.xml$|og\\.png$|favicon\\.svg$|apple-touch-icon\\.png$|assets/|clips/|kit/|dosier/).*)",
       "destination": "/index.html"
     }
   ],

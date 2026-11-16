@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import AppLogo from '@/components/comun/AppLogo.vue'
 // Dosier de una página (A4), solo para generar el PDF descargable
 // (scripts/generar-pdf.mjs → public/dosier/sintonia-dosier.pdf).
 // Qué es, cómo funciona, garantías éticas, estado del proyecto, dirección
@@ -19,7 +20,7 @@ const GARANTIAS = [
   <main class="dosier mx-auto max-w-[48rem] bg-white px-10 py-9 text-[13px] leading-snug text-surface-900">
     <header class="flex items-start justify-between gap-6">
       <div>
-        <p class="font-display text-2xl font-bold text-[#0A4A6C]">SINTON<span class="text-[#248a73]">ÍA</span></p>
+        <p class="text-2xl"><AppLogo /></p>
         <h1 class="mt-2 font-display text-[1.65rem] font-bold leading-tight text-[#0A4A6C]">Acompañar el trabajo académico, sin vigilar</h1>
         <p class="mt-1.5 text-[14px]">Un registro semanal muy breve de estudiante y tutor/a para que las tutorías empiecen por lo que importa.</p>
       </div>

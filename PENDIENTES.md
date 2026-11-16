@@ -78,4 +78,3 @@ Todo lo que SINTONÍA necesita y que no se puede inventar. En la aplicación, ca
 
 | Dato | Dónde se usa | Quién lo aporta |
 |---|---|---|
-| Logotipo definitivo (el actual es tipográfico y provisional) | Toda la interfaz | Fernando |

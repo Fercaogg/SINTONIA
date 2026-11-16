@@ -415,3 +415,11 @@ Motor ligero en `src/lib/efectos.ts`; nada fija ni intercepta el scroll.
 - **Ligado al desplazamiento:** barra de progreso de lectura bajo la cabecera; las ondas de "El problema" se acercan al leer; en la banda azul, ondas grandes de fondo se deslizan; la línea de Puente se dibuja y cada paso se enciende al llegar; las ondas del cierre coinciden al bajar.
 - **Ilustraciones de "Cómo funciona":** al aparecer, se marcan las respuestas, llegan las preguntas y las ondas del paso 2 se acercan con el scroll.
 - **Reglas:** solo transform y opacity (la luz solo cambia dos variables de una tarjeta); estilos aplicados desde código por la CSP; con "reducir movimiento", todo quieto y en su sitio.
+
+### 12.3. Logotipo (16/11/2026)
+
+Logotipo facilitado por Fernando (original en `docs/marca/logotipo-original.webp`), redibujado en vector en `src/components/comun/SimboloSintonia.vue`: tres hojas que forman una S, dos en azul marino (#0A4A6C) y una verde (#34C6A3) en el centro, con las proporciones del original (hojas de 30 de alto y 12 de separación en un cuadrado de 114).
+
+- `AppLogo` muestra el símbolo y el nombre. Las hojas azules toman el color del texto: azul marino sobre fondo claro, blanco sobre azul marino y claro en modo oscuro. La verde no cambia.
+- Icono del navegador (`public/favicon.svg`, que se aclara en modo oscuro) e icono para la pantalla de inicio del móvil (`public/apple-touch-icon.png`, 180 px, generado con `node scripts/generar-iconos.mjs`).
+- También en los PDF del kit y del dosier.

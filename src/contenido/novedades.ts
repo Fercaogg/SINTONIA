@@ -10,6 +10,11 @@ export interface Novedad {
 
 export const NOVEDADES: Novedad[] = [
   {
+    version: '0.5.0',
+    fecha: '2026-11-16',
+    cambios: ['Logotipo definitivo de SINTONÍA: tres hojas que forman una S, en la web, el icono del navegador y los documentos en PDF.'],
+  },
+  {
     version: '0.4.0',
     fecha: '2026-11-15',
     cambios: [
