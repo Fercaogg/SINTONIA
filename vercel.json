@@ -7,7 +7,11 @@
   ],
   "rewrites": [
     {
-      "source": "/((?!api/|robots\\.txt$|sitemap\\.xml$|og\\.png$|favicon\\.svg$|apple-touch-icon\\.png$|assets/|clips/|kit/|dosier/).*)",
+      "source": "/(como-funciona|investigacion|instituciones|demo|demo/recorrido|seguridad|accesibilidad|novedades|estado|hoja-de-ruta|participantes|privacidad|aviso-legal|cookies|consentimiento|acceso|registro)",
+      "destination": "/$1.html"
+    },
+    {
+      "source": "/((?!api/|robots\\.txt$|sitemap\\.xml$|og\\.png$|favicon\\.svg$|apple-touch-icon\\.png$|assets/|clips/|kit/|dosier/|og/).*)",
       "destination": "/index.html"
     }
   ],
@@ -46,7 +50,7 @@
       ]
     },
     {
-      "source": "/((?!api/|robots\\.txt$|sitemap\\.xml$|og\\.png$|favicon\\.svg$|assets/|$|como-funciona$|acceso$|registro$|privacidad$|aviso-legal$|cookies$|consentimiento$|investigacion$|demo$|demo/recorrido$|participantes$|instituciones$|hoja-de-ruta$|seguridad$|accesibilidad$|novedades$|estado$).*)",
+      "source": "/((?!api/|robots\\.txt$|sitemap\\.xml$|og\\.png$|favicon\\.svg$|apple-touch-icon\\.png$|assets/|clips/|kit/|dosier/|og/|$|como-funciona$|investigacion$|instituciones$|demo$|demo/recorrido$|seguridad$|accesibilidad$|novedades$|estado$|hoja-de-ruta$|participantes$|privacidad$|aviso-legal$|cookies$|consentimiento$|acceso$|registro$).*)",
       "headers": [
         {
           "key": "X-Robots-Tag",
@@ -77,5 +81,6 @@
     "api/reiniciar-demo.ts": {
       "maxDuration": 300
     }
-  }
+  },
+  "cleanUrls": false
 }

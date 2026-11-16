@@ -1,0 +1,176 @@
+[
+  {
+    "ruta": "/",
+    "idioma": "es",
+    "titulo": "SINTONÍA: acompañar el trabajo académico, sin vigilar",
+    "descripcion": "Un registro semanal muy breve de estudiante y tutor/a para que las tutorías empiecen por lo que importa. Sin notas, sin rankings.",
+    "og": "inicio",
+    "imagen": {
+      "titulo": "Acompañar el trabajo académico, sin vigilar",
+      "subtitulo": "Un minuto a la semana, dos miradas y tres preguntas cuando no coinciden."
+    }
+  },
+  {
+    "ruta": "/como-funciona",
+    "idioma": "es",
+    "titulo": "Cómo funciona y tus datos · SINTONÍA",
+    "descripcion": "Qué hace SINTONÍA, qué no hace nunca y quién ve cada dato: estudiante, tutor/a, dirección e investigación.",
+    "og": "como-funciona",
+    "imagen": {
+      "titulo": "Cómo funciona y tus datos",
+      "subtitulo": "Qué hace, qué no hace nunca y quién ve cada dato."
+    }
+  },
+  {
+    "ruta": "/investigacion",
+    "idioma": "es",
+    "titulo": "La investigación · SINTONÍA",
+    "descripcion": "El estudio detrás de SINTONÍA: diseño, garantías, calendario, cómo citarlo y referencias.",
+    "og": "investigacion",
+    "imagen": {
+      "titulo": "La investigación",
+      "subtitulo": "Diseño mixto de 10 semanas con un microensayo aleatorizado."
+    }
+  },
+  {
+    "ruta": "/instituciones",
+    "idioma": "es",
+    "titulo": "Para instituciones · SINTONÍA",
+    "descripcion": "Cómo se implanta SINTONÍA en un máster, programa o escuela de doctorado, qué necesita la universidad y cómo pedir una demostración.",
+    "og": "instituciones",
+    "imagen": {
+      "titulo": "Para instituciones",
+      "subtitulo": "Cómo se implanta en un máster y qué necesita la universidad."
+    }
+  },
+  {
+    "ruta": "/demo",
+    "idioma": "es",
+    "titulo": "Demostración · SINTONÍA",
+    "descripcion": "Entra en SINTONÍA como estudiante, tutor/a, dirección o investigación, con datos ficticios.",
+    "og": "demo",
+    "imagen": {
+      "titulo": "Demostración",
+      "subtitulo": "Entra como quieras, con datos ficticios."
+    }
+  },
+  {
+    "ruta": "/demo/recorrido",
+    "idioma": "es",
+    "titulo": "Demostración guiada · SINTONÍA",
+    "descripcion": "Prueba SINTONÍA en unos 60 segundos: tu check-in, la mirada del tutor/a, el desajuste y lo que ve la dirección.",
+    "og": "recorrido",
+    "imagen": {
+      "titulo": "Pruébala en 60 segundos",
+      "subtitulo": "Tu check-in, la mirada del tutor/a y las tres preguntas."
+    }
+  },
+  {
+    "ruta": "/seguridad",
+    "idioma": "es",
+    "titulo": "Seguridad · SINTONÍA",
+    "descripcion": "Dónde se guardan los datos de SINTONÍA, cómo se cifran, quién accede a qué y cómo pedir el borrado.",
+    "og": "seguridad",
+    "imagen": {
+      "titulo": "Seguridad",
+      "subtitulo": "Datos en la Unión Europea, bienestar cifrado y borrado cuando quieras."
+    }
+  },
+  {
+    "ruta": "/accesibilidad",
+    "idioma": "es",
+    "titulo": "Declaración de accesibilidad · SINTONÍA",
+    "descripcion": "Nivel de accesibilidad de SINTONÍA, cómo se ha revisado, limitaciones conocidas y contacto.",
+    "og": "accesibilidad",
+    "imagen": {
+      "titulo": "Accesibilidad",
+      "subtitulo": "Pensada para usarse con teclado, lector de pantalla y en el móvil."
+    }
+  },
+  {
+    "ruta": "/novedades",
+    "idioma": "es",
+    "titulo": "Novedades · SINTONÍA",
+    "descripcion": "Registro de cambios de SINTONÍA, con fecha y versión.",
+    "og": "novedades",
+    "imagen": {
+      "titulo": "Novedades",
+      "subtitulo": "Qué ha cambiado, versión a versión."
+    }
+  },
+  {
+    "ruta": "/estado",
+    "idioma": "es",
+    "titulo": "Estado de la plataforma · SINTONÍA",
+    "descripcion": "Comprobación en directo de si SINTONÍA funciona: servidor, base de datos y acceso.",
+    "og": "estado",
+    "imagen": {
+      "titulo": "Estado de la plataforma",
+      "subtitulo": "Comprobación en directo del servidor y la base de datos."
+    }
+  },
+  {
+    "ruta": "/hoja-de-ruta",
+    "idioma": "es",
+    "titulo": "Hoja de ruta · SINTONÍA",
+    "descripcion": "Lo que SINTONÍA ya hace y lo que está planificado durante el piloto y después.",
+    "og": "hoja-de-ruta",
+    "imagen": {
+      "titulo": "Hoja de ruta",
+      "subtitulo": "Lo hecho, el piloto y lo que viene después."
+    }
+  },
+  {
+    "ruta": "/participantes",
+    "idioma": "es",
+    "titulo": "Kit para participantes · SINTONÍA",
+    "descripcion": "Hoja informativa, consentimiento y preguntas frecuentes del piloto, para leer o descargar en PDF.",
+    "og": "participantes",
+    "imagen": {
+      "titulo": "Kit para participantes",
+      "subtitulo": "Hoja informativa, consentimiento y preguntas frecuentes."
+    }
+  },
+  {
+    "ruta": "/privacidad",
+    "idioma": "es",
+    "titulo": "Política de privacidad · SINTONÍA",
+    "descripcion": "Política de privacidad de SINTONÍA.",
+    "og": "inicio"
+  },
+  {
+    "ruta": "/aviso-legal",
+    "idioma": "es",
+    "titulo": "Aviso legal · SINTONÍA",
+    "descripcion": "Aviso legal de SINTONÍA.",
+    "og": "inicio"
+  },
+  {
+    "ruta": "/cookies",
+    "idioma": "es",
+    "titulo": "Cookies · SINTONÍA",
+    "descripcion": "SINTONÍA no usa cookies de seguimiento ni analítica.",
+    "og": "inicio"
+  },
+  {
+    "ruta": "/consentimiento",
+    "idioma": "es",
+    "titulo": "Consentimiento informado · SINTONÍA",
+    "descripcion": "Consentimiento informado para participar en el estudio de SINTONÍA.",
+    "og": "inicio"
+  },
+  {
+    "ruta": "/acceso",
+    "idioma": "es",
+    "titulo": "Iniciar sesión · SINTONÍA",
+    "descripcion": "Entra en SINTONÍA con el enlace que llega a tu correo de la universidad.",
+    "og": "inicio"
+  },
+  {
+    "ruta": "/registro",
+    "idioma": "es",
+    "titulo": "Crear tu cuenta · SINTONÍA",
+    "descripcion": "Crea tu cuenta de SINTONÍA con el código de tu máster o de tu tutor/a.",
+    "og": "inicio"
+  }
+]

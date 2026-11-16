@@ -3,6 +3,8 @@
 // aplica la base de datos (RLS), aunque alguien se salte esta comprobación.
 
 import { nextTick } from 'vue'
+import PAGINAS from '@/contenido/paginas.json'
+import { URL_SITIO } from '@/lib/publico'
 import { createRouter, createWebHistory, type RouteRecordRaw } from 'vue-router'
 import { useSesion } from '@/stores/sesion'
 import { INICIO_ROL, necesitaConsentimiento, type Rol } from '@/lib/tipos'
@@ -33,6 +35,7 @@ const routes: RouteRecordRaw[] = [
   { path: '/demo', component: () => import('@/views/DemoView.vue'), meta: { publica: true, titulo: 'Demostración' } },
   { path: '/instituciones', component: () => import('@/views/InstitucionesView.vue'), meta: { publica: true, titulo: 'Para instituciones' } },
   { path: '/hoja-de-ruta', component: () => import('@/views/HojaRutaView.vue'), meta: { publica: true, titulo: 'Hoja de ruta' } },
+  { path: '/og/:clave', component: () => import('@/views/ImagenCompartirView.vue'), meta: { publica: true, titulo: 'Imagen para compartir', sinIndexar: true } },
   { path: '/dosier/imprimir', component: () => import('@/views/DosierView.vue'), meta: { publica: true, titulo: 'Dosier', sinIndexar: true } },
   { path: '/participantes', component: () => import('@/views/ParticipantesView.vue'), meta: { publica: true, titulo: 'Kit para participantes' } },
   { path: '/participantes/imprimir/:doc', component: () => import('@/views/ImprimirView.vue'), meta: { publica: true, titulo: 'Documento', sinIndexar: true } },
@@ -165,4 +168,16 @@ router.afterEach((to) => {
     document.head.appendChild(robots)
   }
   robots.content = to.meta.publica && !to.meta.sinIndexar && to.matched[0]?.path !== '/:pathMatch(.*)*' ? 'index, follow' : 'noindex, nofollow'
+  // URL canónica de las páginas públicas (src/contenido/paginas.json), con la
+  // dirección única del sitio (URL_SITIO): así sigue bien al navegar sin recargar.
+  const pagina = (PAGINAS as { ruta: string }[]).find((p) => p.ruta === to.path)
+  let canonica = document.querySelector<HTMLLinkElement>('link[rel="canonical"]')
+  if (pagina) {
+    if (!canonica) {
+      canonica = document.createElement('link')
+      canonica.rel = 'canonical'
+      document.head.appendChild(canonica)
+    }
+    canonica.href = URL_SITIO + (pagina.ruta === '/' ? '/' : pagina.ruta)
+  } else canonica?.remove()
 })
