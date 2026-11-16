@@ -87,6 +87,17 @@ export function escribir(raiz, salida, base) {
     mkdirSync(dirname(destino), { recursive: true })
     writeFileSync(destino, htmlDe(plantilla, p, todas, base))
   }
+  // 404.html: Vercel la sirve, con el código 404, para cualquier dirección
+  // que no sea una página ni una pantalla de la aplicación. La aplicación
+  // carga igual y muestra "Esta página no está en sintonía".
+  const portada = todas.find((p) => p.ruta === '/')
+  const noEncontrada = { ...portada, titulo: 'Página no encontrada · SINTONÍA', descripcion: 'Esta página no existe o se ha movido.' }
+  writeFileSync(
+    join(salida, '404.html'),
+    htmlDe(plantilla, noEncontrada, [], base)
+      .replace(/\n\s*<link rel="canonical"[^>]*>/, '')
+      .replace('<!-- /pagina -->', '<meta name="robots" content="noindex" />\n  <!-- /pagina -->'),
+  )
   writeFileSync(join(salida, 'sitemap.xml'), sitemap(todas, base))
   writeFileSync(join(salida, 'robots.txt'), robots(todas, base))
   return todas.length

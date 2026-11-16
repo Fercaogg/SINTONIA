@@ -11,11 +11,18 @@ import { fileURLToPath } from 'node:url'
 const raiz = join(dirname(fileURLToPath(import.meta.url)), '..')
 const ARCHIVOS = 'api/|robots\\.txt$|sitemap\\.xml$|og\\.png$|favicon\\.svg$|apple-touch-icon\\.png$|assets/|clips/|kit/|dosier/|og/'
 
+// Pantallas de la aplicación (src/router/index.ts) que no son páginas públicas.
+const PANTALLAS = 'acceso/confirmar|consentimiento/aceptar|dosier/imprimir|estudiante|tutor|direccion|investigador|calendario|cuenta'
+const SECCIONES = 'estudiante|tutor|direccion|investigador|calendario|cuenta|og|participantes/imprimir'
+
 export function reglas(paginas) {
   const rutas = paginas.map((p) => p.ruta).filter((r) => r !== '/').map((r) => r.slice(1).replace(/[.*+?^${}()|[\]\\]/g, '\\$&'))
   return {
     paginas: { source: `/(${rutas.join('|')})`, destination: '/$1.html' },
-    resto: { source: `/((?!${ARCHIVOS}).*)`, destination: '/index.html' },
+    // Solo las pantallas de la aplicación van a index.html; cualquier otra
+    // dirección recibe 404.html con el código 404 (ver paginas-estaticas.mjs).
+    app: { source: `/(${PANTALLAS})`, destination: '/index.html' },
+    appDentro: { source: `/(${SECCIONES})/(.*)`, destination: '/index.html' },
     noIndexar: `/((?!${ARCHIVOS}|$|${rutas.map((r) => r + '$').join('|')}).*)`,
   }
 }
@@ -26,7 +33,7 @@ export function sincronizar() {
   const config = JSON.parse(readFileSync(ruta, 'utf8'))
   const r = reglas(paginas)
   config.cleanUrls = false
-  config.rewrites = [r.paginas, r.resto]
+  config.rewrites = [r.paginas, r.app, r.appDentro]
   const cabecera = config.headers.find((h) => h.headers.some((x) => x.key === 'X-Robots-Tag'))
   cabecera.source = r.noIndexar
   writeFileSync(ruta, JSON.stringify(config, null, 2) + '\n')

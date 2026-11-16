@@ -11,7 +11,11 @@
       "destination": "/$1.html"
     },
     {
-      "source": "/((?!api/|robots\\.txt$|sitemap\\.xml$|og\\.png$|favicon\\.svg$|apple-touch-icon\\.png$|assets/|clips/|kit/|dosier/|og/).*)",
+      "source": "/(acceso/confirmar|consentimiento/aceptar|dosier/imprimir|estudiante|tutor|direccion|investigador|calendario|cuenta)",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/(estudiante|tutor|direccion|investigador|calendario|cuenta|og|participantes/imprimir)/(.*)",
       "destination": "/index.html"
     }
   ],

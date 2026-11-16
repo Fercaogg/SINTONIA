@@ -13,7 +13,7 @@ describe('páginas públicas (src/contenido/paginas.json)', () => {
   it('vercel.json está sincronizado (si falla: node scripts/sincronizar-vercel.mjs)', () => {
     const config = JSON.parse(readFileSync('vercel.json', 'utf8'))
     const r = reglas(paginas)
-    expect(config.rewrites).toEqual([r.paginas, r.resto])
+    expect(config.rewrites).toEqual([r.paginas, r.app, r.appDentro])
     expect(config.headers.find((h: { headers: { key: string }[] }) => h.headers.some((x) => x.key === 'X-Robots-Tag')).source).toBe(r.noIndexar)
   })
 
@@ -50,5 +50,21 @@ describe('páginas públicas (src/contenido/paginas.json)', () => {
     expect(html).not.toContain('vercel.app')
     expect(sitemap(paginas, base)).not.toContain('vercel.app')
     expect(robots(paginas, base)).toContain('Sitemap: https://sintonia.ejemplo.es/sitemap.xml')
+  })
+
+  it('cada pantalla de la aplicación llega a index.html; lo demás, a la 404 de verdad', () => {
+    const r = reglas(paginas)
+    const aApp = (ruta: string) =>
+      [r.app, r.appDentro].some((x: { source: string }) => new RegExp('^' + x.source + '$').test(ruta))
+    const rutasRouter = readFileSync('src/router/index.ts', 'utf8')
+    for (const ruta of ['/acceso/confirmar', '/consentimiento/aceptar', '/estudiante', '/estudiante/checkin', '/tutor/codigos', '/direccion/avisos', '/investigador/datos', '/calendario', '/cuenta', '/og/inicio', '/dosier/imprimir', '/participantes/imprimir/hoja']) {
+      expect(aApp(ruta), ruta).toBe(true)
+    }
+    for (const ruta of ['/no-existe', '/wp-admin', '/en/nada']) expect(aApp(ruta), ruta).toBe(false)
+    // Cada sección del enrutador está cubierta.
+    for (const seccion of ['estudiante', 'tutor', 'direccion', 'investigador', 'calendario', 'cuenta']) {
+      expect(rutasRouter).toContain(`path: '/${seccion}'`)
+      expect(aApp('/' + seccion)).toBe(true)
+    }
   })
 })
