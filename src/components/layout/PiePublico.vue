@@ -51,7 +51,7 @@ const GRUPOS = computed(() => [
       </div>
       <nav :aria-label="t('Información del proyecto', 'Project information')" class="grid grid-cols-2 gap-x-8 gap-y-6 sm:grid-cols-3">
         <div v-for="g in GRUPOS" :key="g.titulo">
-          <h2 class="text-xs font-semibold uppercase tracking-[0.14em] text-surface-800">{{ g.titulo }}</h2>
+          <h2 class="text-xs font-mono font-normal uppercase tracking-[0.14em] text-surface-800">{{ g.titulo }}</h2>
           <ul class="mt-1">
             <li v-for="e in g.enlaces" :key="e.to">
               <RouterLink :to="ruta(e.to)" class="enlace inline-flex items-center min-h-tactil" :hreflang="soloEnEspanol(e.to) ? 'es' : undefined"

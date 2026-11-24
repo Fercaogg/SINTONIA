@@ -10,7 +10,7 @@ defineProps<{ id: string; etiqueta: string; titulo: string; claro?: boolean }>()
 <template>
   <div class="grid gap-4 lg:grid-cols-12 lg:items-end mb-12 sm:mb-14">
     <div v-revelar class="lg:col-span-6">
-      <p class="text-xs font-semibold uppercase tracking-[0.16em]" :class="claro ? 'text-brand-400' : 'text-brand-900'">{{ etiqueta }}</p>
+      <p class="text-xs font-mono font-normal uppercase tracking-[0.14em]" :class="claro ? 'text-brand-400' : 'text-brand-900'">{{ etiqueta }}</p>
       <h2 :id="id" class="mt-3 font-display text-4xl sm:text-5xl font-semibold tracking-tight text-balance" :class="claro ? 'text-white' : 'text-surface-900'">
         {{ titulo }}
       </h2>

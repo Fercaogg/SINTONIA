@@ -1,6 +1,6 @@
 <script setup lang="ts">
 // Plantilla de la imagen para compartir (Open Graph, 1200 x 630) de cada
-// página principal: azul marino #0A4A6C, el logotipo, el título y las dos
+// página principal: tinta #1B1B1B, el logotipo, el título y las dos
 // ondas. Solo la usa scripts/generar-og.mjs; no aparece en buscadores.
 import { computed } from 'vue'
 import { useRoute } from 'vue-router'
@@ -25,10 +25,10 @@ const dominio = URL_SITIO.replace('https://', '')
     <div class="absolute inset-x-[-80px] bottom-[38px] opacity-90"><OndasSintonia :desfase="pagina.og === 'inicio' ? 0 : 0.45" :alto="150" :grosor="3" sobre-oscuro /></div>
     <div class="relative flex h-full flex-col px-[80px] pt-[70px]">
       <p class="text-[44px]"><AppLogo variante="claro" /></p>
-      <h1 class="mt-[46px] max-w-[960px] font-display text-[76px] font-bold leading-[1.02] tracking-tight">{{ pagina.imagen.titulo }}</h1>
+      <h1 class="mt-[46px] max-w-[960px] font-display text-[76px] font-normal leading-[0.98] tracking-[-0.03em]">{{ pagina.imagen.titulo }}</h1>
       <p class="mt-[22px] max-w-[900px] text-[32px] leading-snug text-white/85">{{ pagina.imagen.subtitulo }}</p>
     </div>
-    <p class="absolute bottom-[34px] right-[80px] text-[24px] font-medium text-white/80">{{ dominio }}</p>
+    <p class="absolute bottom-[34px] right-[80px] font-mono text-[20px] uppercase tracking-[0.14em] text-[#ff9670]">{{ dominio }}</p>
   </div>
 </template>
 
@@ -36,6 +36,6 @@ const dominio = URL_SITIO.replace('https://', '')
 .tarjeta {
   width: 1200px;
   height: 630px;
-  background: radial-gradient(120% 90% at 85% 115%, rgba(52, 198, 163, 0.28), transparent 60%), #0a4a6c;
+  background: #1b1b1b;
 }
 </style>

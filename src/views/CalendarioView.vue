@@ -163,7 +163,7 @@ const textoIntro = computed(() => {
             :aria-pressed="visibles.has(tipo)"
             @click="alternar(tipo)"
           >
-            <span class="w-2.5 h-2.5 rounded-full" :style="{ backgroundColor: visibles.has(tipo) ? TIPOS[tipo].color : '#8A9BA5' }" aria-hidden="true" />
+            <span class="w-2.5 h-2.5 rounded-full" :style="{ backgroundColor: visibles.has(tipo) ? TIPOS[tipo].color : '#A6A6A0' }" aria-hidden="true" />
             {{ TIPOS[tipo].etiqueta }}
           </button>
         </div>

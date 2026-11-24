@@ -30,7 +30,7 @@ watch(visible, (v) => {
 <template>
   <div ref="raiz">
     <p class="sr-only">{{ valor }} {{ unidad }} {{ texto }}</p>
-    <p aria-hidden="true" class="font-display font-bold leading-none tracking-tight">
+    <p aria-hidden="true" class="font-display font-medium leading-none tracking-tight">
       <span class="inline-block text-6xl sm:text-7xl tabular-nums text-right" :style="{ minWidth: `${String(valor).length}ch` }">{{ mostrado }}</span>
       <span class="text-2xl sm:text-3xl ml-1">{{ unidad }}</span>
     </p>

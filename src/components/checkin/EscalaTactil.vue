@@ -1,9 +1,7 @@
 <script setup lang="ts">
-// Escala táctil de 1 a 5, con el estilo del check-in de WORKWELL360
-// (CheckInView.vue:158 a 161): botones de 48 a 56 px, radio de 16 px, borde
-// de 2 px; la opción elegida se agranda y toma el color de la marca.
-// Cambio de accesibilidad: el borde de la opción elegida usa #1d7060 para que
-// se distinga con un contraste suficiente.
+// Escala táctil de 1 a 5 con el estilo «Tinta y lumbre» (LUMBRA360): botones
+// circulares de 48 a 56 px con filete de 1 px; la opción elegida se rellena de
+// tinta y crece un poco (la tinta sobre blanco supera de sobra el 3:1).
 // Teclado: se comporta como un grupo de opciones (flechas, Inicio y Fin).
 import { computed, nextTick, ref } from 'vue'
 
@@ -56,12 +54,12 @@ function teclado(ev: KeyboardEvent) {
         :aria-checked="modelValue === n"
         :aria-label="n === 1 ? `1, ${anclaMin}` : n === 5 ? `5, ${anclaMax}` : String(n)"
         :tabindex="enfocable === n ? 0 : -1"
-        class="opcion-escala rounded-2xl font-semibold border-2 shrink-0 flex items-center justify-center"
+        class="opcion-escala rounded-full font-medium tabular-nums border shrink-0 flex items-center justify-center"
         :class="[
           compacta ? 'w-11 h-11 text-base' : 'w-12 h-12 sm:w-14 sm:h-14 text-lg',
           modelValue === n
-            ? 'border-brand-900 bg-brand-50 text-surface-900 scale-110 shadow-lg shadow-brand-500/20'
-            : 'border-surface-300 bg-papel text-surface-800 hover:bg-surface-50',
+            ? 'border-brand-900 bg-brand-900 text-papel scale-105'
+            : 'border-surface-300 bg-papel text-surface-900 hover:border-surface-900',
         ]"
         @click="elegir(n)"
       >

@@ -27,14 +27,14 @@ const trazo = computed(() => `${Math.max(0, Math.min(1, props.progreso)) * PERIM
 </script>
 
 <template>
-  <section class="tarjeta-semana relative overflow-hidden rounded-lg bg-marino text-white p-6 sm:p-8" :aria-label="titulo">
+  <section class="tarjeta-semana relative overflow-hidden rounded-panel bg-marino text-white p-6 sm:p-8" :aria-label="titulo">
     <div class="absolute inset-x-0 bottom-0 opacity-40 pointer-events-none" aria-hidden="true">
       <OndasSintonia :desfase="hecho ? 0 : 0.7" :alto="90" :grosor="3" sobre-oscuro />
     </div>
     <div class="relative grid gap-6 sm:grid-cols-[1fr_auto] items-start">
       <div>
-        <p class="text-xs font-semibold uppercase tracking-[0.16em] text-brand-400">{{ etiqueta }}</p>
-        <p class="font-display text-5xl sm:text-6xl font-bold tracking-tight leading-none mt-3 tabular-nums">{{ cifra }}</p>
+        <p class="text-xs font-mono font-normal uppercase tracking-[0.14em] text-brand-400">{{ etiqueta }}</p>
+        <p class="font-display text-5xl sm:text-6xl font-medium tracking-tight leading-none mt-3 tabular-nums">{{ cifra }}</p>
         <h2 class="font-display text-xl sm:text-2xl font-semibold mt-4">{{ titulo }}</h2>
         <p class="mt-1 text-white/85">{{ texto }}</p>
         <RouterLink :to="accion.to" class="btn-claro mt-6">{{ accion.texto }}</RouterLink>
@@ -47,13 +47,13 @@ const trazo = computed(() => `${Math.max(0, Math.min(1, props.progreso)) * PERIM
             cy="40"
             :r="R"
             fill="none"
-            stroke="#34C6A3"
+            stroke="#FF6A33"
             stroke-width="6"
             stroke-linecap="round"
             :stroke-dasharray="trazo"
             transform="rotate(-90 40 40)"
           />
-          <text x="40" y="45" text-anchor="middle" font-size="15" font-weight="700" fill="#ffffff">{{ textoAnillo }}</text>
+          <text x="40" y="45" text-anchor="middle" font-size="15" font-weight="500" fill="#ffffff">{{ textoAnillo }}</text>
         </svg>
       </div>
     </div>

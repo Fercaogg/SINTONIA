@@ -35,7 +35,7 @@ const { t, idioma } = useIdioma()
 
     <div class="mt-8 border-t border-surface-200 pt-6" aria-live="polite">
       <p class="text-sm font-medium texto-suave">{{ t('Tiempo de todo el máster, cada semana', 'Time for the whole programme, each week') }}</p>
-      <p class="mt-1 font-display text-5xl font-bold tracking-tight text-surface-900 tabular-nums">{{ total }} <span class="text-2xl">min</span></p>
+      <p class="mt-1 font-display text-5xl font-medium tracking-tight text-surface-900 tabular-nums">{{ total }} <span class="text-2xl">min</span></p>
       <dl class="mt-5 grid gap-3 sm:grid-cols-2 text-sm">
         <div class="rounded-lg bg-surface-100 p-3">
           <dt class="texto-suave">{{ t('Estudiantes (60 s cada uno)', 'Students (60 s each)') }}</dt>

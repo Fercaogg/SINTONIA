@@ -29,8 +29,8 @@ const estilo = (e: Record<string, string>) => e
         <div class="mx-auto max-w-md" :style="estilo({ '--ondas-duracion': '1400ms' })" aria-hidden="true">
           <OndasSintonia :desfase="desfase" :alto="110" />
         </div>
-        <p class="mt-8 text-sm font-semibold uppercase tracking-[0.16em] text-brand-900">Error 404</p>
-        <h1 class="mt-2 font-display text-4xl sm:text-5xl font-bold tracking-tight text-surface-900 text-balance">Esta página no está en sintonía</h1>
+        <p class="mt-8 text-sm font-mono font-normal uppercase tracking-[0.14em] text-surface-600">Error 404</p>
+        <h1 class="mt-2 font-display text-4xl sm:text-5xl font-medium tracking-tight text-surface-900 text-balance">Esta página no está en sintonía</h1>
         <p class="mt-4 text-lg texto-suave">Puede que el enlace esté mal escrito o que la página se haya movido. Volvamos a un sitio conocido.</p>
         <div class="mt-8 flex flex-col sm:flex-row gap-3 justify-center">
           <RouterLink to="/" class="btn-primary px-6 py-3">Volver al inicio</RouterLink>

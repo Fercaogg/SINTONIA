@@ -64,7 +64,8 @@ const router = useRouter()
 const menuAbierto = ref(false)
 
 const rol = computed(() => sesion.perfil?.rol ?? 'estudiante')
-const oscuro = computed(() => rol.value === 'direccion' || rol.value === 'investigador')
+// Con «Tinta y lumbre» todos los perfiles comparten el menú claro (LUMBRA360).
+const oscuro = computed(() => false)
 const enlaces = computed(() =>
   (sesion.perfil?.retirado ? [CUENTA, COMO] : MENUS[rol.value]).map((e) => ({ ...e, label: t(e.label) })),
 )
@@ -99,7 +100,7 @@ async function salir() {
         class="fixed lg:sticky top-0 left-0 z-50 h-[100dvh] w-64 flex flex-col menu-lateral lg:translate-x-0"
         :class="[
           menuAbierto ? 'translate-x-0' : '-translate-x-full',
-          oscuro ? 'bg-marino' : 'bg-papel border-r border-surface-200/60',
+          oscuro ? 'bg-marino' : 'bg-surface-100 border-r border-surface-200',
         ]"
         aria-label="Menú principal"
         @keydown.esc="menuAbierto = false"

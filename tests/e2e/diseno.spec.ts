@@ -12,7 +12,7 @@ test.describe('modo oscuro', () => {
       await page.goto(ruta)
       await page.waitForLoadState('networkidle')
       const fondo = await page.evaluate(() => getComputedStyle(document.body).backgroundColor)
-      expect(fondo, ruta).toBe('rgb(9, 24, 31)')
+      expect(fondo, ruta).toBe('rgb(14, 14, 14)')
       await sinErroresDeAccesibilidad(page)
     }
     await entrarConContrasena(page, 'ana@usal.es')
@@ -34,7 +34,7 @@ test.describe('modo oscuro', () => {
       await page.goto(ruta)
       await page.waitForLoadState('networkidle')
       const fondo = await page.evaluate(() => getComputedStyle(document.body).backgroundColor)
-      expect(fondo, ruta).toBe('rgb(9, 24, 31)')
+      expect(fondo, ruta).toBe('rgb(14, 14, 14)')
       await sinErroresDeAccesibilidad(page)
     }
   })

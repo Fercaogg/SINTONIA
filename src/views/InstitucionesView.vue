@@ -21,7 +21,7 @@ const NECESITA = computed(() => (idioma.value === 'en' ? EN.NECESITA : ES.NECESI
 
 <template>
   <LayoutPublico>
-    <p class="text-xs font-semibold uppercase tracking-[0.16em] text-brand-900">{{ t('Para instituciones', 'For institutions') }}</p>
+    <p class="text-xs font-mono font-normal uppercase tracking-[0.14em] text-surface-600">{{ t('Para instituciones', 'For institutions') }}</p>
     <h1 class="titulo-pagina mt-2 mb-3">{{ t('SINTONÍA en tu máster, programa o escuela de doctorado', 'SINTONÍA in your Master\'s programme, PhD programme or doctoral school') }}</h1>
     <p class="text-lg leading-relaxed texto-suave">
       {{ t('Un registro semanal muy breve de estudiante y tutor/a para que las tutorías empiecen por lo que importa. Sin notas, sin rankings y sin vigilar.', 'A very short weekly check-in for student and supervisor, so that supervision meetings start with what matters. No marks, no rankings and no surveillance.') }}
@@ -75,11 +75,11 @@ const NECESITA = computed(() => (idioma.value === 'en' ? EN.NECESITA : ES.NECESI
       <ul class="mt-6 grid gap-3 md:grid-cols-3">
         <li v-for="p in PERFILES" :key="p.clave" class="card p-4">
           <h3 class="font-display text-lg font-semibold text-surface-900">{{ p.nombre }}</h3>
-          <p class="mt-3 text-xs font-semibold uppercase tracking-[0.12em] text-surface-800">{{ t('Ve', 'Sees') }}</p>
+          <p class="mt-3 text-xs font-mono font-normal uppercase tracking-[0.14em] text-surface-800">{{ t('Ve', 'Sees') }}</p>
           <ul class="mt-1 space-y-1 text-sm">
             <li v-for="t in p.ve" :key="t" class="flex gap-2"><AppIcon name="eye" :size="15" class="mt-0.5 shrink-0 text-brand-900" />{{ t }}</li>
           </ul>
-          <p class="mt-3 text-xs font-semibold uppercase tracking-[0.12em] text-surface-800">{{ t('No ve', 'Does not see') }}</p>
+          <p class="mt-3 text-xs font-mono font-normal uppercase tracking-[0.14em] text-surface-800">{{ t('No ve', 'Does not see') }}</p>
           <ul class="mt-1 space-y-1 text-sm">
             <li v-for="t in p.noVe" :key="t" class="flex gap-2"><AppIcon name="lock" :size="15" class="mt-0.5 shrink-0 text-surface-800" />{{ t }}</li>
           </ul>

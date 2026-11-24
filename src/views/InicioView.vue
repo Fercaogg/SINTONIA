@@ -191,10 +191,10 @@ const estilo = (e: Record<string, string>) => e
         <CampoSintonia />
         <div class="relative z-10 max-w-[1180px] mx-auto px-4 sm:px-6 pt-14 pb-16 sm:pt-20 sm:pb-24 grid gap-14 lg:grid-cols-12 lg:items-center">
           <div class="entrada lg:col-span-6">
-            <p class="inline-flex items-center gap-2 rounded-full border border-surface-200 bg-papel/80 px-3 py-1 text-xs font-semibold uppercase tracking-[0.14em] text-brand-900">
+            <p class="inline-flex items-center gap-2 rounded-full border border-surface-200 bg-papel/80 px-3 py-1 text-xs font-mono font-normal uppercase tracking-[0.14em] text-surface-600">
               <span class="h-1.5 w-1.5 rounded-full bg-brand-500" aria-hidden="true" />{{ t('Tutoría de TFM, TFG y tesis', 'Supervision of Master\'s theses, final projects and PhDs') }}
             </p>
-            <h1 id="t-inicio" class="mt-6 font-display text-[2.6rem] leading-[1.04] sm:text-6xl lg:text-[3.6rem] xl:text-[4rem] font-bold tracking-tight text-surface-900 text-balance">
+            <h1 id="t-inicio" class="mt-6 font-display text-[2.6rem] leading-[1.04] sm:text-6xl lg:text-[3.6rem] xl:text-[4rem] font-medium tracking-tight text-surface-900 text-balance">
               {{ t('Acompañar el trabajo académico,', 'Supporting academic work,') }}
               <span class="text-brand-900">{{ t('sin vigilar', 'without surveillance') }}</span>
             </h1>
@@ -245,7 +245,7 @@ const estilo = (e: Record<string, string>) => e
       <section id="problema" class="scroll-mt-20 max-w-[1180px] mx-auto px-4 sm:px-6 py-20 sm:py-28" aria-labelledby="t-problema">
         <div class="grid gap-12 lg:grid-cols-12">
           <div v-revelar class="lg:col-span-6">
-            <p class="text-xs font-semibold uppercase tracking-[0.16em] text-brand-900">{{ t('01 · Por qué', '01 · Why') }}</p>
+            <p class="text-xs font-mono font-normal uppercase tracking-[0.14em] text-surface-600">{{ t('01 · Por qué', '01 · Why') }}</p>
             <h2 id="t-problema" class="mt-3 font-display text-4xl sm:text-5xl font-semibold tracking-tight text-surface-900">{{ t('El problema', 'The problem') }}</h2>
             <p class="mt-8 font-display text-2xl sm:text-[1.75rem] leading-snug text-surface-900">
               {{ t('Estudiante y tutor/a no siempre ven igual el mismo trabajo. En un estudio sobre la tutorización del TFM, el profesorado valoró la tutorización mejor que el alumnado (Colomo Magaña et al., 2025).', "Student and supervisor do not always see the same work in the same way. In a study on Master's thesis supervision, teaching staff rated supervision more highly than students did (Colomo Magaña et al., 2025).") }}
@@ -299,7 +299,7 @@ const estilo = (e: Record<string, string>) => e
         </div>
         <div class="relative max-w-[1180px] mx-auto px-4 sm:px-6 py-20 sm:py-28 grid gap-14 lg:grid-cols-12 lg:items-center">
           <div v-revelar class="lg:col-span-5">
-            <p class="text-xs font-semibold uppercase tracking-[0.16em] text-brand-400">{{ t('03 · Pruébalo', '03 · Try it') }}</p>
+            <p class="text-xs font-mono font-normal uppercase tracking-[0.14em] text-brand-400">{{ t('03 · Pruébalo', '03 · Try it') }}</p>
             <h2 id="t-pruebalo" class="mt-3 font-display text-4xl sm:text-5xl font-semibold tracking-tight">{{ t('Dos miradas, un minuto', 'Two perspectives, one minute') }}</h2>
             <p class="mt-5 text-lg leading-relaxed text-white/85">
               {{ t('Mueve cómo ven el avance estudiante y tutor/a. Si la diferencia es de 2 puntos o más, aparecen las tres preguntas para la tutoría.', 'Move how student and supervisor see the progress. If the difference is 2 points or more, the three questions for the meeting appear.') }}
@@ -321,7 +321,7 @@ const estilo = (e: Record<string, string>) => e
       <section id="tiempo" class="scroll-mt-20 bg-papel border-b border-surface-200" aria-labelledby="t-tiempo">
         <div class="max-w-[1180px] mx-auto px-4 sm:px-6 py-20 sm:py-28 grid gap-12 lg:grid-cols-12 lg:items-center">
           <div v-revelar class="lg:col-span-5">
-            <p class="text-xs font-semibold uppercase tracking-[0.16em] text-brand-900">{{ t('04 · Tiempo', '04 · Time') }}</p>
+            <p class="text-xs font-mono font-normal uppercase tracking-[0.14em] text-surface-600">{{ t('04 · Tiempo', '04 · Time') }}</p>
             <h2 id="t-tiempo" class="mt-3 font-display text-4xl sm:text-5xl font-semibold tracking-tight text-surface-900">{{ t('¿Cuánto tiempo pide a un máster?', 'How much time does it take a programme?') }}</h2>
             <p class="mt-6 text-lg leading-relaxed">{{ t('Escribe cuántos estudiantes y tutores tiene el máster y mira los minutos de todos, cada semana.', 'Enter how many students and supervisors the programme has and see everyone\'s minutes, each week.') }}</p>
           </div>
@@ -333,7 +333,7 @@ const estilo = (e: Record<string, string>) => e
       <section id="privacidad" class="scroll-mt-20 max-w-[1180px] mx-auto px-4 sm:px-6 py-20 sm:py-28" aria-labelledby="t-privacidad">
         <div class="grid gap-12 lg:grid-cols-12">
           <div v-revelar class="lg:col-span-6">
-            <p class="text-xs font-semibold uppercase tracking-[0.16em] text-brand-900">{{ t('05 · Tus datos', '05 · Your data') }}</p>
+            <p class="text-xs font-mono font-normal uppercase tracking-[0.14em] text-surface-600">{{ t('05 · Tus datos', '05 · Your data') }}</p>
             <h2 id="t-privacidad" class="mt-3 font-display text-4xl sm:text-5xl font-semibold tracking-tight text-surface-900">{{ t('Privacidad y ética', 'Privacy and ethics') }}</h2>
             <p class="mt-8 font-display text-3xl sm:text-4xl leading-tight text-surface-900 text-balance">
               {{ t('Tu bienestar solo lo ves tú.', 'Only you see your wellbeing.') }} <span class="text-brand-900">{{ t('La dirección, solo cifras de 5 personas o más.', 'Programme directors only see figures for 5 people or more.') }}</span>
@@ -376,7 +376,7 @@ const estilo = (e: Record<string, string>) => e
       <section id="puente" class="scroll-mt-20 max-w-[1180px] mx-auto px-4 sm:px-6 py-20 sm:py-28" aria-labelledby="t-puente">
         <div class="grid gap-12 lg:grid-cols-12">
           <div v-revelar class="lg:col-span-5">
-            <p class="text-xs font-semibold uppercase tracking-[0.16em] text-brand-900">{{ t('08 · Doctorado', '08 · PhD') }}</p>
+            <p class="text-xs font-mono font-normal uppercase tracking-[0.14em] text-surface-600">{{ t('08 · Doctorado', '08 · PhD') }}</p>
             <h2 id="t-puente" class="mt-3 font-display text-4xl sm:text-5xl font-semibold tracking-tight text-surface-900">{{ t('Puente al doctorado', 'Bridge to the PhD') }}</h2>
             <p class="mt-6 text-lg leading-relaxed">
               {{ t('Si el estudiante lo activa, los plazos de las convocatorias predoctorales y de admisión al doctorado llegan a la tutoría.', 'If the student turns it on, the deadlines of predoctoral and PhD admission calls reach the supervision meeting.') }}
@@ -419,7 +419,7 @@ const estilo = (e: Record<string, string>) => e
       <section id="preguntas" class="scroll-mt-20 max-w-[1180px] mx-auto px-4 sm:px-6 py-20 sm:py-28" aria-labelledby="t-preguntas">
         <div class="grid gap-10 lg:grid-cols-12">
           <div v-revelar class="lg:col-span-4 lg:sticky lg:top-28 self-start">
-            <p class="text-xs font-semibold uppercase tracking-[0.16em] text-brand-900">{{ t('10 · Dudas', '10 · Questions') }}</p>
+            <p class="text-xs font-mono font-normal uppercase tracking-[0.14em] text-surface-600">{{ t('10 · Dudas', '10 · Questions') }}</p>
             <h2 id="t-preguntas" class="mt-3 font-display text-4xl sm:text-5xl font-semibold tracking-tight text-surface-900">{{ t('Preguntas frecuentes', 'Frequently asked questions') }}</h2>
             <p class="mt-4 texto-suave">{{ t('Y si no está aquí,', 'And if it is not here,') }} <a href="#contacto" class="enlace">{{ t('escríbenos', 'write to us') }}</a>.</p>
           </div>
@@ -431,7 +431,7 @@ const estilo = (e: Record<string, string>) => e
       <section id="contacto" class="scroll-mt-20 bg-papel border-y border-surface-200" aria-labelledby="t-contacto">
         <div class="max-w-[1180px] mx-auto px-4 sm:px-6 py-20 sm:py-28 grid gap-10 lg:grid-cols-12">
           <div v-revelar class="lg:col-span-4">
-            <p class="text-xs font-semibold uppercase tracking-[0.16em] text-brand-900">{{ t('11 · Escríbenos', '11 · Write to us') }}</p>
+            <p class="text-xs font-mono font-normal uppercase tracking-[0.14em] text-surface-600">{{ t('11 · Escríbenos', '11 · Write to us') }}</p>
             <h2 id="t-contacto" class="mt-3 font-display text-4xl sm:text-5xl font-semibold tracking-tight text-surface-900">{{ t('Contacto', 'Contact') }}</h2>
             <p class="mt-4 text-lg leading-relaxed">{{ t('Si te interesa SINTONÍA para tu máster, programa o escuela de doctorado, o tienes cualquier duda.', 'If you are interested in SINTONÍA for your Master\'s programme, PhD programme or doctoral school, or have any questions.') }}</p>
             <p class="mt-4"><RouterLink :to="ruta('/instituciones')" class="enlace">{{ t('Información para instituciones y solicitud de demostración', 'Information for institutions and demo requests') }}</RouterLink></p>
@@ -444,7 +444,7 @@ const estilo = (e: Record<string, string>) => e
       <section ref="cierre" aria-labelledby="t-cierre">
         <div class="max-w-[1180px] mx-auto px-4 sm:px-6 pt-20 pb-16 text-center">
           <div ref="ondasCierre" class="max-w-2xl mx-auto" :style="estilo({ '--ondas-duracion': '1100ms' })"><OndasSintonia :desfase="cierreVisto ? 0 : 1" :alto="80" /></div>
-          <div class="mt-8 font-display text-4xl sm:text-6xl font-bold tracking-tight text-surface-900">
+          <div class="mt-8 font-display text-4xl sm:text-6xl font-medium tracking-tight text-surface-900">
             <TituloEnSintonia id="t-cierre" :texto="t('En sintonía.', 'In tune.')" />
           </div>
           <p class="mt-4 text-lg texto-suave max-w-xl mx-auto">{{ t('Acompañar el trabajo académico, sin vigilar.', 'Supporting academic work, without surveillance.') }}</p>
@@ -480,7 +480,7 @@ const estilo = (e: Record<string, string>) => e
 }
 .paso-puente.encendido {
   animation: encender 420ms var(--ease-out);
-  box-shadow: 0 0 0 6px rgba(52, 198, 163, 0.18);
+  box-shadow: 0 0 0 6px color-mix(in srgb, rgb(var(--rgb-b500)) 18%, transparent);
 }
 @keyframes encender {
   from {

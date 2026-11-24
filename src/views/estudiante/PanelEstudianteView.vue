@@ -47,7 +47,7 @@ const { t } = useTerminos()
 
 <template>
   <div class="fade-in max-w-2xl">
-    <h1 class="font-display text-3xl sm:text-4xl font-bold tracking-tight text-surface-900">Hola, {{ nombre }}</h1>
+    <h1 class="font-display text-3xl sm:text-4xl font-medium tracking-tight text-surface-900">Hola, {{ nombre }}</h1>
     <p class="texto-suave mt-2 mb-8">Tu check-in semanal te llevará alrededor de un minuto.</p>
 
     <EstadoCarga v-if="cargando" />

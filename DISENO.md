@@ -1,10 +1,32 @@
-# Sistema visual de SINTONÍA (heredado de WORKWELL360)
+# Sistema visual de SINTONÍA («Tinta y lumbre», de LUMBRA360)
 
 Este documento recoge el sistema visual de WORKWELL360, extraído directamente de su código fuente, y explica cómo se convierte en los tokens de diseño de SINTONÍA.
 
 Las rutas de origen se refieren a la carpeta `workwell360/` del código que me entregaste. Cuando cito "main.css:15" quiero decir "archivo `src/assets/main.css`, línea 15".
 
 Estado: **borrador de la Fase 1, pendiente de tu aprobación.** Las propuestas que se apartan de WORKWELL360 están marcadas como **PROPUESTA** y no se aplicarán sin tu visto bueno.
+
+## 0. Sistema vigente: «Tinta y lumbre» (el de LUMBRA360)
+
+Desde el 24/11/2026 SINTONÍA usa el sistema visual de LUMBRA360 (`brand/DESIGN.md` de ese repositorio). **Los apartados 1 a 12 describen el sistema anterior, heredado de WORKWELL360, y se conservan como historia.** Lo que manda ahora:
+
+| Aspecto | Valor | Dónde |
+|---|---|---|
+| Lienzo | blanco `#FFFFFF`; piedra 50 `#F5F5F2` para alternar y agrupar (menú lateral, bloques suaves) | `tokens.css` (`--rgb-s50`, `--rgb-s100`) |
+| Texto | tinta 950 `#111111`; secundario piedra 700 `#55554F` | `--rgb-s900`, `--rgb-s600` |
+| Acción | tinta 900 `#1B1B1B` (botón principal, enlaces subrayados, opción elegida) | `--rgb-b900`, `.btn-primary` |
+| Acento único | lumbre `#F25A1F`: hoja central del símbolo, progreso, filete del menú activo, antetítulos sobre tinta. Como texto sobre blanco, lumbre 600 `#B83A0E` | `--rgb-b500`, `--color-lumbre-texto` |
+| Bloques oscuros | tinta 900 (antes azul marino). La clase `bg-marino` se conserva por compatibilidad | `--rgb-marino` |
+| Foco | anillo de 2 px en lumbre 500 `#D9480F` | `--color-foco` |
+| Estados | verde `#1D6440`/`#E6F2EB`, ámbar `#7A4B00`/`#FBF0D6`, error carmesí `#A3122F`/`#FCE8EC` (no se confunde con la lumbre) | `--correcto-*`, `--aviso-*`, `--error-*` |
+| Tipografía | Instrument Sans (titulares 400–500 con interletraje −0,03 em; cuerpo 17 px) e IBM Plex Mono para antetítulos (12 px, mayúsculas, +0,14 em). Servidas desde el propio sitio (`src/assets/fuentes`, licencia OFL) | `fuentes.css`, `tailwind.config.js` |
+| Forma | botones y estados en cápsula; campos 8 px; tarjetas de datos 12 px; paneles 20 px | `--radius-*` |
+| Elevación | ninguna en tarjetas y botones (filete de 1 px); sombra solo en lo que flota | `--shadow-*` |
+| Modo oscuro | negro neutro `#0E0E0E`, superficies `#171716`, texto `#F2F2EF`, acción en blanco roto, lumbre `#FF6A33` | `tokens.css`, `@media (prefers-color-scheme: dark)` |
+
+Los nombres de clase (`brand-*`, `surface-*`, `papel`, `marino`) no cambian: solo su valor. Por eso las pantallas apenas se han tocado. Todos los perfiles usan ahora el mismo menú lateral claro, con el elemento activo en blanco y un filete de lumbre.
+
+Ya regenerados con el nuevo sistema: `public/og/*.png` y `public/apple-touch-icon.png`. Pendiente: los vídeos y documentos de `public/clips`, `public/kit` y `public/dosier`, que aún muestran la paleta anterior.
 
 ---
 
