@@ -40,12 +40,89 @@ export function etiquetas(pagina, todas, base) {
     `<meta property="og:image:alt" content="${escapar(pagina.titulo)}" />`,
     `<meta name="twitter:card" content="summary_large_image" />`,
   ]
+  lineas.push(datosEstructurados(pagina, todas, base))
   if (alterna) {
     lineas.push(`<link rel="alternate" hreflang="${pagina.idioma}" href="${url}" />`)
     lineas.push(`<link rel="alternate" hreflang="${alterna.idioma}" href="${base}${alterna.ruta === '/' ? '/' : alterna.ruta}" />`)
     lineas.push(`<link rel="alternate" hreflang="x-default" href="${pagina.idioma === 'es' ? url : base + (alterna.ruta === '/' ? '/' : alterna.ruta)}" />`)
   }
   return lineas.join('\n  ')
+}
+
+const AUTOR = {
+  '@type': 'Person',
+  name: 'Fernando Martín Vaquero',
+  affiliation: { '@type': 'CollegeOrUniversity', name: 'Universidad de Salamanca', url: 'https://www.usal.es' },
+}
+
+/**
+ * Datos estructurados (schema.org, JSON-LD) para que los buscadores entiendan
+ * qué es cada página: el sitio, la página, su lugar en el sitio (migas) y, en
+ * la portada, la aplicación y el proyecto de investigación. Es un bloque de
+ * datos, no código: el navegador no lo ejecuta y la CSP no lo bloquea.
+ */
+export function datosEstructurados(pagina, todas, base) {
+  const url = base + (pagina.ruta === '/' ? '/' : pagina.ruta)
+  const en = pagina.idioma === 'en'
+  const inicio = en ? `${base}/en` : `${base}/`
+  const sitio = {
+    '@type': 'WebSite',
+    '@id': `${base}/#sitio`,
+    url: `${base}/`,
+    name: 'SINTONÍA',
+    inLanguage: ['es', 'en'],
+    publisher: AUTOR,
+  }
+  const web = {
+    '@type': 'WebPage',
+    '@id': `${url}#pagina`,
+    url,
+    name: pagina.titulo,
+    description: pagina.descripcion,
+    inLanguage: pagina.idioma,
+    isPartOf: { '@id': `${base}/#sitio` },
+    primaryImageOfPage: `${base}/og/${en ? 'en-' : ''}${pagina.og}.png`,
+  }
+  const grafo = [sitio, web]
+  const esInicio = pagina.ruta === '/' || pagina.ruta === '/en'
+  if (!esInicio) {
+    web.breadcrumb = { '@id': `${url}#migas` }
+    grafo.push({
+      '@type': 'BreadcrumbList',
+      '@id': `${url}#migas`,
+      itemListElement: [
+        { '@type': 'ListItem', position: 1, name: en ? 'Home' : 'Inicio', item: inicio },
+        { '@type': 'ListItem', position: 2, name: pagina.titulo.replace(/ · SINTONÍA$/, ''), item: url },
+      ],
+    })
+  } else {
+    web.about = { '@id': `${base}/#aplicacion` }
+    grafo.push(
+      {
+        '@type': 'WebApplication',
+        '@id': `${base}/#aplicacion`,
+        name: 'SINTONÍA',
+        url: `${base}/`,
+        description: pagina.descripcion,
+        applicationCategory: 'EducationalApplication',
+        operatingSystem: 'Web',
+        inLanguage: 'es',
+        isAccessibleForFree: true,
+        author: AUTOR,
+      },
+      {
+        '@type': 'ResearchProject',
+        '@id': `${base}/#investigacion`,
+        name: en ? 'SINTONÍA: study of weekly student and supervisor check-ins' : 'SINTONÍA: estudio del registro semanal de estudiante y tutor/a',
+        url: `${base}${en ? '/en/research' : '/investigacion'}`,
+        parentOrganization: AUTOR.affiliation,
+        member: AUTOR,
+      },
+    )
+  }
+  // "</" se escapa para que el bloque no pueda cerrar la etiqueta antes de tiempo.
+  const json = JSON.stringify({ '@context': 'https://schema.org', '@graph': grafo }).replace(/<\//g, '<\\/')
+  return `<script type="application/ld+json">${json}</script>`
 }
 
 const MARCA = /<!-- pagina -->[\s\S]*?<!-- \/pagina -->/
@@ -57,9 +134,25 @@ export function htmlDe(plantilla, pagina, todas, base) {
     .replace(/<html lang="[a-z]+">/, `<html lang="${pagina.idioma}">`)
 }
 
+/** Sitemap con las versiones en otro idioma de cada página (hreflang). */
 export function sitemap(todas, base) {
-  const urls = todas.map((p) => `  <url><loc>${base}${p.ruta === '/' ? '/' : p.ruta}</loc></url>`).join('\n')
-  return `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls}\n</urlset>\n`
+  const dir = (p) => base + (p.ruta === '/' ? '/' : p.ruta)
+  const urls = todas
+    .map((p) => {
+      const otra = p.alterna ? todas.find((q) => q.ruta === p.alterna) : null
+      if (!otra) return `  <url><loc>${dir(p)}</loc></url>`
+      const es = p.idioma === 'es' ? p : otra
+      return [
+        `  <url>`,
+        `    <loc>${dir(p)}</loc>`,
+        `    <xhtml:link rel="alternate" hreflang="${p.idioma}" href="${dir(p)}" />`,
+        `    <xhtml:link rel="alternate" hreflang="${otra.idioma}" href="${dir(otra)}" />`,
+        `    <xhtml:link rel="alternate" hreflang="x-default" href="${dir(es)}" />`,
+        `  </url>`,
+      ].join('\n')
+    })
+    .join('\n')
+  return `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">\n${urls}\n</urlset>\n`
 }
 
 export function robots(todas, base) {
@@ -96,6 +189,7 @@ export function escribir(raiz, salida, base) {
     join(salida, '404.html'),
     htmlDe(plantilla, noEncontrada, [], base)
       .replace(/\n\s*<link rel="canonical"[^>]*>/, '')
+      .replace(/\n\s*<script type="application\/ld\+json">.*?<\/script>/, '')
       .replace('<!-- /pagina -->', '<meta name="robots" content="noindex" />\n  <!-- /pagina -->'),
   )
   writeFileSync(join(salida, 'sitemap.xml'), sitemap(todas, base))

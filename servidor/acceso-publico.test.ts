@@ -108,6 +108,23 @@ describe('contacto', () => {
     expect(correos).toEqual([])
   })
 
+  it('descarta en silencio los envíos demasiado rápidos o llenos de enlaces', async () => {
+    const { d, correos } = falsas()
+    expect((await contacto({ ...MENSAJE, tiempo: 800 }, '2.2.2.1', d)).status).toBe(200)
+    const enlaces = 'Mira https://a.es https://b.es www.c.es http://d.es'
+    expect((await contacto({ ...MENSAJE, email: 'otra@ejemplo.es', mensaje: enlaces, tiempo: 9000 }, '2.2.2.2', d)).status).toBe(200)
+    expect(correos).toEqual([])
+    // Una persona que tarda lo normal sí envía.
+    expect((await contacto({ ...MENSAJE, email: 'tres@ejemplo.es', tiempo: 9000 }, '2.2.2.3', d)).status).toBe(200)
+    expect(correos).toHaveLength(1)
+  })
+
+  it('no admite saltos de línea en los campos que van al asunto', async () => {
+    const { d } = falsas()
+    expect((await contacto({ ...MENSAJE, nombre: 'Ana\r\nBcc: x@y.es' }, '3.3.3.1', d)).status).toBe(400)
+    expect((await contacto({ ...MENSAJE, tipo: 'demostracion', institucion: 'Uni\nBcc: x' }, '3.3.3.2', d)).status).toBe(400)
+  })
+
   it('como mucho 3 mensajes por correo en una hora', async () => {
     const { d, correos } = falsas()
     for (let i = 0; i < 3; i++) await contacto(MENSAJE, `4.4.4.${i}`, d)
