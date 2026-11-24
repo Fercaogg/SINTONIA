@@ -2,7 +2,7 @@
 import { existsSync, readFileSync } from 'node:fs'
 import { describe, expect, it } from 'vitest'
 // @ts-expect-error: módulos de Node en JavaScript, sin tipos
-import { etiquetas, leerPaginas, robots, sitemap } from '../scripts/paginas-estaticas.mjs'
+import { datosEstructurados, etiquetas, leerPaginas, robots, sitemap } from '../scripts/paginas-estaticas.mjs'
 // @ts-expect-error: módulos de Node en JavaScript, sin tipos
 import { reglas } from '../scripts/sincronizar-vercel.mjs'
 
@@ -66,5 +66,23 @@ describe('páginas públicas (src/contenido/paginas.json)', () => {
       expect(rutasRouter).toContain(`path: '/${seccion}'`)
       expect(aApp('/' + seccion)).toBe(true)
     }
+  })
+
+  it('datos estructurados válidos en cada página, con migas fuera de la portada', () => {
+    const base = 'https://sintonia.ejemplo.es'
+    for (const p of paginas) {
+      const bloque = datosEstructurados(p, paginas, base)
+      const json = JSON.parse(bloque.replace(/^<script type="application\/ld\+json">/, '').replace(/<\/script>$/, ''))
+      const tipos = json['@graph'].map((n: { '@type': string }) => n['@type'])
+      expect(tipos, p.ruta).toContain('WebPage')
+      expect(tipos.includes('BreadcrumbList'), p.ruta).toBe(p.ruta !== '/' && p.ruta !== '/en')
+      expect(bloque.slice(0, -9), p.ruta).not.toContain('</')
+    }
+  })
+
+  it('el sitemap enlaza cada página con su versión en el otro idioma', () => {
+    const xml = sitemap(paginas, 'https://s.es')
+    expect(xml).toContain('<xhtml:link rel="alternate" hreflang="en" href="https://s.es/en/how-it-works" />')
+    expect(xml.match(/<loc>/g)).toHaveLength(paginas.length)
   })
 })

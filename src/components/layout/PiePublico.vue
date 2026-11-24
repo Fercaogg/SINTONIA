@@ -3,7 +3,8 @@
 import { computed } from 'vue'
 import { RouterLink } from 'vue-router'
 import { useIdioma } from '@/lib/idioma'
-import { AUTORIA, AUTORIA_EN, CORREO_CONTACTO, VERSION } from '@/lib/publico'
+import BotonWhatsApp from '@/components/comun/BotonWhatsApp.vue'
+import { AUTORIA, AUTORIA_EN, CORREO_CONTACTO, VERSION, WHATSAPP } from '@/lib/publico'
 
 const { t, ruta, soloEnEspanol } = useIdioma()
 
@@ -43,7 +44,7 @@ const GRUPOS = computed(() => [
 
 <template>
   <footer class="border-t border-surface-200 bg-papel">
-    <div class="max-w-[1100px] mx-auto px-4 sm:px-6 py-10 grid gap-8 lg:grid-cols-[1fr_auto] text-sm">
+    <div class="max-w-[1100px] mx-auto px-4 sm:px-6 pt-10 grid gap-8 lg:grid-cols-[1fr_auto] text-sm" :class="WHATSAPP ? 'pb-24' : 'pb-10'">
       <div class="space-y-2">
         <p class="text-surface-900 font-medium">{{ t(AUTORIA, AUTORIA_EN) }}</p>
         <p class="texto-suave">{{ t('Contacto', 'Contact') }}: <a :href="`mailto:${CORREO_CONTACTO}`" class="enlace">{{ CORREO_CONTACTO }}</a></p>
@@ -62,5 +63,6 @@ const GRUPOS = computed(() => [
         </div>
       </nav>
     </div>
+    <BotonWhatsApp />
   </footer>
 </template>

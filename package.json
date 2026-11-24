@@ -23,7 +23,9 @@
     "rendimiento": "node scripts/medir-rendimiento.mjs",
     "test:demo": "playwright test --config playwright.demo.config.ts --trace off",
     "capturas": "CAPTURAS=1 playwright test --config playwright.demo.config.ts --trace off",
-    "typecheck": "vue-tsc --noEmit"
+    "typecheck": "vue-tsc --noEmit",
+    "enlaces": "node scripts/comprobar-enlaces.mjs",
+    "iconos": "node scripts/generar-iconos.mjs"
   },
   "engines": {
     "node": ">=20"

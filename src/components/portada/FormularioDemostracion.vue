@@ -18,6 +18,8 @@ const institucion = ref('')
 const cargo = ref('')
 const mensaje = ref('')
 const sitio = ref('')
+// Momento en que se mostró el formulario: un envío en menos de 3 s es de un programa.
+const mostrado = Date.now()
 const enviando = ref(false)
 const enviado = ref(false)
 const error = ref('')
@@ -35,6 +37,7 @@ async function enviar() {
     cargo: cargo.value,
     mensaje: mensaje.value,
     sitio: sitio.value,
+    tiempo: Date.now() - mostrado,
   })
   enviando.value = false
   if (!r.ok) {

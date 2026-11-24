@@ -87,3 +87,13 @@ Todo lo que SINTONÍA necesita y que no se puede inventar. En la aplicación, ca
 | Traducir los textos legales y el kit para participantes, solo cuando el Comité de Ética apruebe la versión en español | /en (hoy enlazan a la versión en español) | Comité de Ética, después Fernando |
 | Probar cómo se ve un enlace al compartirlo en WhatsApp, LinkedIn y el correo de la USAL, una vez con el dominio definitivo | Imágenes para compartir (public/og) | Fernando |
 
+
+## Acabado web (24/11/2026)
+
+| Dato | Dónde se usa | Quién lo aporta |
+|---|---|---|
+| NIF y domicilio del titular (los exige el artículo 10 de la LSSI) | /aviso-legal, apartado "Titular" (`src/views/legal/AvisoLegalView.vue`) | Fernando |
+| Número de WhatsApp de contacto. Sin él, el botón no aparece | Variable `VITE_WHATSAPP` en Vercel (por ejemplo, `34600000000`) y volver a publicar | Fernando |
+| Activar Web Analytics en Vercel (proyecto `sintonia360-ferca` > Analytics > Enable). El código ya está; sin activarlo no se cuenta nada | Estadísticas de visitas | Fernando |
+| Alta en Google Search Console y envío del sitemap (pasos en docs/FICHA-GOOGLE.md) | Buscadores | Fernando, con Claude para la etiqueta de verificación |
+| Comprobar los enlaces externos (ORCID, DOI, USAL) con `npm run enlaces -- http://localhost:4173 --externos` desde un ordenador con internet. Los internos ya están comprobados | Portada e /investigacion | Fernando o Claude |

@@ -201,12 +201,13 @@ const estilo = (e: Record<string, string>) => e
             <p class="mt-6 text-lg sm:text-xl leading-relaxed texto-suave max-w-xl">
               {{ t('Un registro semanal muy breve de estudiante y tutor/a para que las tutorías empiecen por lo que importa.', 'A very short weekly check-in for student and supervisor, so that supervision meetings start with what matters.') }}
             </p>
-            <div class="mt-9 flex flex-col sm:flex-row gap-3">
+            <!-- Una sola llamada a la acción: un botón; lo demás, enlaces de texto. -->
+            <div class="mt-9 flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-5">
               <a v-if="modoDemo" href="#entrar" class="btn-primary px-6 py-3">{{ t('Entrar en la demostración', 'Enter the demo') }}</a>
               <RouterLink v-else to="/registro" class="btn-primary px-6 py-3">{{ t('Tengo un código', 'I have a code') }}</RouterLink>
-              <a v-if="modoDemo" href="#como-funciona" class="btn-secondary px-6 py-3">{{ t('Ver cómo funciona', 'See how it works') }}</a>
-              <RouterLink v-else-if="hayDemostracion" to="/demo" class="btn-secondary px-6 py-3">{{ t('Ver la demostración', 'See the demo') }}</RouterLink>
-              <a v-else href="#demostracion" class="btn-secondary px-6 py-3">{{ t('Ver la demostración', 'See the demo') }}</a>
+              <a v-if="modoDemo" href="#como-funciona" class="enlace inline-flex items-center justify-center min-h-tactil px-2">{{ t('Ver cómo funciona', 'See how it works') }}</a>
+              <RouterLink v-else-if="hayDemostracion" to="/demo" class="enlace inline-flex items-center justify-center min-h-tactil px-2">{{ t('Ver la demostración', 'See the demo') }}</RouterLink>
+              <a v-else href="#demostracion" class="enlace inline-flex items-center justify-center min-h-tactil px-2">{{ t('Ver la demostración', 'See the demo') }}</a>
             </div>
             <ul class="mt-10 grid gap-4 sm:grid-cols-3 border-t border-surface-200 pt-6 text-sm">
               <li class="flex items-start gap-2.5"><AppIcon name="clock" :size="18" class="mt-0.5 shrink-0 text-brand-900" /><span class="text-surface-900 font-medium">{{ t('Unos 60 segundos a la semana', 'About 60 seconds a week') }}</span></li>
@@ -343,7 +344,7 @@ const estilo = (e: Record<string, string>) => e
               <li class="flex gap-3"><AppIcon name="shield" :size="22" class="mt-1 shrink-0 text-brand-900" />{{ t('Las reglas de quién ve qué están escritas en la propia base de datos.', 'The rules on who sees what are written into the database itself.') }}</li>
               <li class="flex gap-3"><AppIcon name="brain" :size="22" class="mt-1 shrink-0 text-brand-900" />{{ t('No deduce emociones, no pone notas y no hace rankings.', 'It does not infer emotions, give marks or make rankings.') }}</li>
             </ul>
-            <RouterLink :to="ruta('/como-funciona')" class="btn-secondary mt-9">{{ t('Ver quién ve cada dato', 'See who sees each piece of data') }}</RouterLink>
+            <RouterLink :to="ruta('/como-funciona')" class="enlace mt-9 inline-flex items-center min-h-tactil">{{ t('Ver quién ve cada dato', 'See who sees each piece of data') }}</RouterLink>
           </div>
           <div class="lg:col-span-5 lg:col-start-8 lg:pt-14">
             <div v-revelar="1" v-cursor class="rounded-[var(--radius-md)]"><QuienVeBienestar /></div>
@@ -448,10 +449,10 @@ const estilo = (e: Record<string, string>) => e
             <TituloEnSintonia id="t-cierre" :texto="t('En sintonía.', 'In tune.')" />
           </div>
           <p class="mt-4 text-lg texto-suave max-w-xl mx-auto">{{ t('Acompañar el trabajo académico, sin vigilar.', 'Supporting academic work, without surveillance.') }}</p>
-          <div class="mt-8 flex flex-col sm:flex-row gap-3 justify-center">
+          <div class="mt-8 flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-5 justify-center">
             <a v-if="modoDemo" href="#entrar" class="btn-primary px-6 py-3">{{ t('Entrar en la demostración', 'Enter the demo') }}</a>
             <RouterLink v-else to="/registro" class="btn-primary px-6 py-3">{{ t('Tengo un código', 'I have a code') }}</RouterLink>
-            <RouterLink :to="ruta('/investigacion')" class="btn-secondary px-6 py-3">{{ t('Leer la investigación', 'Read about the research') }}</RouterLink>
+            <RouterLink :to="ruta('/investigacion')" class="enlace inline-flex items-center justify-center min-h-tactil px-2">{{ t('Leer la investigación', 'Read about the research') }}</RouterLink>
           </div>
         </div>
       </section>

@@ -1,5 +1,6 @@
 <script setup lang="ts">
-// Formulario de contacto. Protección antispam no invasiva: campo trampa y
+// Formulario de contacto. Protección antispam no invasiva: campo trampa,
+// tiempo mínimo de rellenado, límite de enlaces y
 // límite de envíos en el servidor (api/contacto). Sin capturas ni rompecabezas.
 import { ref } from 'vue'
 import { enviarAlServidor, errorEnIngles } from '@/lib/servidor'
@@ -14,6 +15,8 @@ const nombre = ref('')
 const email = ref('')
 const mensaje = ref('')
 const sitio = ref('')
+// Momento en que se mostró el formulario: un envío en menos de 3 s es de un programa.
+const mostrado = Date.now()
 const enviando = ref(false)
 const enviado = ref(false)
 const error = ref('')
@@ -23,7 +26,7 @@ async function enviar() {
   error.value = ''
   sinCorreo.value = false
   enviando.value = true
-  const r = await enviarAlServidor('contacto', { nombre: nombre.value, email: email.value, mensaje: mensaje.value, sitio: sitio.value })
+  const r = await enviarAlServidor('contacto', { nombre: nombre.value, email: email.value, mensaje: mensaje.value, sitio: sitio.value, tiempo: Date.now() - mostrado })
   enviando.value = false
   if (!r.ok) {
     if (r.status === 503) sinCorreo.value = true

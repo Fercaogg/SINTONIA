@@ -58,16 +58,26 @@ export const esquemaRegistro = z.object({
 
 export const esquemaAcceso = z.object({ email, sitio: trampa })
 
+// Una sola línea, sin saltos ni caracteres de control (van en el asunto del correo).
+const linea = (max: number) => z.string().trim().max(max).regex(/^[^\u0000-\u001f\u007f]*$/)
+// Señales de envío automático: rellenado en menos de 3 segundos o con muchos enlaces.
+export const TIEMPO_MINIMO_MS = 3000
+export const ENLACES_MAXIMOS = 3
+const pareceAutomatico = (tiempo: number | undefined, mensaje: string) =>
+  (tiempo !== undefined && tiempo < TIEMPO_MINIMO_MS) || (mensaje.match(/https?:\/\/|www\./gi)?.length ?? 0) > ENLACES_MAXIMOS
+
 export const esquemaContacto = z
   .object({
-    nombre: z.string().trim().min(1).max(120),
+    nombre: linea(120).min(1),
     email,
     // "demostracion": solicitud de demostración desde /instituciones.
     tipo: z.enum(['contacto', 'demostracion']).default('contacto'),
-    institucion: z.string().trim().max(200).optional(),
-    cargo: z.string().trim().max(120).optional(),
+    institucion: linea(200).optional(),
+    cargo: linea(120).optional(),
     mensaje: z.string().trim().max(3000).default(''),
     sitio: trampa,
+    // Milisegundos desde que se mostró el formulario (lo pone la web).
+    tiempo: z.number().int().min(0).optional(),
   })
   // Un mensaje de contacto necesita texto; una solicitud de demostración, la institución.
   .refine((c) => (c.tipo === 'demostracion' ? !!c.institucion && c.institucion.length >= 2 : c.mensaje.length >= 10))
@@ -121,8 +131,9 @@ export async function acceso(entrada: unknown, ip: string, d: Dependencias): Pro
 export async function contacto(entrada: unknown, ip: string, d: Dependencias): Promise<Respuesta> {
   const r = esquemaContacto.safeParse(entrada)
   if (!r.success) return fallo(400, MENSAJES.datos)
-  const { nombre, email: correo, mensaje, sitio, tipo, institucion, cargo } = r.data
-  if (sitio) return ok()
+  const { nombre, email: correo, mensaje, sitio, tipo, institucion, cargo, tiempo } = r.data
+  // Campo trampa relleno o señales de programa: se responde "enviado" y se descarta en silencio.
+  if (sitio || pareceAutomatico(tiempo, mensaje)) return ok()
   if (!(await dentroDelLimite(d, 'contacto', ip, correo))) return fallo(429, MENSAJES.demasiados)
   // Sin servicio de correo configurado, se dice claramente (no es un fallo pasajero).
   if (!d.enviador) return fallo(503, MENSAJES.sinCorreo)
