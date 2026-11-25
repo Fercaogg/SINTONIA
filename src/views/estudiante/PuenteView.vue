@@ -1,5 +1,6 @@
 <script setup lang="ts">
 // Puente al doctorado: el estudiante lo activa o desactiva cuando quiere.
+// Se muestra dentro de Doctorado > Plazos y ayudas («incrustado»).
 import { onMounted, ref } from 'vue'
 import { llamar, mensajeDeError } from '@/lib/api'
 import { fechaCorta } from '@/lib/fechas'
@@ -18,6 +19,8 @@ interface Convocatoria {
   enlace: string
   estado: string
 }
+
+defineProps<{ incrustado?: boolean }>()
 
 const activado = ref(false)
 const convocatorias = ref<Convocatoria[]>([])
@@ -58,11 +61,13 @@ const { t } = useTerminos()
 </script>
 
 <template>
-  <div class="fade-in max-w-2xl">
-    <h1 class="titulo-pagina">Puente al doctorado</h1>
-    <p class="texto-suave mt-1 mb-8">
-      Para que la información sobre las convocatorias del doctorado te llegue a tiempo.
-    </p>
+  <div class="max-w-2xl" :class="incrustado ? '' : 'fade-in'">
+    <template v-if="!incrustado">
+      <h1 class="titulo-pagina">Puente al doctorado</h1>
+      <p class="texto-suave mt-1 mb-8">
+        Para que la información sobre las convocatorias del doctorado te llegue a tiempo.
+      </p>
+    </template>
 
     <EstadoCarga v-if="cargando" />
     <template v-else>
@@ -71,7 +76,7 @@ const { t } = useTerminos()
       <section class="card p-5 sm:p-6 mb-6" aria-labelledby="t-activar">
         <div class="flex items-start gap-4">
           <div class="flex-1">
-            <h2 id="t-activar" class="font-semibold text-surface-900">Avisarme de los plazos en la agenda</h2>
+            <h3 id="t-activar" class="font-semibold text-surface-900">Avisarme de los plazos en la agenda</h3>
             <p class="text-sm texto-suave mt-1 leading-relaxed">
               Si lo activas, cuando una convocatoria abra o cierre en las próximas 4 semanas, la agenda de la tutoría
               incluirá una línea para comentarlo. {{ t('Tu tutor/a también verá esa línea.') }} Puedes desactivarlo cuando quieras.
@@ -104,13 +109,13 @@ const { t } = useTerminos()
         </p>
       </section>
 
-      <h2 class="font-display text-xl font-semibold text-surface-900 mb-3">Convocatorias</h2>
+      <h3 class="font-display text-xl font-medium tracking-tight text-surface-900 mb-3">Convocatorias</h3>
       <ul class="space-y-3">
         <li v-for="c in convocatorias" :key="c.id" class="card p-5">
           <div class="flex items-start gap-3">
             <AppIcon name="graduation" :size="22" class="text-surface-900 shrink-0 mt-0.5" />
             <div class="flex-1 min-w-0 space-y-1.5">
-              <h3 class="font-semibold text-surface-900">{{ c.nombre }}</h3>
+              <h4 class="font-semibold text-surface-900">{{ c.nombre }}</h4>
               <p class="text-sm"><span class="texto-suave">Organismo: </span><Pendiente :texto="c.organismo" /></p>
               <p class="text-sm">
                 <span class="texto-suave">Plazo: </span>
@@ -133,7 +138,7 @@ const { t } = useTerminos()
       </ul>
 
       <section v-if="normativa.length" class="mt-8" aria-labelledby="t-norm">
-        <h2 id="t-norm" class="font-display text-xl font-semibold text-surface-900 mb-3">Normativa del doctorado</h2>
+        <h3 id="t-norm" class="font-display text-xl font-medium tracking-tight text-surface-900 mb-3">Normativa del doctorado</h3>
         <ul class="card divide-y divide-surface-200">
           <li v-for="n in normativa" :key="n.url" class="p-4">
             <a :href="n.url" target="_blank" rel="noopener" class="enlace">

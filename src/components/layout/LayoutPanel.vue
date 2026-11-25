@@ -24,7 +24,7 @@ const MENUS: Record<Rol, Enlace[]> = {
     { to: '/estudiante/checkin', label: 'Check-in semanal', icon: 'checkin' },
     CALENDARIO,
     { to: '/estudiante/historial', label: 'Mi histórico', icon: 'history' },
-    { to: '/estudiante/puente', label: 'Puente al doctorado', icon: 'graduation' },
+    { to: '/estudiante/doctorado', label: 'Doctorado', icon: 'graduation' },
     { to: '/estudiante/apoyo', label: 'Necesito apoyo', icon: 'heart' },
     CUENTA,
     COMO,

@@ -67,7 +67,10 @@ const routes: RouteRecordRaw[] = [
       { path: 'checkin', component: () => import('@/views/estudiante/CheckinEstudianteView.vue'), meta: { titulo: 'Check-in semanal' } },
       { path: 'historial', component: () => import('@/views/estudiante/HistorialView.vue'), meta: { titulo: 'Mi histórico' } },
       { path: 'apoyo', component: () => import('@/views/estudiante/ApoyoView.vue'), meta: { titulo: 'Necesito apoyo' } },
-      { path: 'puente', component: () => import('@/views/estudiante/PuenteView.vue'), meta: { titulo: 'Puente al doctorado' } },
+      // Puente al doctorado vive ahora dentro de Doctorado > Plazos y ayudas.
+      { path: 'puente', redirect: '/estudiante/doctorado/plazos' },
+      { path: 'doctorado', redirect: '/estudiante/doctorado/que-es' },
+      { path: 'doctorado/:seccion(que-es|acceso|requisitos|programas|plazos|grupos|orientacion)', component: () => import('@/views/estudiante/DoctoradoView.vue'), meta: { titulo: 'Doctorado' } },
       { path: 'cuestionario/:clave', component: () => import('@/views/estudiante/CuestionarioView.vue'), meta: { titulo: 'Cuestionario' } },
     ],
   },

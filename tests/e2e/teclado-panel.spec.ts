@@ -6,7 +6,7 @@ import { test, expect, type Page } from '@playwright/test'
 import { entrarConContrasena, sinErroresDeAccesibilidad } from './ayudantes'
 
 const PERFILES: { correo: string; pantallas: string[] }[] = [
-  { correo: 'ana@usal.es', pantallas: ['/estudiante', '/estudiante/checkin', '/estudiante/historial', '/estudiante/apoyo', '/estudiante/puente', '/calendario', '/cuenta'] },
+  { correo: 'ana@usal.es', pantallas: ['/estudiante', '/estudiante/checkin', '/estudiante/historial', '/estudiante/apoyo', '/estudiante/puente', '/estudiante/doctorado/que-es', '/estudiante/doctorado/acceso', '/estudiante/doctorado/plazos', '/estudiante/doctorado/orientacion', '/calendario', '/cuenta'] },
   { correo: 'tutora@usal.es', pantallas: ['/tutor', '/tutor/checkin', '/tutor/codigos'] },
   { correo: 'direccion@usal.es', pantallas: ['/direccion', '/direccion/avisos'] },
   {
