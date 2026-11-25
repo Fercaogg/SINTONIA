@@ -42,7 +42,7 @@ const INDICE = computed(() => [
     </p>
 
     <nav :aria-label="t('En esta página', 'On this page')" class="mb-10 rounded-xl border border-surface-200 bg-papel p-4">
-      <p class="text-xs font-semibold uppercase tracking-[0.14em] text-surface-800 mb-2">{{ t('En esta página', 'On this page') }}</p>
+      <p class="text-xs font-mono font-normal uppercase tracking-[0.14em] text-surface-800 mb-2">{{ t('En esta página', 'On this page') }}</p>
       <ul class="flex flex-wrap gap-x-4 gap-y-1 text-sm">
         <li v-for="i in INDICE" :key="i.id"><a :href="`#${i.id}`" class="enlace inline-flex items-center min-h-tactil">{{ i.texto }}</a></li>
       </ul>

@@ -12,7 +12,7 @@ const { t, idioma, ruta } = useIdioma()
 const HOJA_DE_RUTA = computed(() => (idioma.value === 'en' ? HOJA_EN : HOJA_ES))
 
 const COLUMNAS = computed(() => [
-  { clave: 'hecho', titulo: t('Hecho', 'Done'), icono: 'check', estilo: 'bg-[#1d7060] text-white' },
+  { clave: 'hecho', titulo: t('Hecho', 'Done'), icono: 'check', estilo: 'bg-brand-800 text-white' },
   { clave: 'piloto', titulo: t('Durante el piloto (febrero a abril de 2027)', 'During the pilot (February to April 2027)'), icono: 'calendar', estilo: 'bg-marino text-white' },
   { clave: 'despues', titulo: t('Después (TFG y tesis)', 'Afterwards (final projects and PhD theses)'), icono: 'graduation', estilo: 'bg-surface-100 text-surface-900' },
 ] as const)

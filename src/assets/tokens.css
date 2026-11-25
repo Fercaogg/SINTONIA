@@ -1,42 +1,84 @@
 /*
-  Tokens de diseño de SINTONÍA, heredados de WORKWELL360.
-  Origen de cada valor: DISENO.md (WW360 = código fuente de WORKWELL360).
-  Ninguna pantalla escribe colores directamente: todas usan estas variables
-  o las clases de Tailwind equivalentes (tailwind.config.js).
+  Tokens de diseño de SINTONÍA · sistema «Tinta y lumbre» (el de LUMBRA360).
+  Ver DISENO.md, apartado 0.
 
-  Modo oscuro: según la preferencia del sistema (DISENO.md, apartado 11).
-  La identidad no cambia: el azul marino #0A4A6C sigue siendo el de las
-  bandas y el verde de la marca, el del logotipo y los acentos. En oscuro
-  solo se invierten los neutros (fondo, papel, texto) y el verde de los
-  enlaces se aclara para mantener el contraste.
+  Lienzo blanco con mucho aire, tinta negra para el texto y la interfaz,
+  titulares en grotesca (Instrument Sans) con interletraje cerrado y un único
+  acento bermellón (lumbre) que aparece solo donde importa: la hoja central
+  del símbolo, el progreso y la novedad.
+
+  Los nombres de las variables («s50», «brand», «marino»…) se conservan para
+  que las clases de Tailwind de las pantallas sigan funcionando; solo cambia
+  su valor. Ninguna pantalla escribe colores directamente.
+
+  Modo oscuro: según la preferencia del sistema. Valores tomados uno a uno del
+  modo oscuro de LUMBRA360 (negro neutro, texto blanco roto, acción en blanco).
 */
 
 :root {
-  /* Neutros en canales RGB (para Tailwind, con transparencias). */
-  --rgb-s50: 245 247 246;    /* #F5F7F6 fondo, WW360 main.css:21 */
-  --rgb-s100: 240 244 243;   /* #F0F4F3 WW360 tailwind.config.js:20 */
-  --rgb-s200: 227 234 234;   /* #E3EAEA bordes, WW360 main.css:22 */
-  --rgb-s300: 138 155 165;   /* #8A9BA5 solo decoración */
-  --rgb-s600: 90 107 117;    /* #5A6B75 texto de párrafo */
-  --rgb-s800: 58 74 84;      /* #3A4A54 etiquetas */
-  --rgb-s900: 10 74 108;     /* #0A4A6C títulos */
+  /* ---------- Primitivos (escalas de LUMBRA360, brand/tokens.css) ---------- */
+  --tinta-50: #f4f4f3;
+  --tinta-100: #e7e7e5;
+  --tinta-200: #cbcbc8;
+  --tinta-700: #333331;
+  --tinta-800: #272726;
+  --tinta-900: #1b1b1b; /* logotipo, botón principal, bloques oscuros */
+  --tinta-950: #111111; /* todo el texto */
+
+  --lumbre-50: #fff3ee;
+  --lumbre-100: #ffe1d4;
+  --lumbre-300: #ff9670;
+  --lumbre-400: #f25a1f; /* el único acento */
+  --lumbre-500: #d9480f; /* anillo de foco */
+  --lumbre-600: #b83a0e; /* lumbre como texto sobre blanco */
+  --lumbre-700: #9a300c;
+
+  --piedra-50: #f5f5f2;
+  --piedra-100: #ededea;
+  --piedra-200: #e3e3df;
+  --piedra-300: #cfcfca;
+  --piedra-500: #8a8a84;
+  --piedra-600: #6b6b65;
+  --piedra-700: #55554f;
+
+  /* ---------- Canales RGB que leen las clases de Tailwind ---------- */
+  --rgb-s50: 255 255 255;    /* fondo: lienzo blanco */
+  --rgb-s100: 245 245 242;   /* piedra 50: alterna secciones y agrupa */
+  --rgb-s200: 227 227 223;   /* piedra 200: filetes */
+  --rgb-s300: 207 207 202;   /* piedra 300: filete fuerte, solo decoración */
+  --rgb-s600: 85 85 79;      /* piedra 700: texto secundario (7,4:1) */
+  --rgb-s800: 51 51 49;      /* tinta 700: etiquetas */
+  --rgb-s900: 17 17 17;      /* tinta 950: texto y titulares */
   --rgb-papel: 255 255 255;  /* tarjetas */
-  --rgb-b900: 29 112 96;     /* #1d7060 verde de acción (texto e iconos) */
+  --rgb-marino: 27 27 27;    /* tinta 900: bandas y bloques oscuros */
 
-  /* Marca */
-  --color-primary: #34C6A3;          /* WW360 main.css:15. Identidad: logo, progreso, selección */
-  --color-primary-hover: #2FB393;    /* WW360 main.css:16 */
-  --color-primary-light: #4ED7C2;    /* WW360 main.css:17 */
-  --color-accion: #1d7060;           /* WW360 tailwind.config.js:16. Enlaces y bordes de acción (5,93:1) */
-  --color-accion-hover: #0A4A6C;     /* WW360 main.css:18 */
-  --color-accion-fondo: #1d7060;     /* Fondo de los botones principales (texto blanco) */
-  --color-accion-fondo-hover: #0A4A6C;
-  --color-marino: #0A4A6C;           /* Bandas y avatares: igual en claro y en oscuro */
-  --color-primary-tint-08: rgba(52,198,163,0.08); /* WW360 tailwind.config.js:8 */
-  --color-primary-tint-15: rgba(52,198,163,0.15); /* WW360 tailwind.config.js:9 */
-  --color-primary-tint-40: rgba(52,198,163,0.4);  /* WW360 tailwind.config.js:10 */
+  --rgb-b50: 244 244 243;    /* tinta 50: selección, fila activa */
+  --rgb-b100: 231 231 229;   /* tinta 100: círculos de icono */
+  --rgb-b200: 207 207 202;   /* piedra 300: bordes suaves */
+  --rgb-b400: 255 150 112;   /* lumbre 300: acento sobre tinta */
+  --rgb-b500: 242 90 31;     /* lumbre 400: el acento */
+  --rgb-b700: 217 72 15;     /* lumbre 500 */
+  --rgb-b800: 39 39 38;      /* tinta 800: rellenos oscuros con texto blanco */
+  --rgb-b900: 27 27 27;      /* tinta 900: acción (texto, iconos, bordes) */
 
-  /* Neutros con nombre (los usan main.css y los gráficos) */
+  /* ---------- Semánticos con nombre (main.css y gráficos) ---------- */
+  --color-primary: rgb(var(--rgb-b500));        /* lumbre: el acento */
+  --color-primary-hover: rgb(var(--rgb-b700));
+  --color-primary-light: rgb(var(--rgb-b400));
+  --color-accion: rgb(var(--rgb-b900));         /* enlaces y bordes de acción: tinta */
+  --color-accion-hover: var(--tinta-950);
+  --color-accion-fondo: var(--tinta-900);       /* botón principal */
+  --color-accion-fondo-hover: var(--tinta-800);
+  --color-accion-texto: #f5f5f2;                /* texto sobre el botón principal */
+  --color-marino: rgb(var(--rgb-marino));
+  --color-primary-tint-08: rgb(var(--rgb-b50));
+  --color-primary-tint-15: rgb(var(--rgb-b100));
+  --color-primary-tint-40: rgb(var(--rgb-b200));
+  --color-lumbre-texto: var(--lumbre-600);
+  --color-lumbre-suave: var(--lumbre-50); /* fondo de iconos, como en LUMBRA360 */
+  --color-foco: var(--lumbre-500);
+  --color-borde-control: var(--piedra-500);     /* bordes de campos: 3:1 */
+
   --color-heading: rgb(var(--rgb-s900));
   --color-label: rgb(var(--rgb-s800));
   --color-body: rgb(var(--rgb-s600));
@@ -44,51 +86,101 @@
   --color-bg: rgb(var(--rgb-s50));
   --color-surface-alt: rgb(var(--rgb-s100));
   --color-border: rgb(var(--rgb-s200));
+  --color-border-strong: rgb(var(--rgb-s300));
   --color-white: rgb(var(--rgb-papel));
 
-  /* Sombras: WW360 main.css:24 a 26 */
-  --shadow-soft: 0 1px 3px rgba(0,0,0,0.04), 0 4px 12px rgba(10,74,108,0.06);
-  --shadow-card: rgba(10,74,108,0.15) 0px 20px 40px -20px, rgba(0,0,0,0.08) 0px 10px 20px -10px;
-  --shadow-elevated: rgba(10,74,108,0.15) 0px 20px 40px -12px, rgba(0,0,0,0.08) 0px 10px 20px -8px;
+  /* Estados (LUMBRA360): el error es carmesí para no confundirse con la lumbre. */
+  --correcto-texto: #1d6440;
+  --correcto-fondo: #e6f2eb;
+  --correcto-borde: #b5d6c3;
+  --aviso-texto: #7a4b00;
+  --aviso-fondo: #fbf0d6;
+  --aviso-borde: #ecd093;
+  --error-texto: #a3122f;
+  --error-fondo: #fce8ec;
+  --error-borde: #f1bcc7;
+  --error-solido: #c4213f;
 
-  /* Radios: WW360 main.css:28 a 30 */
-  --radius-sm: 4px;
-  --radius-md: 6px;
-  --radius-lg: 8px;
+  /* Elevación mínima: la jerarquía se hace con aire, filetes y cambio de fondo.
+     Solo flota lo que flota (menús, modales). */
+  --shadow-soft: 0 0 0 1px rgb(17 17 17 / 0.06);
+  --shadow-card: none;
+  --shadow-elevated: 0 1px 2px rgb(17 17 17 / 0.04), 0 12px 32px -16px rgb(17 17 17 / 0.16);
+  --shadow-overlay: 0 2px 6px rgb(17 17 17 / 0.05), 0 32px 64px -24px rgb(17 17 17 / 0.24);
 
-  /* Movimiento (skill de Emil Kowalski): curvas fuertes y duraciones cortas */
+  /* Radios (LUMBRA360): campos 8, tarjetas de datos 12, paneles 20, cápsula. */
+  --radius-xs: 4px;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 20px;
+  --radius-xl: 28px;
+  --radius-pill: 999px;
+
+  /* Tipografía */
+  --fuente-titular: 'Instrument Sans', 'Helvetica Neue', Arial, sans-serif;
+  --fuente-datos: 'IBM Plex Mono', ui-monospace, 'SFMono-Regular', monospace;
+  --tracking-heroe: -0.045em;
+  --tracking-titular: -0.03em;
+  --tracking-mayusculas: 0.14em;
+
+  /* Movimiento */
   --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
-  --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
-  --dur-micro: 160ms;
-  --dur-ui: 220ms;
-  --dur-entrada: 420ms;
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --dur-micro: 150ms;
+  --dur-ui: 200ms;
+  --dur-entrada: 360ms;
 
-  --color-graf-tutores: #248a73;
+  --color-graf-tutores: #55554f;
 
   color-scheme: light;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --rgb-s50: 9 24 31;        /* #09181F */
-    --rgb-s100: 15 33 42;      /* #0F212A */
-    --rgb-s200: 36 63 75;      /* #243F4B */
-    --rgb-s300: 92 118 130;    /* #5C7682 solo decoración */
-    --rgb-s600: 170 190 199;   /* #AABEC7 */
-    --rgb-s800: 204 218 224;   /* #CCDAE0 */
-    --rgb-s900: 234 243 246;   /* #EAF3F6 */
-    --rgb-papel: 14 37 48;     /* #0E2530 */
-    --rgb-b900: 95 224 200;    /* #5FE0C8 */
+    --rgb-s50: 14 14 14;       /* #0E0E0E */
+    --rgb-s100: 20 20 19;      /* #141413 */
+    --rgb-s200: 38 38 37;      /* #262625 */
+    --rgb-s300: 53 53 51;      /* #353533 solo decoración */
+    --rgb-s600: 169 169 163;   /* #A9A9A3 */
+    --rgb-s800: 214 214 210;   /* #D6D6D2 */
+    --rgb-s900: 242 242 239;   /* #F2F2EF */
+    --rgb-papel: 23 23 22;     /* #171716 */
+    --rgb-marino: 31 31 30;    /* #1F1F1E, superficie elevada */
 
-    --color-accion: #5FE0C8;
-    --color-accion-hover: #9BEEDD;
-    --color-accion-fondo-hover: #248a73;
+    --rgb-b50: 35 35 34;       /* #232322 */
+    --rgb-b100: 44 44 42;      /* #2C2C2A */
+    --rgb-b200: 53 53 51;
+    --rgb-b400: 255 150 112;
+    --rgb-b500: 255 106 51;    /* #FF6A33 */
+    --rgb-b700: 255 150 112;
+    --rgb-b800: 46 46 44;      /* rellenos oscuros: siguen con texto blanco */
+    --rgb-b900: 242 242 239;   /* la acción, en blanco roto */
 
-    --shadow-soft: 0 1px 3px rgba(0,0,0,0.3), 0 4px 12px rgba(0,0,0,0.25);
-    --shadow-card: rgba(0,0,0,0.45) 0px 20px 40px -20px, rgba(0,0,0,0.3) 0px 10px 20px -10px;
-    --shadow-elevated: rgba(0,0,0,0.5) 0px 20px 40px -12px, rgba(0,0,0,0.3) 0px 10px 20px -8px;
+    --color-accion-hover: #ffffff;
+    --color-accion-fondo: #f2f2ef;
+    --color-accion-fondo-hover: #ffffff;
+    --color-accion-texto: #111111;
+    --color-lumbre-texto: #ff9670;
+    --color-lumbre-suave: #2e170d;
+    --color-foco: #ff9670;
+    --color-borde-control: #6e6e69;
 
-    --color-graf-tutores: #4ED7C2;
+    --correcto-texto: #8fcfa8;
+    --correcto-fondo: #13261b;
+    --correcto-borde: #28482f;
+    --aviso-texto: #f0c66e;
+    --aviso-fondo: #2b2210;
+    --aviso-borde: #4d3c19;
+    --error-texto: #f5a3b3;
+    --error-fondo: #331219;
+    --error-borde: #5c2330;
+    --error-solido: #e5617b;
+
+    --shadow-soft: 0 0 0 1px rgb(255 255 255 / 0.06);
+    --shadow-elevated: 0 1px 2px rgb(0 0 0 / 0.4), 0 12px 32px -16px rgb(0 0 0 / 0.6);
+    --shadow-overlay: 0 2px 6px rgb(0 0 0 / 0.4), 0 32px 64px -24px rgb(0 0 0 / 0.7);
+
+    --color-graf-tutores: #a9a9a3;
 
     color-scheme: dark;
   }

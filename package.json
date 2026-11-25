@@ -23,6 +23,7 @@
     "rendimiento": "node scripts/medir-rendimiento.mjs",
     "test:demo": "playwright test --config playwright.demo.config.ts --trace off",
     "capturas": "CAPTURAS=1 playwright test --config playwright.demo.config.ts --trace off",
+    "clips": "CLIPS=1 playwright test --config playwright.demo.config.ts --project escritorio --trace off && bash scripts/convertir-clips.sh",
     "typecheck": "vue-tsc --noEmit"
   },
   "engines": {
@@ -30,7 +31,6 @@
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^1.8.0",
-    "@fontsource/fira-sans": "^5.3.0",
     "@supabase/ssr": "^0.12.7",
     "@supabase/supabase-js": "^2.119.0",
     "pg": "^8.23.1",

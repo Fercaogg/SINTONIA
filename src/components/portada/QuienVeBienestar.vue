@@ -16,7 +16,7 @@ const FILAS = computed(() => [
 
 <template>
   <div class="card p-6 sm:p-7">
-    <p class="text-xs font-semibold uppercase tracking-[0.16em] text-brand-900">{{ t('Tu bienestar, ¿quién lo ve?', 'Your wellbeing: who sees it?') }}</p>
+    <p class="text-xs font-mono font-normal uppercase tracking-[0.14em] text-surface-600">{{ t('Tu bienestar, ¿quién lo ve?', 'Your wellbeing: who sees it?') }}</p>
     <ul class="mt-5 divide-y divide-surface-200">
       <li v-for="(f, i) in FILAS" :key="f.quien" v-revelar="i + 1" class="py-4 first:pt-0 last:pb-0 flex items-center gap-4">
         <span class="h-11 w-11 shrink-0 rounded-xl bg-surface-100 text-surface-900 flex items-center justify-center"><AppIcon :name="f.icono" :size="20" /></span>

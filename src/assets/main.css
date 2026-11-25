@@ -1,8 +1,10 @@
 /*
-  Estilos base de SINTONÍA. Adaptados de WORKWELL360 (src/assets/main.css)
-  con los cambios de accesibilidad aprobados (ver DISENO.md, apartado 1.5).
+  Estilos base de SINTONÍA con el sistema «Tinta y lumbre» de LUMBRA360
+  (ver DISENO.md, apartado 0): lienzo blanco, tinta para el texto y la acción,
+  botones en cápsula, tarjetas con filete en lugar de sombra y un solo acento.
 */
 
+@import './fuentes.css';
 @import './tokens.css';
 
 @tailwind base;
@@ -46,6 +48,23 @@
     background-color: var(--color-bg);
     color: var(--color-heading);
     min-height: 100vh;
+    font-feature-settings: 'kern';
+    font-size: 1.0625rem; /* 17 px: cuerpo de lectura de LUMBRA360 */
+    line-height: 1.55;
+    letter-spacing: -0.005em;
+  }
+
+  /* Titulares: grotesca con interletraje cerrado y peso medio. */
+  h1,
+  h2,
+  h3,
+  .font-display {
+    letter-spacing: -0.025em;
+    text-wrap: balance;
+  }
+
+  ::selection {
+    background-color: var(--color-lumbre-suave);
   }
 
   * {
@@ -55,12 +74,17 @@
 
   /* Foco visible para quien navega con teclado */
   :focus-visible {
-    outline: 3px solid var(--color-accion);
+    outline: 2px solid var(--color-foco);
     outline-offset: 2px;
   }
 
   a {
     color: var(--color-accion);
+    text-decoration-color: var(--color-border-strong);
+    text-underline-offset: 4px;
+  }
+  a:hover {
+    text-decoration-color: currentColor;
   }
 
   .tabular-nums {
@@ -82,100 +106,124 @@
 }
 
 @layer components {
+  /* Tarjeta de datos: filete de 1 px, sin sombra. */
   .card {
     @apply bg-papel border border-surface-200;
     border-radius: var(--radius-md);
     box-shadow: var(--shadow-card);
-    transition: box-shadow 0.3s ease, transform 0.3s ease;
+    transition: border-color var(--dur-ui) var(--ease-out), box-shadow var(--dur-ui) var(--ease-out);
   }
 
-  /* Botones (skill de Emil Kowalski): responden al instante al pasar el
-     ratón y se hunden un poco al pulsar. Solo se animan color y transform. */
+  /* Botones en cápsula (LUMBRA360): 44 px de alto, tinta como acción,
+     contracción leve al pulsar. Solo se animan color, borde y transform. */
+  .btn-primary,
+  .btn-secondary,
+  .btn-claro,
+  .btn-danger,
+  .btn-lumbre {
+    @apply inline-flex items-center justify-center gap-2 px-[22px] py-[10px] min-h-tactil font-medium;
+    font-size: 0.95rem;
+    border-radius: var(--radius-pill);
+    transition:
+      background-color var(--dur-micro) var(--ease-out),
+      border-color var(--dur-micro) var(--ease-out),
+      transform var(--dur-micro) var(--ease-out);
+  }
+  .btn-primary:active:not(:disabled),
+  .btn-secondary:active:not(:disabled),
+  .btn-claro:active:not(:disabled),
+  .btn-danger:active:not(:disabled),
+  .btn-lumbre:active:not(:disabled) {
+    transform: scale(0.98);
+  }
+  .btn-primary:disabled,
+  .btn-secondary:disabled,
+  .btn-lumbre:disabled {
+    @apply cursor-not-allowed;
+    opacity: 0.6;
+  }
+
   .btn-primary {
-    @apply inline-flex items-center justify-center gap-2 px-[18px] py-[10px] min-h-tactil
-           text-white font-medium text-base;
     background-color: var(--color-accion-fondo);
-    border-radius: var(--radius-md);
-    transition: background-color var(--dur-micro) ease, transform var(--dur-micro) var(--ease-out);
+    color: var(--color-accion-texto);
   }
   .btn-primary:hover:not(:disabled) {
     background-color: var(--color-accion-fondo-hover);
   }
-  .btn-primary:active:not(:disabled),
-  .btn-secondary:active:not(:disabled),
-  .btn-danger:active:not(:disabled) {
-    transform: scale(0.97);
-  }
-  .btn-primary:disabled {
-    @apply opacity-50 cursor-not-allowed;
-  }
 
   .btn-secondary {
-    @apply inline-flex items-center justify-center gap-2 px-[18px] py-[10px] min-h-tactil
-           bg-transparent font-medium text-base border;
-    transition: background-color var(--dur-micro) ease, transform var(--dur-micro) var(--ease-out);
-    color: var(--color-accion);
-    border-color: var(--color-accion);
-    border-radius: var(--radius-md);
+    @apply bg-transparent border;
+    color: var(--color-heading);
+    border-color: var(--color-border-strong);
   }
   .btn-secondary:hover:not(:disabled) {
-    background-color: var(--color-primary-tint-08);
+    border-color: var(--color-heading);
   }
 
-  /* Botón sobre azul marino: blanco con texto azul (contraste 8,9:1). */
+  /* Lumbre: reservado a la acción de mayor valor. Texto en tinta (5,6:1). */
+  .btn-lumbre {
+    background-color: rgb(var(--rgb-b500));
+    color: #111111;
+  }
+  .btn-lumbre:hover:not(:disabled) {
+    background-color: var(--lumbre-300);
+  }
+
+  /* Botón sobre un bloque de tinta: blanco roto con texto en tinta. */
   .btn-claro {
-    @apply inline-flex items-center justify-center gap-2 px-[18px] py-[10px] min-h-tactil font-semibold text-base;
-    background-color: #ffffff;
-    color: #0A4A6C;
-    border-radius: var(--radius-md);
-    transition: background-color var(--dur-micro) ease, transform var(--dur-micro) var(--ease-out);
+    background-color: #f5f5f2;
+    color: #111111;
   }
   .btn-claro:hover {
-    background-color: #E6F7F2;
-  }
-  .btn-claro:active {
-    transform: scale(0.97);
+    background-color: #ffffff;
   }
 
   .btn-danger {
-    @apply inline-flex items-center justify-center gap-2 px-[18px] py-[10px] min-h-tactil
-           bg-red-700 text-white font-medium text-base;
-    transition: background-color var(--dur-micro) ease, transform var(--dur-micro) var(--ease-out);
-    border-radius: var(--radius-md);
+    @apply border;
+    background-color: var(--color-white);
+    color: var(--error-texto);
+    border-color: var(--error-borde);
   }
   .btn-danger:hover:not(:disabled) {
-    @apply bg-red-800;
+    background-color: var(--error-fondo);
   }
 
+  /* Enlaces en tinta, siempre subrayados. */
   .enlace {
-    @apply font-medium underline underline-offset-2;
+    @apply font-medium underline underline-offset-4;
     color: var(--color-accion);
+    text-decoration-color: var(--color-border-strong);
   }
   .enlace:hover {
     color: var(--color-accion-hover);
+    text-decoration-color: currentColor;
   }
 
   .input-field {
-    @apply w-full px-4 py-3 bg-papel text-base transition-all duration-200 outline-none min-h-tactil;
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius-md);
+    @apply w-full px-4 py-3 bg-papel text-base outline-none min-h-tactil;
+    border: 1px solid var(--color-borde-control);
+    border-radius: var(--radius-sm);
     color: var(--color-heading);
+    transition: border-color var(--dur-micro) var(--ease-out), box-shadow var(--dur-micro) var(--ease-out);
   }
   .input-field::placeholder {
     color: var(--color-body);
   }
   .input-field:focus {
-    border-color: var(--color-primary);
-    box-shadow: 0 0 0 2px var(--color-primary-tint-15);
+    border-color: var(--color-heading);
+    box-shadow: 0 0 0 2px var(--color-foco);
   }
 
   .label {
     @apply block text-sm font-medium mb-1.5;
-    color: var(--color-label);
+    color: var(--color-heading);
   }
 
   .titulo-pagina {
-    @apply font-display text-3xl sm:text-4xl font-bold tracking-tight;
+    @apply font-display font-medium;
+    font-size: clamp(1.875rem, 1.55rem + 1.4vw, 2.25rem); /* 30 → 36 px */
+    line-height: 1.1;
+    letter-spacing: var(--tracking-titular);
     color: var(--color-heading);
   }
 
@@ -183,73 +231,112 @@
     color: var(--color-body);
   }
 
+  /* Antetítulo: mono en mayúsculas, como en LUMBRA360. */
+  .antetitulo {
+    @apply font-mono text-xs uppercase;
+    letter-spacing: var(--tracking-mayusculas);
+    color: var(--color-body);
+  }
+
+  /* Estados en cápsulas pequeñas. */
   .badge {
-    @apply inline-flex items-center gap-1 px-2.5 py-1 text-xs font-medium;
-    border-radius: var(--radius-sm);
+    @apply inline-flex items-center gap-1 px-2.5 py-0.5 text-xs font-medium whitespace-nowrap;
+    border-radius: var(--radius-pill);
   }
   .badge-green {
-    background-color: rgba(52,198,163,0.2);
-    color: var(--color-heading);
-    border: 1px solid var(--color-primary-tint-40);
+    background-color: var(--correcto-fondo);
+    color: var(--correcto-texto);
+    box-shadow: inset 0 0 0 1px var(--correcto-borde);
   }
   .badge-amber {
-    @apply bg-amber-100 text-amber-800;
+    background-color: var(--aviso-fondo);
+    color: var(--aviso-texto);
+    box-shadow: inset 0 0 0 1px var(--aviso-borde);
   }
   .badge-sky {
-    background-color: rgba(78,215,194,0.15);
+    background-color: var(--color-primary-tint-08);
     color: var(--color-heading);
+    box-shadow: inset 0 0 0 1px var(--color-border);
+  }
+  .badge-lumbre {
+    background-color: var(--color-lumbre-suave);
+    color: var(--color-lumbre-texto);
   }
 
   .stat-card {
     @apply card p-6 flex flex-col gap-2;
   }
   .stat-value {
-    @apply font-display text-5xl font-bold tabular-nums tracking-tight leading-none mt-2;
+    @apply font-display font-medium tabular-nums leading-none mt-2;
+    font-size: 2.75rem;
+    letter-spacing: var(--tracking-titular);
     color: var(--color-heading);
   }
   .stat-label {
-    @apply text-xs font-medium uppercase;
-    color: var(--color-label);
-    letter-spacing: 0.05em;
+    @apply font-mono text-xs uppercase;
+    letter-spacing: var(--tracking-mayusculas);
+    color: var(--color-body);
   }
 
+  /* Menú lateral (LUMBRA360): fondo piedra, elemento activo en blanco con
+     un filete de lumbre a la izquierda. */
   .sidebar-link {
-    @apply flex items-center gap-3 px-4 py-2.5 min-h-tactil text-sm font-medium transition-all duration-200;
-    border-radius: var(--radius-md);
-    color: var(--color-label);
+    @apply relative flex items-center gap-3 px-3 py-2 min-h-[40px] text-[0.95rem];
+    border-radius: var(--radius-sm);
+    color: var(--color-body);
+    transition: background-color var(--dur-micro) var(--ease-out), color var(--dur-micro) var(--ease-out);
   }
   .sidebar-link:hover {
-    background-color: var(--color-primary-tint-08);
     color: var(--color-heading);
+    background-color: rgb(var(--rgb-s200) / 0.5);
   }
   .sidebar-link.active {
-    background-color: var(--color-accion-fondo);
-    color: #ffffff;
+    @apply font-medium;
+    background-color: var(--color-white);
+    color: var(--color-heading);
+    box-shadow: var(--shadow-soft);
+  }
+  .sidebar-link.active::before {
+    content: '';
+    position: absolute;
+    left: -0.75rem;
+    top: 0.5rem;
+    bottom: 0.5rem;
+    width: 4px;
+    border-radius: 999px;
+    background-color: rgb(var(--rgb-b500));
   }
 
-  /* Variante para el menú azul marino (dirección e investigación) */
+  /* Se conserva por compatibilidad: ahora es igual que el menú claro. */
   .sidebar-link-oscuro {
-    @apply flex items-center gap-3 px-4 py-2.5 min-h-tactil text-sm font-medium transition-all duration-200 text-white/85;
-    border-radius: var(--radius-md);
-  }
-  .sidebar-link-oscuro:hover {
-    @apply bg-white/10 text-white;
+    @apply sidebar-link;
   }
   .sidebar-link-oscuro.active {
-    @apply bg-papel text-surface-900;
+    @apply font-medium;
+    background-color: var(--color-white);
+    color: var(--color-heading);
   }
 
   .aviso-error {
-    @apply p-4 rounded-xl bg-red-50 border border-red-200 text-red-700 text-sm flex items-start gap-3;
+    @apply p-4 text-sm flex items-start gap-3 border;
+    border-radius: var(--radius-md);
+    background-color: var(--error-fondo);
+    border-color: var(--error-borde);
+    color: var(--error-texto);
   }
   .aviso-exito {
-    @apply p-4 rounded-xl text-sm flex items-start gap-3;
-    background-color: var(--color-primary-tint-08);
-    border: 1px solid var(--color-primary-tint-40);
-    color: var(--color-heading);
+    @apply p-4 text-sm flex items-start gap-3 border;
+    border-radius: var(--radius-md);
+    background-color: var(--correcto-fondo);
+    border-color: var(--correcto-borde);
+    color: var(--correcto-texto);
   }
   .aviso-pendiente {
-    @apply p-3 rounded-xl bg-amber-50 border border-amber-200 text-amber-900 text-sm;
+    @apply p-3 text-sm border;
+    border-radius: var(--radius-md);
+    background-color: var(--aviso-fondo);
+    border-color: var(--aviso-borde);
+    color: var(--aviso-texto);
   }
 
   .fade-in {
@@ -270,24 +357,6 @@
 
   .solo-lector {
     @apply sr-only;
-  }
-}
-
-/* Modo oscuro: avisos y etiquetas con colores propios (contraste AA). */
-@media (prefers-color-scheme: dark) {
-  .aviso-error {
-    background-color: rgba(185, 28, 28, 0.18);
-    border-color: rgba(248, 113, 113, 0.45);
-    color: #fecaca;
-  }
-  .aviso-pendiente {
-    background-color: rgba(180, 83, 9, 0.2);
-    border-color: rgba(251, 191, 36, 0.4);
-    color: #fde68a;
-  }
-  .badge-amber {
-    background-color: rgba(180, 83, 9, 0.25);
-    color: #fde68a;
   }
 }
 
@@ -322,7 +391,7 @@
 @media (hover: hover) and (pointer: fine) {
   .tarjeta-enlace:hover {
     transform: translateY(-2px);
-    box-shadow: var(--shadow-elevated);
+    border-color: var(--color-border-strong);
   }
 }
 .tarjeta-enlace:active {
@@ -357,14 +426,14 @@
   pointer-events: none;
   z-index: 1;
   opacity: 0;
-  background: radial-gradient(420px circle at var(--luz-x, 50%) var(--luz-y, 50%), rgba(52, 198, 163, 0.14), transparent 60%);
+  background: radial-gradient(420px circle at var(--luz-x, 50%) var(--luz-y, 50%), color-mix(in srgb, rgb(var(--rgb-b500)) 12%, transparent), transparent 60%);
   transition: opacity 260ms ease;
 }
 .con-luz:hover::after {
   opacity: 1;
 }
 .con-luz:hover {
-  box-shadow: 0 18px 40px -22px rgba(10, 74, 108, 0.35);
+  box-shadow: 0 30px 60px -36px rgb(17 17 17 / 0.35);
 }
 .revelar.revelado.con-luz {
   transition: transform 220ms var(--ease-out), box-shadow 220ms var(--ease-out), opacity 700ms var(--ease-out);

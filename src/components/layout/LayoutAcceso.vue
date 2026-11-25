@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import SaltarContenido from '@/components/layout/SaltarContenido.vue'
 // Estructura de las pantallas de acceso: dos columnas en escritorio, con el
-// panel azul marino a la izquierda (WW360 LoginView.vue), y solo el
+// panel de tinta a la izquierda (WW360 LoginView.vue), y solo el
 // formulario en el móvil.
 import { RouterLink } from 'vue-router'
 import AppLogo from '@/components/comun/AppLogo.vue'
@@ -14,15 +14,11 @@ import BandaEntorno from '@/components/comun/BandaEntorno.vue'
     <BandaEntorno />
     <div class="flex-1 flex">
       <div class="hidden lg:flex w-1/2 bg-marino relative overflow-hidden items-center justify-center p-12">
-        <div class="absolute inset-0" aria-hidden="true">
-          <div class="absolute top-20 left-20 w-64 h-64 bg-brand-500/20 rounded-full blur-3xl" />
-          <div class="absolute bottom-20 right-20 w-80 h-80 bg-brand-400/10 rounded-full blur-3xl" />
-        </div>
         <div class="relative max-w-md">
           <RouterLink to="/" class="text-3xl inline-block mb-8" aria-label="SINTONÍA, ir al inicio">
             <AppLogo variante="claro" />
           </RouterLink>
-          <p class="font-display text-4xl font-semibold text-white mb-4 tracking-tight leading-tight">
+          <p class="font-display text-[2.75rem] font-normal text-white mb-5 tracking-tight leading-[1.02]">
             Dos miradas sobre el mismo trabajo
           </p>
           <p class="text-white/85 leading-relaxed">
@@ -31,12 +27,12 @@ import BandaEntorno from '@/components/comun/BandaEntorno.vue'
           </p>
           <div class="mt-10 flex gap-8">
             <div>
-              <p class="font-display text-2xl font-semibold text-brand-400">1 minuto</p>
-              <p class="text-xs text-white/80">a la semana</p>
+              <p class="font-display text-2xl font-medium text-white">1 minuto</p>
+              <p class="font-mono text-xs uppercase tracking-[0.14em] text-brand-400 mt-1">a la semana</p>
             </div>
             <div>
-              <p class="font-display text-2xl font-semibold text-brand-400">3 preguntas</p>
-              <p class="text-xs text-white/80">para la tutoría</p>
+              <p class="font-display text-2xl font-medium text-white">3 preguntas</p>
+              <p class="font-mono text-xs uppercase tracking-[0.14em] text-brand-400 mt-1">para la tutoría</p>
             </div>
           </div>
         </div>

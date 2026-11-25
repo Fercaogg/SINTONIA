@@ -13,7 +13,7 @@ import { INICIO_ROL } from '@/lib/tipos'
 import { modoDemo } from '@/lib/supabase'
 import { useVisibleUnaVez } from '@/lib/movimiento'
 import { hayDemostracion } from '@/lib/demo'
-import { DIRECCION, REFERENCIAS } from '@/contenido/portada'
+import { REFERENCIAS } from '@/contenido/portada'
 import { PUENTE as PUENTE_EN } from '@/contenido/en'
 import { useIdioma } from '@/lib/idioma'
 import { useContenido } from '@/lib/contenido'
@@ -34,7 +34,7 @@ import QuienVeBienestar from '@/components/portada/QuienVeBienestar.vue'
 import TarjetasPerfiles from '@/components/portada/TarjetasPerfiles.vue'
 import OndasSintonia from '@/components/portada/OndasSintonia.vue'
 import TituloEnSintonia from '@/components/portada/TituloEnSintonia.vue'
-import TarjetaDireccion from '@/components/portada/TarjetaDireccion.vue'
+import ApartadoRespaldo from '@/components/portada/ApartadoRespaldo.vue'
 import PreguntasFrecuentes from '@/components/portada/PreguntasFrecuentes.vue'
 import FormularioContacto from '@/components/portada/FormularioContacto.vue'
 
@@ -55,15 +55,13 @@ const contenido = useContenido()
 const DATOS_CLAVE = computed(() => contenido.value.DATOS_CLAVE)
 const PARA_QUIEN = computed(() => contenido.value.PARA_QUIEN)
 const PASOS = computed(() => contenido.value.PASOS)
-const AUTOR = computed(() => contenido.value.AUTOR)
-const ANTECEDENTE = computed(() => contenido.value.ANTECEDENTE)
 
 const SECCIONES = computed(() => [
   { id: 'como-funciona', texto: t('Cómo funciona', 'How it works') },
   { id: 'privacidad', texto: t('Privacidad', 'Privacy') },
   { id: 'perfiles', texto: t('Perfiles', 'Profiles') },
   { id: 'puente', texto: t('Puente', 'Bridge') },
-  { id: 'direccion', texto: t('Dirección', 'Team') },
+  { id: 'respaldo', texto: t('Respaldo', 'Backing') },
   { id: 'preguntas', texto: t('Preguntas', 'FAQ') },
   { id: 'contacto', texto: t('Contacto', 'Contact') },
 ])
@@ -73,7 +71,7 @@ const PUENTE_LARGO = 3
 // ---------- Movimiento ligado al desplazamiento (DISENO.md 12.1) ----------
 const limitar = (v: number) => Math.min(1, Math.max(0, v))
 const tramo = (v: number, a: number, b: number) => limitar((v - a) / (b - a))
-const progreso = ref<HTMLElement | null>(null)
+const plegada = ref(false)
 const ondasProblema = ref<HTMLElement | null>(null)
 const ondasBanda = ref<HTMLElement | null>(null)
 const banda = ref<HTMLElement | null>(null)
@@ -83,17 +81,18 @@ const puenteActivo = ref(sinMovimiento() ? PUENTE_LARGO : 0)
 const ondasCierre = ref<HTMLElement | null>(null)
 const quitar: (() => void)[] = []
 let marcoProgreso = 0
+// Cabecera: transparente arriba y con fondo difuminado al bajar (LUMBRA360).
 function pintarProgreso() {
   marcoProgreso = 0
-  const total = document.documentElement.scrollHeight - window.innerHeight
-  if (progreso.value) progreso.value.style.transform = `scaleX(${limitar(window.scrollY / Math.max(1, total)).toFixed(4)})`
+  plegada.value = window.scrollY > 8
 }
 const pedirProgreso = () => {
   if (!marcoProgreso) marcoProgreso = requestAnimationFrame(pintarProgreso)
 }
 onMounted(() => {
-  if (sinMovimiento()) return
   window.addEventListener('scroll', pedirProgreso, { passive: true })
+  pintarProgreso()
+  if (sinMovimiento()) return
   // El problema: las dos miradas se acercan algo al leer, sin llegar a coincidir.
   if (ondasProblema.value) {
     const el = ondasProblema.value
@@ -143,11 +142,12 @@ const estilo = (e: Record<string, string>) => e
   <div class="min-h-screen flex flex-col">
     <SaltarContenido />
     <BandaEntorno />
-    <header class="sticky top-0 z-30 bg-surface-50/95 backdrop-blur-md border-b border-surface-200">
-      <div class="max-w-[1180px] mx-auto px-4 sm:px-6 py-3 flex items-center justify-between gap-3">
-        <RouterLink :to="ruta('/')" class="text-xl" :aria-label="t('SINTONÍA, inicio', 'SINTONÍA, home')"><AppLogo /></RouterLink>
+    <!-- Cabecera como la de LUMBRA360: transparente arriba; al bajar, fondo difuminado y filete. -->
+    <header class="cabecera sticky top-0 z-30" :data-plegada="plegada || menuAbierto">
+      <div class="max-w-[1264px] mx-auto px-6 sm:px-8 h-16 flex items-center justify-between gap-6">
+        <RouterLink :to="ruta('/')" class="text-xl rounded-md py-2" :aria-label="t('SINTONÍA, inicio', 'SINTONÍA, home')"><AppLogo /></RouterLink>
         <nav :aria-label="t('Secciones', 'Sections')" class="hidden lg:block">
-          <ul class="flex items-center gap-1 text-sm">
+          <ul class="flex items-center gap-7">
             <li v-for="s in SECCIONES" :key="s.id">
               <a :href="`#${s.id}`" class="enlace-nav">{{ s.texto }}</a>
             </li>
@@ -155,12 +155,16 @@ const estilo = (e: Record<string, string>) => e
         </nav>
         <div class="flex items-center gap-2">
           <SelectorIdioma class="hidden sm:inline-flex" />
-          <RouterLink v-if="sesion.rol" :to="INICIO_ROL[sesion.rol]" class="btn-primary text-sm">{{ t('Ir a mi panel', 'My dashboard') }}</RouterLink>
-          <RouterLink v-else to="/acceso" class="btn-secondary text-sm" :lang="idioma === 'en' ? 'es' : undefined">{{ t('Iniciar sesión', 'Sign in') }}</RouterLink>
-          <a v-if="modoDemo && !sesion.rol" href="#entrar" class="btn-primary text-sm hidden sm:inline-flex">{{ t('Probar', 'Try it') }}</a>
+          <RouterLink v-if="sesion.rol" :to="INICIO_ROL[sesion.rol]" class="btn-primary min-h-10 px-5 text-sm">{{ t('Ir a mi panel', 'My dashboard') }}</RouterLink>
+          <template v-else>
+            <!-- «Iniciar sesión» es para quien ya tiene cuenta: discreto. El botón destacado es el código o la demo. -->
+            <RouterLink to="/acceso" class="enlace-nav font-medium" :lang="idioma === 'en' ? 'es' : undefined">{{ t('Iniciar sesión', 'Sign in') }}</RouterLink>
+            <a v-if="modoDemo" href="#entrar" class="btn-primary min-h-10 px-5 text-sm hidden sm:inline-flex">{{ t('Probar', 'Try it') }}</a>
+            <RouterLink v-else to="/registro" class="btn-primary min-h-10 px-5 text-sm hidden sm:inline-flex">{{ t('Tengo un código', 'I have a code') }}</RouterLink>
+          </template>
           <button
             type="button"
-            class="lg:hidden min-w-tactil min-h-tactil inline-flex items-center justify-center rounded-md text-surface-900 hover:bg-surface-100"
+            class="lg:hidden min-w-tactil min-h-tactil inline-flex items-center justify-center rounded-full text-surface-900 hover:bg-surface-100"
             :aria-expanded="menuAbierto"
             aria-controls="menu-secciones"
             @click="menuAbierto = !menuAbierto"
@@ -169,67 +173,62 @@ const estilo = (e: Record<string, string>) => e
           </button>
         </div>
       </div>
-      <nav v-show="menuAbierto" id="menu-secciones" :aria-label="t('Secciones', 'Sections')" class="lg:hidden border-t border-surface-200 bg-surface-50">
-        <ul class="max-w-[1180px] mx-auto px-4 py-2 grid grid-cols-2 gap-1 text-sm">
+      <nav v-show="menuAbierto" id="menu-secciones" :aria-label="t('Secciones', 'Sections')" class="lg:hidden border-t border-surface-200">
+        <ul class="max-w-[1264px] mx-auto px-6 py-2 grid grid-cols-2 gap-1 text-sm">
           <li v-for="s in SECCIONES" :key="s.id">
             <a :href="`#${s.id}`" class="px-2 min-h-tactil flex items-center rounded-md text-surface-900 hover:bg-surface-100" @click="menuAbierto = false">{{ s.texto }}</a>
           </li>
         </ul>
       </nav>
-      <div class="absolute inset-x-0 -bottom-px h-0.5 overflow-hidden" aria-hidden="true">
-        <div ref="progreso" class="h-full origin-left bg-brand-500" :style="estilo({ transform: 'scaleX(0)' })" />
-      </div>
     </header>
 
-    <main id="contenido" tabindex="-1" class="outline-none flex-1">
+    <main id="contenido" tabindex="-1" class="outline-none flex-1 overflow-x-clip">
       <p v-if="route.query.borrado" class="aviso-exito max-w-[900px] mx-4 sm:mx-auto mt-6" role="status">
         {{ t('Hemos borrado tu cuenta y todos tus datos. Gracias por haber participado.', 'We have deleted your account and all your data. Thank you for taking part.') }}
       </p>
 
-      <!-- 1. Inicio: qué es, para qué y cómo probarlo; a la derecha, el producto -->
+      <!-- 1. Inicio: titular centrado y, debajo, el producto (como el héroe de LUMBRA360) -->
       <section class="relative overflow-hidden" aria-labelledby="t-inicio">
         <CampoSintonia />
-        <div class="relative z-10 max-w-[1180px] mx-auto px-4 sm:px-6 pt-14 pb-16 sm:pt-20 sm:pb-24 grid gap-14 lg:grid-cols-12 lg:items-center">
-          <div class="entrada lg:col-span-6">
-            <p class="inline-flex items-center gap-2 rounded-full border border-surface-200 bg-papel/80 px-3 py-1 text-xs font-semibold uppercase tracking-[0.14em] text-brand-900">
-              <span class="h-1.5 w-1.5 rounded-full bg-brand-500" aria-hidden="true" />{{ t('Tutoría de TFM, TFG y tesis', 'Supervision of Master\'s theses, final projects and PhDs') }}
-            </p>
-            <h1 id="t-inicio" class="mt-6 font-display text-[2.6rem] leading-[1.04] sm:text-6xl lg:text-[3.6rem] xl:text-[4rem] font-bold tracking-tight text-surface-900 text-balance">
+        <div class="relative z-10 max-w-[1264px] mx-auto px-6 sm:px-8 pt-14 pb-16 sm:pt-20 lg:pt-24">
+          <div class="entrada mx-auto flex max-w-[52rem] flex-col items-center gap-6 text-center">
+            <p class="font-mono text-xs uppercase tracking-[0.14em] text-surface-600">{{ t('Tutoría de TFM, TFG y tesis', 'Supervision of Master\'s theses, final projects and PhDs') }}</p>
+            <h1 id="t-inicio" class="font-display text-[2.4rem] leading-[1.04] sm:text-5xl lg:text-[3.75rem] font-medium tracking-[-0.035em] text-surface-900 text-balance">
               {{ t('Acompañar el trabajo académico,', 'Supporting academic work,') }}
-              <span class="text-brand-900">{{ t('sin vigilar', 'without surveillance') }}</span>
+              {{ t('sin vigilar', 'without surveillance') }}
             </h1>
-            <p class="mt-6 text-lg sm:text-xl leading-relaxed texto-suave max-w-xl">
+            <p class="max-w-[36rem] text-lg texto-suave text-pretty">
               {{ t('Un registro semanal muy breve de estudiante y tutor/a para que las tutorías empiecen por lo que importa.', 'A very short weekly check-in for student and supervisor, so that supervision meetings start with what matters.') }}
             </p>
-            <div class="mt-9 flex flex-col sm:flex-row gap-3">
-              <a v-if="modoDemo" href="#entrar" class="btn-primary px-6 py-3">{{ t('Entrar en la demostración', 'Enter the demo') }}</a>
-              <RouterLink v-else to="/registro" class="btn-primary px-6 py-3">{{ t('Tengo un código', 'I have a code') }}</RouterLink>
-              <a v-if="modoDemo" href="#como-funciona" class="btn-secondary px-6 py-3">{{ t('Ver cómo funciona', 'See how it works') }}</a>
-              <RouterLink v-else-if="hayDemostracion" to="/demo" class="btn-secondary px-6 py-3">{{ t('Ver la demostración', 'See the demo') }}</RouterLink>
-              <a v-else href="#demostracion" class="btn-secondary px-6 py-3">{{ t('Ver la demostración', 'See the demo') }}</a>
+            <div class="mt-2 flex w-full flex-col items-center gap-3 sm:w-auto sm:flex-row sm:gap-4">
+              <a v-if="modoDemo" href="#entrar" class="btn-primary w-full sm:w-auto min-h-12 px-6 text-base">{{ t('Entrar en la demostración', 'Enter the demo') }}</a>
+              <RouterLink v-else to="/registro" class="btn-primary w-full sm:w-auto min-h-12 px-6 text-base">{{ t('Tengo un código', 'I have a code') }}</RouterLink>
+              <a v-if="modoDemo" href="#como-funciona" class="enlace-flecha">{{ t('Ver cómo funciona', 'See how it works') }} <span aria-hidden="true">↓</span></a>
+              <RouterLink v-else-if="hayDemostracion" to="/demo" class="enlace-flecha">{{ t('Ver la demostración', 'See the demo') }} <span aria-hidden="true">→</span></RouterLink>
+              <a v-else href="#demostracion" class="enlace-flecha">{{ t('Ver la demostración', 'See the demo') }} <span aria-hidden="true">↓</span></a>
             </div>
-            <ul class="mt-10 grid gap-4 sm:grid-cols-3 border-t border-surface-200 pt-6 text-sm">
-              <li class="flex items-start gap-2.5"><AppIcon name="clock" :size="18" class="mt-0.5 shrink-0 text-brand-900" /><span class="text-surface-900 font-medium">{{ t('Unos 60 segundos a la semana', 'About 60 seconds a week') }}</span></li>
-              <li class="flex items-start gap-2.5"><AppIcon name="shield" :size="18" class="mt-0.5 shrink-0 text-brand-900" /><span class="text-surface-900 font-medium">{{ t('Sin notas, sin rankings', 'No marks, no rankings') }}</span></li>
-              <li class="flex items-start gap-2.5"><AppIcon name="lock" :size="18" class="mt-0.5 shrink-0 text-brand-900" /><span class="text-surface-900 font-medium">{{ t('Tu bienestar solo lo ves tú', 'Only you see your wellbeing') }}</span></li>
+            <ul class="mt-2 flex flex-wrap justify-center gap-x-6 gap-y-2 text-sm font-medium text-surface-900">
+              <li class="inline-flex items-center gap-2.5"><span class="h-2 w-2 rounded-full bg-brand-500" aria-hidden="true" />{{ t('Unos 60 segundos a la semana', 'About 60 seconds a week') }}</li>
+              <li class="inline-flex items-center gap-2.5"><span class="h-2 w-2 rounded-full bg-brand-500" aria-hidden="true" />{{ t('Sin notas, sin rankings', 'No marks, no rankings') }}</li>
+              <li class="inline-flex items-center gap-2.5"><span class="h-2 w-2 rounded-full bg-brand-500" aria-hidden="true" />{{ t('Tu bienestar solo lo ves tú', 'Only you see your wellbeing') }}</li>
             </ul>
           </div>
-          <div class="lg:col-span-6 lg:col-start-7">
+          <div class="mx-auto mt-14 max-w-[56rem] lg:mt-16">
             <RecorridoProducto />
           </div>
         </div>
       </section>
 
-      <!-- 2. Para quién es: una franja, justo debajo del inicio -->
-      <section id="para-quien" class="scroll-mt-20 bg-papel border-y border-surface-200" aria-labelledby="t-para">
-        <div class="max-w-[1180px] mx-auto px-4 sm:px-6 py-10 sm:py-12 grid gap-8 lg:grid-cols-12 lg:items-start">
-          <h2 id="t-para" class="lg:col-span-3 font-display text-2xl font-semibold tracking-tight text-surface-900">{{ t('Para quién es', 'Who it is for') }}</h2>
-          <ul class="lg:col-span-9 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-            <li v-for="(p, i) in PARA_QUIEN" :key="p.titulo" v-revelar="i" class="flex gap-3 lg:block">
-              <span class="h-10 w-10 shrink-0 rounded-lg bg-brand-100 text-brand-900 flex items-center justify-center"><AppIcon :name="ICONOS_PARA_QUIEN[i]" :size="20" /></span>
-              <div class="lg:mt-3">
+      <!-- 2. Para quién es -->
+      <section id="para-quien" class="seccion bg-surface-100" aria-labelledby="t-para">
+        <div class="contenedor">
+          <CabeceraSeccion id="t-para" :etiqueta="t('Para quién', 'Who')" :titulo="t('Para quién es', 'Who it is for')" />
+          <ul class="grid gap-x-8 gap-y-10 sm:grid-cols-2 lg:grid-cols-4">
+            <li v-for="(p, i) in PARA_QUIEN" :key="p.titulo" v-revelar="i" class="flex flex-col gap-4 border-t border-surface-300 pt-6">
+              <span class="h-11 w-11 shrink-0 rounded-xl bg-lumbre-suave text-lumbre-texto flex items-center justify-center"><AppIcon :name="ICONOS_PARA_QUIEN[i]" :size="20" /></span>
+              <div>
                 <h3 class="font-semibold text-surface-900">{{ p.titulo }}</h3>
-                <p class="mt-1 text-sm leading-relaxed texto-suave">{{ p.texto }}</p>
+                <p class="mt-1 text-[0.95rem] leading-relaxed texto-suave text-pretty">{{ p.texto }}</p>
               </div>
             </li>
           </ul>
@@ -237,135 +236,143 @@ const estilo = (e: Record<string, string>) => e
       </section>
 
       <!-- 3. Probarla por dentro (solo en la demostración) -->
-      <section v-if="modoDemo" id="entrar" class="scroll-mt-24 max-w-[1180px] mx-auto px-4 sm:px-6 pt-14 sm:pt-16" aria-label="Entrar en la demostración" :lang="idioma === 'en' ? 'es' : undefined">
+      <section v-if="modoDemo" id="entrar" class="scroll-mt-24 max-w-[1264px] mx-auto px-6 sm:px-8 pt-14 sm:pt-16" aria-label="Entrar en la demostración" :lang="idioma === 'en' ? 'es' : undefined">
         <AccesosDemo ancho />
       </section>
 
       <!-- 4. El problema -->
-      <section id="problema" class="scroll-mt-20 max-w-[1180px] mx-auto px-4 sm:px-6 py-20 sm:py-28" aria-labelledby="t-problema">
-        <div class="grid gap-12 lg:grid-cols-12">
-          <div v-revelar class="lg:col-span-6">
-            <p class="text-xs font-semibold uppercase tracking-[0.16em] text-brand-900">{{ t('01 · Por qué', '01 · Why') }}</p>
-            <h2 id="t-problema" class="mt-3 font-display text-4xl sm:text-5xl font-semibold tracking-tight text-surface-900">{{ t('El problema', 'The problem') }}</h2>
-            <p class="mt-8 font-display text-2xl sm:text-[1.75rem] leading-snug text-surface-900">
-              {{ t('Estudiante y tutor/a no siempre ven igual el mismo trabajo. En un estudio sobre la tutorización del TFM, el profesorado valoró la tutorización mejor que el alumnado (Colomo Magaña et al., 2025).', "Student and supervisor do not always see the same work in the same way. In a study on Master's thesis supervision, teaching staff rated supervision more highly than students did (Colomo Magaña et al., 2025).") }}
-            </p>
-          </div>
-          <div class="lg:col-span-5 lg:col-start-8 lg:pt-14">
-            <div ref="ondasProblema" v-revelar="1" v-cursor class="card p-6" aria-hidden="true">
-              <OndasSintonia :desfase="0.7" :alto="80" :grosor="3" />
-              <div class="mt-3 flex justify-between text-xs font-medium text-surface-800">
-                <span class="inline-flex items-center gap-1.5"><span class="h-1 w-4 rounded-full bg-brand-500" />{{ t('Una mirada', 'One perspective') }}</span>
-                <span class="inline-flex items-center gap-1.5"><span class="h-1 w-4 rounded-full bg-surface-900" />{{ t('Otra mirada', 'Another perspective') }}</span>
+      <section id="problema" class="seccion" aria-labelledby="t-problema">
+        <div class="contenedor">
+          <CabeceraSeccion id="t-problema" :etiqueta="t('Por qué', 'Why')" :titulo="t('El problema', 'The problem')" />
+          <div class="grid gap-12 lg:grid-cols-12 lg:items-center">
+            <div class="lg:col-span-6 flex flex-col gap-8">
+              <p v-revelar class="max-w-[34rem] text-pretty text-lg sm:text-xl lg:text-[1.375rem] leading-relaxed text-surface-900">
+                {{ t('Estudiante y tutor/a no siempre ven igual el mismo trabajo. En un estudio sobre la tutorización del TFM, el profesorado valoró la tutorización mejor que el alumnado (Colomo Magaña et al., 2025).', "Student and supervisor do not always see the same work in the same way. In a study on Master's thesis supervision, teaching staff rated supervision more highly than students did (Colomo Magaña et al., 2025).") }}
+              </p>
+              <div v-revelar="1" class="max-w-[34rem] space-y-5 leading-relaxed texto-suave sm:text-lg">
+                <p>
+                  {{ t('Y esa relación importa: cómo percibe el estudiante la relación con su tutor/a se ha relacionado con la nota final, con lo que cree que el tutor/a aporta a su aprendizaje y con su satisfacción (de Kleijn et al., 2012).', "And that relationship matters: how students perceive their relationship with their supervisor has been related to their final grade, to what they believe the supervisor contributes to their learning and to their satisfaction (de Kleijn et al., 2012).") }}
+                </p>
+                <p>
+                  {{ t('¿Llega a todo el mundo por igual la información sobre el doctorado? SINTONÍA se pregunta si acercarla a través de la tutoría ayuda a quien termina el máster.', "Does information about doing a PhD reach everyone equally? SINTONÍA asks whether bringing it closer through supervision helps those finishing their Master's.") }}
+                </p>
+                <p><RouterLink :to="ruta('/investigacion')" class="enlace">{{ t('Cómo lo vamos a estudiar y referencias', 'How we will study it, and references') }}</RouterLink></p>
               </div>
             </div>
-            <div v-revelar="2" class="mt-8 space-y-5 text-lg leading-relaxed">
-              <p>
-                {{ t('Y esa relación importa: cómo percibe el estudiante la relación con su tutor/a se ha relacionado con la nota final, con lo que cree que el tutor/a aporta a su aprendizaje y con su satisfacción (de Kleijn et al., 2012).', "And that relationship matters: how students perceive their relationship with their supervisor has been related to their final grade, to what they believe the supervisor contributes to their learning and to their satisfaction (de Kleijn et al., 2012).") }}
-              </p>
-              <p>
-                {{ t('¿Llega a todo el mundo por igual la información sobre el doctorado? SINTONÍA se pregunta si acercarla a través de la tutoría ayuda a quien termina el máster.', "Does information about doing a PhD reach everyone equally? SINTONÍA asks whether bringing it closer through supervision helps those finishing their Master's.") }}
-              </p>
-              <p><RouterLink :to="ruta('/investigacion')" class="enlace">{{ t('Cómo lo vamos a estudiar y referencias', 'How we will study it, and references') }}</RouterLink></p>
+            <div class="lg:col-span-5 lg:col-start-8">
+              <div ref="ondasProblema" v-revelar="1" v-cursor class="rounded-[20px] border border-surface-200 bg-surface-50 p-6 sm:p-8" aria-hidden="true">
+                <OndasSintonia :desfase="0.7" :alto="80" :grosor="3" />
+                <div class="mt-3 flex justify-between text-xs font-medium text-surface-800">
+                  <span class="inline-flex items-center gap-1.5"><span class="h-1 w-4 rounded-full bg-brand-500" />{{ t('Una mirada', 'One perspective') }}</span>
+                  <span class="inline-flex items-center gap-1.5"><span class="h-1 w-4 rounded-full bg-surface-900" />{{ t('Otra mirada', 'Another perspective') }}</span>
+                </div>
+              </div>
             </div>
           </div>
         </div>
       </section>
 
-      <!-- 5. Cómo funciona: tres pasos ilustrados -->
-      <section id="como-funciona" class="scroll-mt-20 bg-papel border-y border-surface-200" aria-labelledby="t-como">
-        <div class="max-w-[1180px] mx-auto px-4 sm:px-6 py-20 sm:py-28">
-          <CabeceraSeccion id="t-como" :etiqueta="t('02 · Paso a paso', '02 · Step by step')" :titulo="t('Cómo funciona', 'How it works')">
+      <!-- 5. Cómo funciona: tres pasos ilustrados, con el número y la línea de LUMBRA360 -->
+      <section id="como-funciona" class="seccion bg-surface-100" aria-labelledby="t-como">
+        <div class="contenedor">
+          <CabeceraSeccion id="t-como" :etiqueta="t('Paso a paso', 'Step by step')" :titulo="t('Cómo funciona', 'How it works')">
             {{ t('Tres pasos cada semana. Nadie sube su trabajo y nadie pone notas.', 'Three steps every week. Nobody uploads their work and nobody gives marks.') }}
           </CabeceraSeccion>
-          <ol class="grid gap-6 lg:grid-cols-3">
-            <li v-for="(p, i) in PASOS" :key="p.titulo" v-revelar="i" v-cursor="'inclinar'" class="rounded-2xl border border-surface-200 bg-surface-50 p-5 sm:p-6 flex flex-col">
-              <IlustracionPaso :paso="(i + 1) as 1 | 2 | 3" />
-              <p class="mt-6 font-display text-sm font-semibold tabular-nums text-brand-900" aria-hidden="true">{{ t('Paso', 'Step') }} {{ i + 1 }}</p>
-              <h3 class="mt-1 font-display text-2xl font-semibold text-surface-900 flex items-center gap-2">
-                <AppIcon :name="p.icono" :size="22" class="text-brand-900" />{{ p.titulo }}
+          <ol class="grid gap-12 lg:grid-cols-3 lg:gap-8">
+            <li v-for="(p, i) in PASOS" :key="p.titulo" v-revelar="i" class="flex flex-col gap-4">
+              <div v-cursor="'inclinar'" class="rounded-[12px] border border-surface-200 bg-surface-50 p-4 shadow-soft"><IlustracionPaso :paso="(i + 1) as 1 | 2 | 3" /></div>
+              <div class="flex items-center gap-3" aria-hidden="true">
+                <span class="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-brand-900 font-mono text-xs text-papel">{{ i + 1 }}</span>
+                <span class="relative hidden h-0.5 flex-1 overflow-hidden rounded-full bg-surface-200 lg:block" :class="i === PASOS.length - 1 ? 'lg:invisible' : ''">
+                  <span class="absolute inset-0 bg-brand-500" />
+                </span>
+              </div>
+              <h3 class="font-display text-lg font-semibold text-surface-900 flex items-center gap-2">
+                <span class="sr-only">{{ t('Paso', 'Step') }} {{ i + 1 }}: </span>{{ p.titulo }}
               </h3>
-              <p class="mt-3 text-lg leading-relaxed">{{ p.texto }}</p>
-              <p class="mt-3 text-sm leading-relaxed texto-suave">{{ p.detalle }}</p>
+              <p class="text-pretty leading-relaxed">{{ p.texto }}</p>
+              <p class="text-sm leading-relaxed texto-suave text-pretty">{{ p.detalle }}</p>
             </li>
           </ol>
         </div>
       </section>
 
-      <!-- 6. Pruébalo: la demostración interactiva y las cifras, sobre azul marino -->
-      <section ref="banda" class="relative overflow-hidden bg-marino text-white" aria-labelledby="t-pruebalo">
+      <!-- 6. Pruébalo: la demostración interactiva y las cifras, sobre tinta con un resplandor de lumbre -->
+      <section ref="banda" class="seccion relative overflow-hidden bg-[#111111] text-white" aria-labelledby="t-pruebalo">
+        <div class="pointer-events-none absolute left-1/2 top-0 h-[36rem] w-[70rem] -translate-x-1/2 -translate-y-1/2 rounded-full resplandor blur-2xl" aria-hidden="true" />
         <div class="pointer-events-none absolute -inset-x-40 bottom-10 opacity-25" aria-hidden="true">
           <div ref="ondasBanda" class="will-change-transform"><OndasSintonia :desfase="0.6" :alto="160" :grosor="2" sobre-oscuro /></div>
         </div>
-        <div class="relative max-w-[1180px] mx-auto px-4 sm:px-6 py-20 sm:py-28 grid gap-14 lg:grid-cols-12 lg:items-center">
-          <div v-revelar class="lg:col-span-5">
-            <p class="text-xs font-semibold uppercase tracking-[0.16em] text-brand-400">{{ t('03 · Pruébalo', '03 · Try it') }}</p>
-            <h2 id="t-pruebalo" class="mt-3 font-display text-4xl sm:text-5xl font-semibold tracking-tight">{{ t('Dos miradas, un minuto', 'Two perspectives, one minute') }}</h2>
-            <p class="mt-5 text-lg leading-relaxed text-white/85">
-              {{ t('Mueve cómo ven el avance estudiante y tutor/a. Si la diferencia es de 2 puntos o más, aparecen las tres preguntas para la tutoría.', 'Move how student and supervisor see the progress. If the difference is 2 points or more, the three questions for the meeting appear.') }}
-            </p>
-            <RouterLink to="/demo/recorrido" :hreflang="idioma === 'en' ? 'es' : undefined" class="mt-6 inline-flex items-center gap-2 min-h-tactil font-semibold text-white underline decoration-brand-400 decoration-2 underline-offset-4 hover:decoration-white">
-              {{ t('Haz el recorrido guiado, en unos 60 segundos', 'Take the guided tour, in about 60 seconds (in Spanish)') }} <span aria-hidden="true">→</span>
-            </RouterLink>
-            <div :aria-label="t('SINTONÍA en cifras', 'SINTONÍA in figures')" role="group" class="mt-10 grid grid-cols-2 gap-x-6 gap-y-8 border-t border-white/20 pt-8">
-              <CifraAnimada v-for="d in DATOS_CLAVE" :key="d.texto" :valor="Number(d.cifra)" :unidad="d.unidad" :texto="d.texto" />
+        <div class="contenedor relative">
+          <CabeceraSeccion id="t-pruebalo" claro :etiqueta="t('Pruébalo', 'Try it')" :titulo="t('Dos miradas, un minuto', 'Two perspectives, one minute')">
+            {{ t('Mueve cómo ven el avance estudiante y tutor/a. Si la diferencia es de 2 puntos o más, aparecen las tres preguntas para la tutoría.', 'Move how student and supervisor see the progress. If the difference is 2 points or more, the three questions for the meeting appear.') }}
+          </CabeceraSeccion>
+          <div class="grid gap-14 lg:grid-cols-12 lg:items-center">
+            <div v-revelar class="lg:col-span-5">
+              <div :aria-label="t('SINTONÍA en cifras', 'SINTONÍA in figures')" role="group" class="grid grid-cols-2 gap-x-6 gap-y-8">
+                <CifraAnimada v-for="d in DATOS_CLAVE" :key="d.texto" :valor="Number(d.cifra)" :unidad="d.unidad" :texto="d.texto" />
+              </div>
+              <RouterLink to="/demo/recorrido" :hreflang="idioma === 'en' ? 'es' : undefined" class="mt-10 inline-flex items-center gap-2 min-h-tactil font-medium text-white underline decoration-white/30 underline-offset-4 hover:decoration-white">
+                {{ t('Haz el recorrido guiado, en unos 60 segundos', 'Take the guided tour, in about 60 seconds (in Spanish)') }} <span aria-hidden="true">→</span>
+              </RouterLink>
             </div>
-          </div>
-          <div v-revelar="1" v-cursor class="lg:col-span-6 lg:col-start-7 text-surface-900 rounded-[var(--radius-md)]">
-            <DemoSintonia />
+            <div v-revelar="1" v-cursor class="lg:col-span-6 lg:col-start-7 text-surface-900 rounded-[var(--radius-md)]">
+              <DemoSintonia />
+            </div>
           </div>
         </div>
       </section>
 
       <!-- 6b. Calculadora de tiempo -->
-      <section id="tiempo" class="scroll-mt-20 bg-papel border-b border-surface-200" aria-labelledby="t-tiempo">
-        <div class="max-w-[1180px] mx-auto px-4 sm:px-6 py-20 sm:py-28 grid gap-12 lg:grid-cols-12 lg:items-center">
-          <div v-revelar class="lg:col-span-5">
-            <p class="text-xs font-semibold uppercase tracking-[0.16em] text-brand-900">{{ t('04 · Tiempo', '04 · Time') }}</p>
-            <h2 id="t-tiempo" class="mt-3 font-display text-4xl sm:text-5xl font-semibold tracking-tight text-surface-900">{{ t('¿Cuánto tiempo pide a un máster?', 'How much time does it take a programme?') }}</h2>
-            <p class="mt-6 text-lg leading-relaxed">{{ t('Escribe cuántos estudiantes y tutores tiene el máster y mira los minutos de todos, cada semana.', 'Enter how many students and supervisors the programme has and see everyone\'s minutes, each week.') }}</p>
-          </div>
-          <div v-revelar="1" class="lg:col-span-6 lg:col-start-7"><CalculadoraTiempo /></div>
+      <section id="tiempo" class="seccion" aria-labelledby="t-tiempo">
+        <div class="contenedor">
+          <CabeceraSeccion id="t-tiempo" :etiqueta="t('Tiempo', 'Time')" :titulo="t('¿Cuánto tiempo pide a un máster?', 'How much time does it take a programme?')">
+            {{ t('Escribe cuántos estudiantes y tutores tiene el máster y mira los minutos de todos, cada semana.', 'Enter how many students and supervisors the programme has and see everyone\'s minutes, each week.') }}
+          </CabeceraSeccion>
+          <div v-revelar class="mx-auto max-w-[44rem]"><CalculadoraTiempo /></div>
         </div>
       </section>
 
       <!-- 7. Privacidad y ética -->
-      <section id="privacidad" class="scroll-mt-20 max-w-[1180px] mx-auto px-4 sm:px-6 py-20 sm:py-28" aria-labelledby="t-privacidad">
-        <div class="grid gap-12 lg:grid-cols-12">
-          <div v-revelar class="lg:col-span-6">
-            <p class="text-xs font-semibold uppercase tracking-[0.16em] text-brand-900">{{ t('05 · Tus datos', '05 · Your data') }}</p>
-            <h2 id="t-privacidad" class="mt-3 font-display text-4xl sm:text-5xl font-semibold tracking-tight text-surface-900">{{ t('Privacidad y ética', 'Privacy and ethics') }}</h2>
-            <p class="mt-8 font-display text-3xl sm:text-4xl leading-tight text-surface-900 text-balance">
-              {{ t('Tu bienestar solo lo ves tú.', 'Only you see your wellbeing.') }} <span class="text-brand-900">{{ t('La dirección, solo cifras de 5 personas o más.', 'Programme directors only see figures for 5 people or more.') }}</span>
-            </p>
-            <ul class="mt-8 space-y-4 text-lg leading-relaxed">
-              <li class="flex gap-3"><AppIcon name="lock" :size="22" class="mt-1 shrink-0 text-brand-900" />{{ t('Tu tutor/a no ve tus respuestas ni tu bienestar.', 'Your supervisor does not see your answers or your wellbeing.') }}</li>
-              <li class="flex gap-3"><AppIcon name="shield" :size="22" class="mt-1 shrink-0 text-brand-900" />{{ t('Las reglas de quién ve qué están escritas en la propia base de datos.', 'The rules on who sees what are written into the database itself.') }}</li>
-              <li class="flex gap-3"><AppIcon name="brain" :size="22" class="mt-1 shrink-0 text-brand-900" />{{ t('No deduce emociones, no pone notas y no hace rankings.', 'It does not infer emotions, give marks or make rankings.') }}</li>
-            </ul>
-            <RouterLink :to="ruta('/como-funciona')" class="btn-secondary mt-9">{{ t('Ver quién ve cada dato', 'See who sees each piece of data') }}</RouterLink>
-          </div>
-          <div class="lg:col-span-5 lg:col-start-8 lg:pt-14">
-            <div v-revelar="1" v-cursor class="rounded-[var(--radius-md)]"><QuienVeBienestar /></div>
-            <p class="mt-6 texto-suave leading-relaxed">
-              {{ t('Las tecnologías no son neutrales: sus decisiones de diseño también deciden quién puede hacer qué (Winner, 1980). Y el uso de datos de estudiantes plantea dilemas éticos (Slade y Prinsloo, 2013). SINTONÍA los aborda en el propio diseño: cada dato tiene un destino definido.', 'Technologies are not neutral: their design decisions also decide who can do what (Winner, 1980). And the use of student data raises ethical dilemmas (Slade and Prinsloo, 2013). SINTONÍA addresses them in the design itself: every piece of data has a defined destination.') }}
-            </p>
+      <section id="privacidad" class="seccion bg-surface-100" aria-labelledby="t-privacidad">
+        <div class="contenedor">
+          <CabeceraSeccion id="t-privacidad" :etiqueta="t('Tus datos', 'Your data')" :titulo="t('Privacidad y ética', 'Privacy and ethics')" />
+          <div class="grid gap-12 lg:grid-cols-12 lg:items-start">
+            <div v-revelar class="lg:col-span-6">
+              <p class="max-w-[34rem] font-display text-2xl sm:text-[1.75rem] font-medium leading-tight tracking-tight text-surface-900 text-balance">
+                {{ t('Tu bienestar solo lo ves tú.', 'Only you see your wellbeing.') }} <span class="texto-suave">{{ t('La dirección, solo cifras de 5 personas o más.', 'Programme directors only see figures for 5 people or more.') }}</span>
+              </p>
+              <ul class="mt-8 flex max-w-[34rem] flex-col border-t border-surface-300">
+                <li class="flex items-start gap-4 border-b border-surface-300 py-4"><span class="icono-lumbre"><AppIcon name="lock" :size="20" /></span><span class="pt-2.5">{{ t('Tu tutor/a no ve tus respuestas ni tu bienestar.', 'Your supervisor does not see your answers or your wellbeing.') }}</span></li>
+                <li class="flex items-start gap-4 border-b border-surface-300 py-4"><span class="icono-lumbre"><AppIcon name="shield" :size="20" /></span><span class="pt-2.5">{{ t('Las reglas de quién ve qué están escritas en la propia base de datos.', 'The rules on who sees what are written into the database itself.') }}</span></li>
+                <li class="flex items-start gap-4 border-b border-surface-300 py-4"><span class="icono-lumbre"><AppIcon name="brain" :size="20" /></span><span class="pt-2.5">{{ t('No deduce emociones, no pone notas y no hace rankings.', 'It does not infer emotions, give marks or make rankings.') }}</span></li>
+              </ul>
+              <RouterLink :to="ruta('/como-funciona')" class="btn-secondary mt-9">{{ t('Ver quién ve cada dato', 'See who sees each piece of data') }}</RouterLink>
+            </div>
+            <div class="lg:col-span-5 lg:col-start-8">
+              <div v-revelar="1" v-cursor class="rounded-[var(--radius-md)]"><QuienVeBienestar /></div>
+              <p class="mt-6 text-[0.95rem] texto-suave leading-relaxed text-pretty">
+                {{ t('Las tecnologías no son neutrales: sus decisiones de diseño también deciden quién puede hacer qué (Winner, 1980). Y el uso de datos de estudiantes plantea dilemas éticos (Slade y Prinsloo, 2013). SINTONÍA los aborda en el propio diseño: cada dato tiene un destino definido.', 'Technologies are not neutral: their design decisions also decide who can do what (Winner, 1980). And the use of student data raises ethical dilemmas (Slade and Prinsloo, 2013). SINTONÍA addresses them in the design itself: every piece of data has a defined destination.') }}
+              </p>
+            </div>
           </div>
         </div>
       </section>
 
       <!-- 7b. Comparativa honesta -->
-      <section id="comparativa" class="scroll-mt-20 max-w-[1180px] mx-auto px-4 sm:px-6 pb-20 sm:pb-28" aria-labelledby="t-comparativa">
-        <CabeceraSeccion id="t-comparativa" :etiqueta="t('06 · Comparación', '06 · Comparison')" :titulo="t('Entre no saber nada y vigilarlo todo', 'Between knowing nothing and watching everything')">
-          {{ t('Tres formas de acompañar un trabajo académico, comparadas con honestidad. Sin marcas.', 'Three ways of supporting academic work, compared honestly. No brands.') }}
-        </CabeceraSeccion>
-        <div v-revelar><ComparativaHonesta /></div>
+      <section id="comparativa" class="seccion" aria-labelledby="t-comparativa">
+        <div class="contenedor">
+          <CabeceraSeccion id="t-comparativa" :etiqueta="t('Comparación', 'Comparison')" :titulo="t('Entre no saber nada y vigilarlo todo', 'Between knowing nothing and watching everything')">
+            {{ t('Tres formas de acompañar un trabajo académico, comparadas con honestidad. Sin marcas.', 'Three ways of supporting academic work, compared honestly. No brands.') }}
+          </CabeceraSeccion>
+          <div v-revelar><ComparativaHonesta /></div>
+        </div>
       </section>
 
-      <!-- 8. Para cada perfil: las tres personas, una junto a otra -->
-      <section id="perfiles" class="scroll-mt-20 bg-papel border-y border-surface-200" aria-labelledby="t-perfiles">
-        <div class="max-w-[1180px] mx-auto px-4 sm:px-6 py-20 sm:py-28">
-          <CabeceraSeccion id="t-perfiles" :etiqueta="t('07 · Quién hace qué', '07 · Who does what')" :titulo="t('Para cada perfil', 'For each profile')">
+      <!-- 8. Para cada perfil -->
+      <section id="perfiles" class="seccion bg-surface-100" aria-labelledby="t-perfiles">
+        <div class="contenedor">
+          <CabeceraSeccion id="t-perfiles" :etiqueta="t('Quién hace qué', 'Who does what')" :titulo="t('Para cada perfil', 'For each profile')">
             {{ t('Qué hace cada persona, cuánto tiempo le lleva, qué ve y qué no ve.', 'What each person does, how long it takes them, what they see and what they do not.') }}
           </CabeceraSeccion>
           <TarjetasPerfiles />
@@ -373,93 +380,75 @@ const estilo = (e: Record<string, string>) => e
       </section>
 
       <!-- 9. Puente al doctorado: un recorrido de tres tramos -->
-      <section id="puente" class="scroll-mt-20 max-w-[1180px] mx-auto px-4 sm:px-6 py-20 sm:py-28" aria-labelledby="t-puente">
-        <div class="grid gap-12 lg:grid-cols-12">
-          <div v-revelar class="lg:col-span-5">
-            <p class="text-xs font-semibold uppercase tracking-[0.16em] text-brand-900">{{ t('08 · Doctorado', '08 · PhD') }}</p>
-            <h2 id="t-puente" class="mt-3 font-display text-4xl sm:text-5xl font-semibold tracking-tight text-surface-900">{{ t('Puente al doctorado', 'Bridge to the PhD') }}</h2>
-            <p class="mt-6 text-lg leading-relaxed">
-              {{ t('Si el estudiante lo activa, los plazos de las convocatorias predoctorales y de admisión al doctorado llegan a la tutoría.', 'If the student turns it on, the deadlines of predoctoral and PhD admission calls reach the supervision meeting.') }}
-            </p>
-          </div>
-          <ol ref="puenteLista" class="lg:col-span-6 lg:col-start-7 relative">
-            <!-- La línea: un carril gris y su relleno, que se dibuja con el scroll -->
+      <section id="puente" class="seccion" aria-labelledby="t-puente">
+        <div class="contenedor">
+          <CabeceraSeccion id="t-puente" :etiqueta="t('Doctorado', 'PhD')" :titulo="t('Puente al doctorado', 'Bridge to the PhD')">
+            {{ t('Si el estudiante lo activa, los plazos de las convocatorias predoctorales y de admisión al doctorado llegan a la tutoría.', 'If the student turns it on, the deadlines of predoctoral and PhD admission calls reach the supervision meeting.') }}
+          </CabeceraSeccion>
+          <ol ref="puenteLista" class="relative mx-auto max-w-[40rem]">
+            <!-- La línea: un carril gris y su relleno de lumbre, que se dibuja con el scroll -->
             <span class="absolute left-6 top-6 bottom-6 w-0.5 -translate-x-1/2 bg-surface-200" aria-hidden="true" />
-            <span ref="puenteRelleno" class="absolute left-6 top-6 bottom-6 w-0.5 -translate-x-1/2 origin-top bg-brand-800" :style="{ transform: `scaleY(${puenteActivo === PUENTE_LARGO ? 1 : 0})` }" aria-hidden="true" />
+            <span ref="puenteRelleno" class="absolute left-6 top-6 bottom-6 w-0.5 -translate-x-1/2 origin-top bg-brand-500" :style="{ transform: `scaleY(${puenteActivo === PUENTE_LARGO ? 1 : 0})` }" aria-hidden="true" />
             <li v-for="(p, i) in PUENTE" :key="p.titulo" class="relative grid grid-cols-[3rem_1fr] gap-x-5 pb-10 last:pb-0">
               <span
-                class="paso-puente relative z-10 h-12 w-12 rounded-full flex items-center justify-center font-display text-lg font-semibold"
-                :class="i < puenteActivo ? 'bg-brand-800 text-white encendido' : 'bg-papel text-surface-900 ring-2 ring-surface-200'"
+                class="paso-puente relative z-10 h-12 w-12 rounded-full flex items-center justify-center font-mono text-sm"
+                :class="i < puenteActivo ? 'bg-brand-500 text-[#111111] encendido' : 'bg-papel text-surface-900 ring-1 ring-surface-300'"
                 aria-hidden="true"
-              >{{ i + 1 }}</span>
+              >{{ String(i + 1).padStart(2, '0') }}</span>
               <div class="pt-2.5">
                 <h3 class="font-display text-xl font-semibold text-surface-900">{{ p.titulo }}</h3>
-                <p class="mt-2 leading-relaxed">{{ p.texto }}</p>
+                <p class="mt-2 leading-relaxed texto-suave">{{ p.texto }}</p>
               </div>
             </li>
           </ol>
         </div>
       </section>
 
-      <!-- 10. Dirección: dos tarjetas idénticas -->
-      <section id="direccion" class="scroll-mt-20 bg-papel border-y border-surface-200" aria-labelledby="t-direccion">
-        <div class="max-w-[1180px] mx-auto px-4 sm:px-6 py-20 sm:py-28">
-          <CabeceraSeccion id="t-direccion" :etiqueta="t('09 · Equipo', '09 · Team')" :titulo="t('Dirección', 'Supervision')" />
-          <ul class="grid gap-6 md:grid-cols-2 auto-rows-fr">
-            <li v-for="(m, i) in DIRECCION" :key="m.nombre" v-revelar="i" v-cursor="'inclinar'" class="rounded-[var(--radius-md)]"><TarjetaDireccion :miembro="m" /></li>
-          </ul>
-          <div v-revelar class="mt-10 pt-8 border-t border-surface-200 space-y-1">
-            <p class="text-base text-surface-900">{{ AUTOR }}</p>
-            <p class="text-base texto-suave">{{ t('Antecedente', 'Background') }}: {{ ANTECEDENTE }}</p>
-          </div>
-        </div>
-      </section>
+      <!-- 10. Respaldo: lo ya hecho, los avales y el equipo (como en LUMBRA360) -->
+      <ApartadoRespaldo />
 
       <!-- 11. Preguntas frecuentes -->
-      <section id="preguntas" class="scroll-mt-20 max-w-[1180px] mx-auto px-4 sm:px-6 py-20 sm:py-28" aria-labelledby="t-preguntas">
-        <div class="grid gap-10 lg:grid-cols-12">
-          <div v-revelar class="lg:col-span-4 lg:sticky lg:top-28 self-start">
-            <p class="text-xs font-semibold uppercase tracking-[0.16em] text-brand-900">{{ t('10 · Dudas', '10 · Questions') }}</p>
-            <h2 id="t-preguntas" class="mt-3 font-display text-4xl sm:text-5xl font-semibold tracking-tight text-surface-900">{{ t('Preguntas frecuentes', 'Frequently asked questions') }}</h2>
-            <p class="mt-4 texto-suave">{{ t('Y si no está aquí,', 'And if it is not here,') }} <a href="#contacto" class="enlace">{{ t('escríbenos', 'write to us') }}</a>.</p>
-          </div>
-          <div v-revelar="1" class="lg:col-span-7 lg:col-start-6"><PreguntasFrecuentes /></div>
+      <section id="preguntas" class="seccion" aria-labelledby="t-preguntas">
+        <div class="contenedor">
+          <CabeceraSeccion id="t-preguntas" :etiqueta="t('Dudas', 'Questions')" :titulo="t('Preguntas frecuentes', 'Frequently asked questions')" />
+          <div v-revelar="1" class="mx-auto max-w-[48rem]"><PreguntasFrecuentes /></div>
+          <p class="mt-10 text-center texto-suave">{{ t('Y si no está aquí,', 'And if it is not here,') }} <a href="#contacto" class="enlace">{{ t('escríbenos', 'write to us') }}</a>.</p>
         </div>
       </section>
 
       <!-- 12. Contacto -->
-      <section id="contacto" class="scroll-mt-20 bg-papel border-y border-surface-200" aria-labelledby="t-contacto">
-        <div class="max-w-[1180px] mx-auto px-4 sm:px-6 py-20 sm:py-28 grid gap-10 lg:grid-cols-12">
-          <div v-revelar class="lg:col-span-4">
-            <p class="text-xs font-semibold uppercase tracking-[0.16em] text-brand-900">{{ t('11 · Escríbenos', '11 · Write to us') }}</p>
-            <h2 id="t-contacto" class="mt-3 font-display text-4xl sm:text-5xl font-semibold tracking-tight text-surface-900">{{ t('Contacto', 'Contact') }}</h2>
-            <p class="mt-4 text-lg leading-relaxed">{{ t('Si te interesa SINTONÍA para tu máster, programa o escuela de doctorado, o tienes cualquier duda.', 'If you are interested in SINTONÍA for your Master\'s programme, PhD programme or doctoral school, or have any questions.') }}</p>
-            <p class="mt-4"><RouterLink :to="ruta('/instituciones')" class="enlace">{{ t('Información para instituciones y solicitud de demostración', 'Information for institutions and demo requests') }}</RouterLink></p>
+      <section id="contacto" class="seccion bg-surface-100" aria-labelledby="t-contacto">
+        <div class="contenedor">
+          <CabeceraSeccion id="t-contacto" :etiqueta="t('Escríbenos', 'Write to us')" :titulo="t('Contacto', 'Contact')">
+            {{ t('Si te interesa SINTONÍA para tu máster, programa o escuela de doctorado, o tienes cualquier duda.', 'If you are interested in SINTONÍA for your Master\'s programme, PhD programme or doctoral school, or have any questions.') }}
+          </CabeceraSeccion>
+          <div v-revelar="1" class="mx-auto max-w-[44rem]">
+            <FormularioContacto />
+            <p class="mt-6 text-center"><RouterLink :to="ruta('/instituciones')" class="enlace">{{ t('Información para instituciones y solicitud de demostración', 'Information for institutions and demo requests') }}</RouterLink></p>
           </div>
-          <div v-revelar="1" class="lg:col-span-7 lg:col-start-6"><FormularioContacto /></div>
         </div>
       </section>
 
-      <!-- Cierre: las dos ondas, por fin, en sintonía -->
-      <section ref="cierre" aria-labelledby="t-cierre">
-        <div class="max-w-[1180px] mx-auto px-4 sm:px-6 pt-20 pb-16 text-center">
+      <!-- Cierre: las dos ondas, por fin, en sintonía (como la llamada final de LUMBRA360) -->
+      <section ref="cierre" class="seccion" aria-labelledby="t-cierre">
+        <div class="contenedor text-center">
           <div ref="ondasCierre" class="max-w-2xl mx-auto" :style="estilo({ '--ondas-duracion': '1100ms' })"><OndasSintonia :desfase="cierreVisto ? 0 : 1" :alto="80" /></div>
-          <div class="mt-8 font-display text-4xl sm:text-6xl font-bold tracking-tight text-surface-900">
+          <div class="mt-8 font-display text-[2rem] lg:text-[2.5rem] font-medium leading-[1.1] tracking-tight text-surface-900">
             <TituloEnSintonia id="t-cierre" :texto="t('En sintonía.', 'In tune.')" />
           </div>
-          <p class="mt-4 text-lg texto-suave max-w-xl mx-auto">{{ t('Acompañar el trabajo académico, sin vigilar.', 'Supporting academic work, without surveillance.') }}</p>
-          <div class="mt-8 flex flex-col sm:flex-row gap-3 justify-center">
-            <a v-if="modoDemo" href="#entrar" class="btn-primary px-6 py-3">{{ t('Entrar en la demostración', 'Enter the demo') }}</a>
-            <RouterLink v-else to="/registro" class="btn-primary px-6 py-3">{{ t('Tengo un código', 'I have a code') }}</RouterLink>
-            <RouterLink :to="ruta('/investigacion')" class="btn-secondary px-6 py-3">{{ t('Leer la investigación', 'Read about the research') }}</RouterLink>
+          <p class="mt-5 text-lg texto-suave max-w-xl mx-auto text-pretty">{{ t('Acompañar el trabajo académico, sin vigilar.', 'Supporting academic work, without surveillance.') }}</p>
+          <div class="mt-8 flex flex-col sm:flex-row gap-4 justify-center items-center">
+            <a v-if="modoDemo" href="#entrar" class="btn-primary min-h-12 px-6 text-base">{{ t('Entrar en la demostración', 'Enter the demo') }}</a>
+            <RouterLink v-else to="/registro" class="btn-primary min-h-12 px-6 text-base">{{ t('Tengo un código', 'I have a code') }}</RouterLink>
+            <RouterLink :to="ruta('/investigacion')" class="enlace-flecha">{{ t('Leer la investigación', 'Read about the research') }} <span aria-hidden="true">→</span></RouterLink>
           </div>
         </div>
       </section>
 
       <!-- Referencias citadas en esta página -->
-      <section class="max-w-[1180px] mx-auto px-4 sm:px-6 pb-12" aria-labelledby="t-refs">
+      <section class="max-w-[1264px] mx-auto px-6 sm:px-8 pb-12 w-full" aria-labelledby="t-refs">
         <div class="border-t border-surface-200 pt-8">
-          <h2 id="t-refs" class="font-display text-base font-semibold text-surface-900 mb-3">{{ t('Referencias citadas', 'References cited') }}</h2>
+          <h2 id="t-refs" class="font-mono text-xs font-normal uppercase tracking-[0.14em] text-surface-600 mb-4">{{ t('Referencias citadas', 'References cited') }}</h2>
           <ul class="space-y-2 text-sm texto-suave max-w-4xl">
             <li v-for="r in CITADAS" :key="r.clave" class="pl-6 -indent-6">
               {{ r.texto }} <a v-if="r.enlace" :href="r.enlace" target="_blank" rel="noopener noreferrer" class="enlace break-all">{{ r.enlace }}<span class="sr-only">{{ t(' (se abre en otra pestaña)', ' (opens in a new tab)') }}</span></a>
@@ -480,7 +469,7 @@ const estilo = (e: Record<string, string>) => e
 }
 .paso-puente.encendido {
   animation: encender 420ms var(--ease-out);
-  box-shadow: 0 0 0 6px rgba(52, 198, 163, 0.18);
+  box-shadow: 0 0 0 6px color-mix(in srgb, rgb(var(--rgb-b500)) 18%, transparent);
 }
 @keyframes encender {
   from {
@@ -497,15 +486,88 @@ const estilo = (e: Record<string, string>) => e
   display: inline-flex;
   align-items: center;
   min-height: 44px;
-  padding: 0 0.65rem;
-  border-radius: var(--radius-md);
   white-space: nowrap;
-  color: rgb(var(--rgb-s800));
-  transition: background-color var(--dur-micro) ease, color var(--dur-micro) ease;
+  font-size: 0.875rem;
+  color: rgb(var(--rgb-s600));
+  text-decoration: none;
+  transition: color var(--dur-micro) ease;
 }
 .enlace-nav:hover {
-  background-color: rgb(var(--rgb-s100));
   color: rgb(var(--rgb-s900));
+}
+
+/* Enlace secundario con flecha, subrayado fino (LUMBRA360). */
+.enlace-flecha {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  min-height: 44px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: rgb(var(--rgb-s600));
+  text-decoration: underline;
+  text-decoration-color: rgb(var(--rgb-s300));
+  text-underline-offset: 4px;
+  transition: color var(--dur-micro) ease, text-decoration-color var(--dur-micro) ease;
+}
+.enlace-flecha:hover {
+  color: rgb(var(--rgb-s900));
+  text-decoration-color: currentColor;
+}
+
+/* Ritmo de los apartados de LUMBRA360: mucho aire y fondos que alternan. */
+.seccion {
+  scroll-margin-top: 5rem;
+  padding-block: 4rem;
+}
+@media (min-width: 640px) {
+  .seccion {
+    padding-block: 6rem;
+  }
+}
+@media (min-width: 1024px) {
+  .seccion {
+    padding-block: 10rem;
+  }
+}
+.contenedor {
+  max-width: 1264px;
+  margin-inline: auto;
+  padding-inline: 1.5rem;
+}
+@media (min-width: 640px) {
+  .contenedor {
+    padding-inline: 2rem;
+  }
+}
+
+/* Cabecera: transparente arriba; al bajar, fondo difuminado y filete. */
+.cabecera {
+  background: transparent;
+  border-bottom: 1px solid transparent;
+  transition: background-color 240ms var(--ease-out), border-color 240ms var(--ease-out);
+}
+.cabecera[data-plegada='true'] {
+  background: color-mix(in srgb, rgb(var(--rgb-s50)) 88%, transparent);
+  border-bottom-color: rgb(var(--rgb-s200));
+  backdrop-filter: blur(14px) saturate(1.3);
+}
+
+/* Iconos en cuadrado de lumbre suave (LUMBRA360). */
+.icono-lumbre {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: 0.75rem;
+  background-color: var(--color-lumbre-suave);
+  color: var(--color-lumbre-texto);
+}
+
+/* Resplandor de lumbre del apartado oscuro. */
+.resplandor {
+  background: radial-gradient(closest-side, color-mix(in srgb, rgb(var(--rgb-b500)) 22%, transparent), transparent);
 }
 
 /* Entrada del inicio, una sola vez al cargar (Taste: el inicio entra una vez;

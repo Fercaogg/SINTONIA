@@ -33,8 +33,8 @@ const unido = useVisibleUnaVez(raiz)
   transition: transform 900ms var(--ease-in-out), opacity 700ms var(--ease-out);
 }
 .capa-verde {
-  /* Verde oscuro de la marca: contraste suficiente también mientras llega. */
-  color: #248a73;
+  /* Lumbre como texto (lumbre 600): contraste suficiente también mientras llega. */
+  color: var(--color-lumbre-texto);
   transform: translate(-0.35em, -0.12em);
 }
 .capa-tutor {

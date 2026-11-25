@@ -1,10 +1,7 @@
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
-// Fira Sans servida desde el propio sitio (sin llamadas a Google). Ver DISENO.md.
-import '@fontsource/fira-sans/latin-400.css'
-import '@fontsource/fira-sans/latin-500.css'
-import '@fontsource/fira-sans/latin-600.css'
-import '@fontsource/fira-sans/latin-700.css'
+// Instrument Sans e IBM Plex Mono (las de LUMBRA360), servidas desde el propio
+// sitio, sin llamadas a Google: @font-face en src/assets/fuentes.css. Ver DISENO.md.
 import './assets/main.css'
 import App from './App.vue'
 import { router } from './router'

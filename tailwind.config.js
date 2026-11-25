@@ -1,6 +1,6 @@
-// Configuración de Tailwind con los tokens de WORKWELL360 (ver DISENO.md).
-// Los nombres "brand" y "surface" son los mismos que en WORKWELL360 para poder
-// reutilizar sus componentes con cambios mínimos.
+// Configuración de Tailwind con los tokens «Tinta y lumbre» de LUMBRA360 (ver DISENO.md).
+// Los nombres "brand" y "surface" se conservan para no tocar las pantallas:
+// solo cambia su valor (src/assets/tokens.css).
 
 /** @type {import('tailwindcss').Config} */
 export default {
@@ -11,44 +11,60 @@ export default {
     extend: {
       colors: {
         brand: {
-          50: 'rgba(52,198,163,0.08)', // WW360 tailwind.config.js:8
-          100: 'rgba(52,198,163,0.15)', // WW360 tailwind.config.js:9
-          200: 'rgba(52,198,163,0.4)', // WW360 tailwind.config.js:10
-          400: '#4ED7C2', // WW360 tailwind.config.js:11
-          500: '#34C6A3', // WW360 tailwind.config.js:12 (color de identidad)
-          600: '#34C6A3', // WW360 tailwind.config.js:13
-          700: '#2FB393', // WW360 tailwind.config.js:14
-          800: '#248a73', // WW360 tailwind.config.js:15
-          900: 'rgb(var(--rgb-b900) / <alpha-value>)', // #1d7060, WW360 tailwind.config.js:16 (en oscuro se aclara; tokens.css)
+          // Tinta y lumbre (LUMBRA360). Valores en tokens.css; cambian en oscuro.
+          50: 'rgb(var(--rgb-b50) / <alpha-value>)', // tinta 50: selección
+          100: 'rgb(var(--rgb-b100) / <alpha-value>)', // tinta 100: círculos de icono
+          200: 'rgb(var(--rgb-b200) / <alpha-value>)', // piedra 300: bordes suaves
+          400: 'rgb(var(--rgb-b400) / <alpha-value>)', // lumbre 300: acento sobre tinta
+          500: 'rgb(var(--rgb-b500) / <alpha-value>)', // lumbre 400: el único acento
+          600: 'rgb(var(--rgb-b500) / <alpha-value>)',
+          700: 'rgb(var(--rgb-b700) / <alpha-value>)',
+          800: 'rgb(var(--rgb-b800) / <alpha-value>)', // tinta 800: rellenos con texto blanco
+          900: 'rgb(var(--rgb-b900) / <alpha-value>)', // tinta 900: acción
         },
         surface: {
-          // Valores en tokens.css (claro: los de WW360; oscuro: invertidos).
-          50: 'rgb(var(--rgb-s50) / <alpha-value>)', // #F5F7F6 fondo
-          100: 'rgb(var(--rgb-s100) / <alpha-value>)', // #F0F4F3
-          200: 'rgb(var(--rgb-s200) / <alpha-value>)', // #E3EAEA bordes
-          300: 'rgb(var(--rgb-s300) / <alpha-value>)', // #8A9BA5 solo decoración, sin texto
-          600: 'rgb(var(--rgb-s600) / <alpha-value>)', // #5A6B75 texto de párrafo
-          800: 'rgb(var(--rgb-s800) / <alpha-value>)', // #3A4A54 etiquetas
-          900: 'rgb(var(--rgb-s900) / <alpha-value>)', // #0A4A6C títulos, azul marino
+          50: 'rgb(var(--rgb-s50) / <alpha-value>)', // lienzo blanco
+          100: 'rgb(var(--rgb-s100) / <alpha-value>)', // piedra 50: alterna secciones
+          200: 'rgb(var(--rgb-s200) / <alpha-value>)', // filetes
+          300: 'rgb(var(--rgb-s300) / <alpha-value>)', // filete fuerte, sin texto
+          600: 'rgb(var(--rgb-s600) / <alpha-value>)', // texto secundario
+          800: 'rgb(var(--rgb-s800) / <alpha-value>)', // etiquetas
+          900: 'rgb(var(--rgb-s900) / <alpha-value>)', // tinta: texto y titulares
         },
         // Fondo de tarjetas (blanco en claro).
         papel: 'rgb(var(--rgb-papel) / <alpha-value>)',
-        // Azul marino de la marca, fijo en los dos modos (bandas, avatares, pestaña activa).
-        marino: '#0A4A6C',
+        // Bloques oscuros de la marca (tinta 900). El nombre se conserva por compatibilidad.
+        marino: 'rgb(var(--rgb-marino) / <alpha-value>)',
+        lumbre: {
+          DEFAULT: 'rgb(var(--rgb-b500) / <alpha-value>)',
+          texto: 'var(--color-lumbre-texto)',
+          suave: 'var(--color-lumbre-suave)',
+        },
       },
       fontFamily: {
-        display: ['"Fira Sans"', 'system-ui', 'sans-serif'],
-        body: ['"Fira Sans"', 'system-ui', 'sans-serif'],
+        display: ['"Instrument Sans"', '"Helvetica Neue"', 'Arial', 'sans-serif'],
+        body: ['"Instrument Sans"', 'system-ui', '"Segoe UI"', 'sans-serif'],
+        mono: ['"IBM Plex Mono"', 'ui-monospace', 'SFMono-Regular', 'monospace'],
       },
+      // Las utilidades rounded-* van un escalón por debajo de los tokens (las usan
+      // piezas pequeñas); tarjetas y paneles usan --radius-md/--radius-lg en main.css.
       borderRadius: {
-        sm: 'var(--radius-sm)',
-        md: 'var(--radius-md)',
-        lg: 'var(--radius-lg)',
+        sm: 'var(--radius-xs)',
+        md: 'var(--radius-sm)',
+        lg: 'var(--radius-md)',
+        panel: 'var(--radius-lg)',
+        pill: 'var(--radius-pill)',
       },
       boxShadow: {
         soft: 'var(--shadow-soft)',
         card: 'var(--shadow-card)',
         elevated: 'var(--shadow-elevated)',
+        overlay: 'var(--shadow-overlay)',
+      },
+      // Interletraje de titulares de LUMBRA360: cerrado.
+      letterSpacing: {
+        tight: 'var(--tracking-titular)',
+        tighter: 'var(--tracking-heroe)',
       },
       minHeight: {
         tactil: '44px',

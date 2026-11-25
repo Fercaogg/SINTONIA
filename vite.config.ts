@@ -27,7 +27,7 @@ function cabecerasDeVercel(supabaseLocal: string | null): Record<string, string>
 }
 
 /**
- * Precarga de las dos fuentes de la primera pantalla (Fira Sans 400 y 700),
+ * Precarga de las dos fuentes de la primera pantalla (Instrument Sans 400 y 500),
  * para que el titular se pinte antes. Solo al compilar.
  */
 function precargarFuentes(): Plugin {
@@ -37,7 +37,7 @@ function precargarFuentes(): Plugin {
     transformIndexHtml: {
       order: 'post',
       handler(_html, ctx) {
-        const archivos = Object.keys(ctx.bundle ?? {}).filter((f) => /fira-sans-latin-(400|700)-normal.*\.woff2$/.test(f))
+        const archivos = Object.keys(ctx.bundle ?? {}).filter((f) => /instrument-sans-latin-(400|500)-normal.*\.woff2$/.test(f))
         return archivos.map((f) => ({
           tag: 'link',
           attrs: { rel: 'preload', as: 'font', type: 'font/woff2', href: `/${f}`, crossorigin: '' },

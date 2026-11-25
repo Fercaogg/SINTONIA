@@ -93,7 +93,7 @@ const estilo = (e: Record<string, string>) => e
     :aria-label="t('Así funciona SINTONÍA, paso a paso (ejemplo)', 'How SINTONÍA works, step by step (example)')"
   >
     <!-- El móvil -->
-    <div class="mx-auto w-[17.5rem] rounded-[2.6rem] bg-marino p-2.5 shadow-[0_30px_60px_-24px_rgba(10,74,108,0.5)]" aria-hidden="true">
+    <div class="mx-auto w-[17.5rem] rounded-[2.6rem] bg-marino p-2.5 shadow-[0_40px_80px_-40px_rgb(17_17_17/0.45)]" aria-hidden="true">
       <div class="relative h-[31.5rem] rounded-[2.1rem] bg-papel overflow-hidden">
         <div class="flex items-center justify-between px-6 pt-3 text-[0.65rem] font-semibold text-surface-900">
           <span>SINTONÍA</span>
@@ -104,7 +104,7 @@ const estilo = (e: Record<string, string>) => e
         <Transition name="pantalla" mode="out-in">
           <!-- 1. El estudiante responde -->
           <div v-if="paso === 0" key="0" class="pantalla px-5 pt-5">
-            <p class="text-[0.68rem] font-semibold uppercase tracking-[0.14em] text-brand-900">{{ t('Esta semana', 'This week') }}</p>
+            <p class="text-[0.68rem] font-mono font-normal uppercase tracking-[0.14em] text-surface-600">{{ t('Esta semana', 'This week') }}</p>
             <p class="mt-1 font-display text-lg font-semibold leading-tight text-surface-900">{{ t('¿Cómo va el trabajo?', 'How is the work going?') }}</p>
             <ul class="mt-4 space-y-3.5">
               <li v-for="(q, i) in PREGUNTAS" :key="q.texto">
@@ -126,7 +126,7 @@ const estilo = (e: Record<string, string>) => e
             </ul>
             <div class="relative mt-5 h-10 rounded-lg bg-marino text-white text-sm font-semibold overflow-hidden">
               <span class="boton-texto absolute inset-0 flex items-center justify-center" :style="retraso(3500)">{{ t('Enviar', 'Send') }}</span>
-              <span class="boton-hecho absolute inset-0 flex items-center justify-center gap-1.5 bg-[#1d7060]" :style="retraso(3500)">
+              <span class="boton-hecho absolute inset-0 flex items-center justify-center gap-1.5 bg-brand-800" :style="retraso(3500)">
                 <AppIcon name="check" :size="16" />{{ t('Enviado', 'Sent') }}
               </span>
             </div>
@@ -134,7 +134,7 @@ const estilo = (e: Record<string, string>) => e
 
           <!-- 2. El tutor/a responde -->
           <div v-else-if="paso === 1" key="1" class="pantalla px-5 pt-5">
-            <p class="text-[0.68rem] font-semibold uppercase tracking-[0.14em] text-brand-900">{{ t('Tus estudiantes', 'Your students') }}</p>
+            <p class="text-[0.68rem] font-mono font-normal uppercase tracking-[0.14em] text-surface-600">{{ t('Tus estudiantes', 'Your students') }}</p>
             <p class="mt-1 font-display text-lg font-semibold leading-tight text-surface-900">{{ t('¿Cómo ves el avance?', 'How do you see the progress?') }}</p>
             <ul class="mt-4 space-y-3">
               <li v-for="(e, i) in ESTUDIANTES" :key="e.nombre" class="entra rounded-xl border border-surface-200 p-3" :style="{ animationDelay: `${150 + i * 120}ms` }">
@@ -158,7 +158,7 @@ const estilo = (e: Record<string, string>) => e
 
           <!-- 3. Las dos miradas -->
           <div v-else-if="paso === 2" key="2" class="pantalla px-5 pt-5">
-            <p class="text-[0.68rem] font-semibold uppercase tracking-[0.14em] text-brand-900">{{ t('Estudiante 1', 'Student 1') }}</p>
+            <p class="text-[0.68rem] font-mono font-normal uppercase tracking-[0.14em] text-surface-600">{{ t('Estudiante 1', 'Student 1') }}</p>
             <p class="mt-1 font-display text-lg font-semibold leading-tight text-surface-900">{{ t('Dos miradas sobre el avance', 'Two perspectives on progress') }}</p>
             <div class="mt-6" :style="estilo({ '--ondas-duracion': '1600ms' })">
               <OndasSintonia :desfase="desfaseOndas" :alto="96" :grosor="3" />
@@ -166,11 +166,11 @@ const estilo = (e: Record<string, string>) => e
             <div class="mt-4 grid grid-cols-2 gap-2">
               <div class="entra rounded-xl bg-surface-100 p-3 text-center" :style="retraso(300)">
                 <p class="text-[0.65rem] font-medium text-surface-800 flex items-center justify-center gap-1"><span class="h-1 w-3 rounded-full bg-brand-500" />{{ t('Estudiante', 'Student') }}</p>
-                <p class="mt-1 font-display text-2xl font-bold text-surface-900">4</p>
+                <p class="mt-1 font-display text-2xl font-medium text-surface-900">4</p>
               </div>
               <div class="entra rounded-xl bg-surface-100 p-3 text-center" :style="retraso(420)">
                 <p class="text-[0.65rem] font-medium text-surface-800 flex items-center justify-center gap-1"><span class="h-1 w-3 rounded-full bg-surface-900" />{{ t('Tutor/a', 'Supervisor') }}</p>
-                <p class="mt-1 font-display text-2xl font-bold text-surface-900">2</p>
+                <p class="mt-1 font-display text-2xl font-medium text-surface-900">2</p>
               </div>
             </div>
             <p class="entra mt-4 rounded-xl border border-brand-200 bg-brand-50 p-3 text-xs font-medium leading-snug text-surface-900" :style="retraso(2000)">
@@ -180,7 +180,7 @@ const estilo = (e: Record<string, string>) => e
 
           <!-- 4. La agenda -->
           <div v-else key="3" class="pantalla px-5 pt-5">
-            <p class="text-[0.68rem] font-semibold uppercase tracking-[0.14em] text-brand-900">{{ t('Próxima tutoría', 'Next meeting') }}</p>
+            <p class="text-[0.68rem] font-mono font-normal uppercase tracking-[0.14em] text-surface-600">{{ t('Próxima tutoría', 'Next meeting') }}</p>
             <p class="mt-1 font-display text-lg font-semibold leading-tight text-surface-900">{{ t('Agenda para los dos', 'Agenda for both') }}</p>
             <ol class="mt-4 space-y-2.5">
               <li

@@ -7,7 +7,7 @@ import { join, dirname } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 const raiz = join(dirname(fileURLToPath(import.meta.url)), '..')
-const svg = readFileSync(join(raiz, 'public', 'favicon.svg'), 'utf8').replace(/<style>[\s\S]*?<\/style>/, '<style>.p{fill:#0A4A6C}</style>')
+const svg = readFileSync(join(raiz, 'public', 'favicon.svg'), 'utf8').replace(/<style>[\s\S]*?<\/style>/, '<style>.p{fill:#1B1B1B}</style>')
 const navegador = await chromium.launch()
 const pagina = await navegador.newPage({ viewport: { width: 180, height: 180 } })
 await pagina.setContent(`<body style="margin:0;background:#fff;display:grid;place-items:center;width:180px;height:180px"><div style="width:120px;height:120px">${svg.replace('<svg ', '<svg width="120" height="120" ')}</div></body>`)

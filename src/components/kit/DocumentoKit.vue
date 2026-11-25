@@ -14,7 +14,7 @@ const info = DOCUMENTOS.find((d) => d.clave === props.doc)!
     <p class="aviso-borrador rounded-lg border border-amber-300 bg-amber-50 px-4 py-3 text-sm font-medium text-amber-900">
       {{ EN_ELABORACION }} {{ KIT_VERSION }}.
     </p>
-    <component :is="nivel === 2 ? 'h2' : 'h1'" class="mt-6 font-display text-3xl font-bold tracking-tight text-surface-900">{{ info.titulo }}</component>
+    <component :is="nivel === 2 ? 'h2' : 'h1'" class="mt-6 font-display text-3xl font-medium tracking-tight text-surface-900">{{ info.titulo }}</component>
     <p class="mt-1 texto-suave">SINTONÍA · Piloto en la Universidad de Salamanca, febrero a abril de 2027</p>
 
     <!-- Hoja informativa -->

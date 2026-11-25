@@ -30,8 +30,8 @@ const ICONOS = { estudiante: 'person', tutor: 'users', direccion: 'chart', inves
     <main id="contenido" tabindex="-1" class="outline-none flex-1">
       <section class="max-w-[1180px] mx-auto px-4 sm:px-6 py-14 sm:py-20 grid gap-12 lg:grid-cols-[5fr_7fr] items-start">
         <div>
-          <p class="text-xs font-semibold uppercase tracking-[0.18em] text-brand-900">Demostración</p>
-          <h1 class="font-display text-4xl sm:text-6xl font-bold tracking-tight text-surface-900 mt-3">Entra como quieras</h1>
+          <p class="text-xs font-mono font-normal uppercase tracking-[0.14em] text-surface-600">Demostración</p>
+          <h1 class="font-display text-4xl sm:text-6xl font-medium tracking-tight text-surface-900 mt-3">Entra como quieras</h1>
           <p class="mt-6 text-lg leading-relaxed">
             Un máster inventado, con 4 tutores, 12 estudiantes y 6 semanas simuladas. Elige un perfil y verás SINTONÍA por dentro, tal como lo vería esa persona.
           </p>
