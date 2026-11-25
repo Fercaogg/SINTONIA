@@ -7,6 +7,7 @@ import AppIcon from '@/components/comun/AppIcon.vue'
 import AvisoError from '@/components/comun/AvisoError.vue'
 import EstadoCarga from '@/components/comun/EstadoCarga.vue'
 import Pendiente from '@/components/comun/Pendiente.vue'
+import GuiaDoctorado from '@/components/puente/GuiaDoctorado.vue'
 import { useTerminos } from '@/lib/terminos'
 
 interface Convocatoria {
@@ -144,5 +145,8 @@ const { t } = useTerminos()
         </ul>
       </section>
     </template>
+
+    <!-- Información pública y comprobada: se ve aunque falle la carga. -->
+    <GuiaDoctorado />
   </div>
 </template>
