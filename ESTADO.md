@@ -62,7 +62,7 @@ En la columna "Qué hay hoy" está lo que he comprobado. En "Qué haré", lo que
 | Logotipos de la USAL o de empresas sin permiso | Cumple: no hay ninguno |
 | Contadores de usuarios, testimonios o casos de éxito | Cumple: no hay ninguno |
 | Chats de IA o reclamos de "IA" | Cumple: el programa de redacción no tiene interfaz visible y la web no usa la palabra "IA" como reclamo |
-| Cookies de seguimiento o analítica de terceros | Cumple: no hay ninguna (lo garantiza también la política de seguridad de contenidos) |
+| Cookies de seguimiento o analítica de terceros | Cumple: no hay cookies. Las estadísticas de visitas (24/11/2026) no usan cookies, se sirven desde el propio dominio y solo cuentan páginas públicas |
 
 ## Resumen
 
@@ -77,3 +77,28 @@ En la columna "Qué hay hoy" está lo que he comprobado. En "Qué haré", lo que
 **Fases 1 a 4 terminadas el 15/11/2026.** Pruebas y capturas en docs/capturas (prefijos `fase1-` a `fase4-`). Pendiente de tu visto bueno antes de la Fase 5.
 
 **Fase 5 terminada el 16/11/2026.** Pruebas y capturas en docs/capturas (prefijo `fase5-`). Lo que queda depende de datos tuyos o del Comité: está en PENDIENTES.md.
+
+## Lista de acabado web (24 de noviembre de 2026)
+
+| Punto | Estado | Qué hay |
+|---|---|---|
+| Aviso legal | **Hecho, falta un dato** | Titular, objeto, propiedad intelectual, responsabilidad, enlaces y legislación aplicable. Falta el NIF y el domicilio del titular (PENDIENTES.md) |
+| Política de privacidad | **Hecho, falta lo del Comité** | Nuevo apartado "Si solo visitas la web" (estadísticas sin cookies, formularios, WhatsApp y registros técnicos). Base jurídica y conservación siguen pendientes del Comité |
+| Aviso de cookies | **Hecho** | /cookies explica por qué no hay aviso: no hay cookies; solo la sesión en el almacenamiento local, que es imprescindible (art. 22.2 LSSI) |
+| Forzar HTTPS | **Hecho** | Vercel redirige a HTTPS; HSTS de 2 años con `preload` y `upgrade-insecure-requests` en la CSP |
+| Meta títulos y descripciones | **Hecho** | Propios por página (`paginas.json`), con prueba de unicidad y longitud |
+| Datos estructurados | **Hecho** | JSON-LD en cada página: sitio, página, migas y, en la portada, aplicación y proyecto de investigación |
+| Sitemap y robots.txt | **Hecho** | Se generan al publicar; el sitemap incluye ahora hreflang |
+| Ficha de Google | **No aplica** | Google no admite fichas de proyectos solo en línea. Guía de Search Console en docs/FICHA-GOOGLE.md |
+| Favicon | **Hecho** | SVG (con modo oscuro), favicon.ico, icono de Apple, iconos de 192 y 512 px y manifiesto |
+| Texto alternativo | **Hecho** | La única imagen (fija de los clips) es decorativa, con `alt=""` y su texto en la tarjeta; los gráficos llevan tabla de datos |
+| Imágenes comprimidas | **Hecho** | Imágenes para compartir a 256 colores (2,4 MB a 1 MB); clips de 40 a 100 KB en WebM y MP4 |
+| Velocidad de carga | **Hecho** | Lighthouse móvil 92 a 99; ahora además caché de un año para `/assets` |
+| Contraste de colores | **Hecho** | Revisión AA automática en claro y en oscuro; el botón de WhatsApp tiene 5,3:1 |
+| Se ve bien en el móvil | **Hecho** | Pruebas a 360 px sin desbordamiento |
+| Página 404 | **Hecho** | Propia, con código 404 de verdad |
+| Enlaces rotos | **Hecho** | `npm run enlaces`: 27 páginas y 104 enlaces, ningún enlace interno roto. Los externos no se pudieron comprobar desde aquí |
+| Formularios contra spam | **Hecho** | Campo trampa, tiempo mínimo, límite de enlaces, límite de envíos y sin saltos de línea en el asunto |
+| Botón de WhatsApp | **Hecho, falta el número** | Aparece en cuanto se pone `VITE_WHATSAPP` |
+| Analítica | **Hecho, falta activarla** | Código listo; se activa en Vercel > Analytics |
+| Una sola llamada a la acción | **Hecho** | Un único botón en la portada; lo demás, enlaces de texto |

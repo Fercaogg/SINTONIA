@@ -33,3 +33,14 @@ export const URL_SITIO = (import.meta.env.VITE_URL_SITIO as string | undefined)?
 export const EN_ELABORACION_EN = 'In preparation. Pending review by the Research Ethics Committee of the Universidad de Salamanca.'
 export const EN_ELABORACION_PROYECTO_EN = 'In preparation. It will be published here when available.'
 export const AUTORIA_EN = "Prototype of Fernando Martín Vaquero's Master's thesis · Universidad de Salamanca"
+
+/**
+ * Número de WhatsApp de contacto (variable VITE_WHATSAPP), con prefijo de país
+ * y sin espacios ni "+", por ejemplo 34600000000. Sin número, no se muestra el botón.
+ */
+export const WHATSAPP = ((import.meta.env.VITE_WHATSAPP as string | undefined) ?? '').replace(/[^\d]/g, '')
+
+/** Enlace de WhatsApp con un mensaje inicial ya escrito. */
+export function enlaceWhatsApp(numero: string, mensaje: string): string {
+  return `https://wa.me/${numero}?text=${encodeURIComponent(mensaje)}`
+}

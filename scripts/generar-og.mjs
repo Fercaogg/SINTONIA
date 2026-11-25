@@ -3,6 +3,7 @@
 // Uso, con la web en marcha: node scripts/generar-og.mjs [http://localhost:5173]
 import { chromium } from 'playwright'
 import { mkdirSync, readFileSync } from 'node:fs'
+import { execFileSync } from 'node:child_process'
 import { join, dirname } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
@@ -17,7 +18,10 @@ for (const p of paginas) {
   const clave = p.idioma === 'en' ? `en-${p.og}` : p.og
   await pagina.goto(`${base}/og/${clave}`, { waitUntil: 'networkidle' })
   await pagina.addStyleTag({ content: '[data-banda-entorno], .banda-entorno { display: none !important }' })
-  await pagina.locator('[data-og-listo]').screenshot({ path: join(raiz, 'public', 'og', `${clave}.png`) })
+  const archivo = join(raiz, 'public', 'og', `${clave}.png`)
+  await pagina.locator('[data-og-listo]').screenshot({ path: archivo })
+  // Paleta de 256 colores: la mitad de peso, sin diferencia visible (necesita ImageMagick).
+  execFileSync('convert', [archivo, '-strip', '-dither', 'FloydSteinberg', '-colors', '256', '-define', 'png:compression-level=9', `PNG8:${archivo}`])
   console.log('og/' + clave + '.png')
 }
 await navegador.close()

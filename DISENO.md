@@ -423,3 +423,11 @@ Logotipo facilitado por Fernando (original en `docs/marca/logotipo-original.webp
 - `AppLogo` muestra el símbolo y el nombre. Las hojas azules toman el color del texto: azul marino sobre fondo claro, blanco sobre azul marino y claro en modo oscuro. La verde no cambia.
 - Icono del navegador (`public/favicon.svg`, que se aclara en modo oscuro) e icono para la pantalla de inicio del móvil (`public/apple-touch-icon.png`, 180 px, generado con `node scripts/generar-iconos.mjs`).
 - También en los PDF del kit y del dosier.
+
+## 13. Rediseño del 25/11/2026 (estilo Apple)
+
+- **Tipografía:** `.titular-xl` (hasta 100 px, interletraje -0,045em), `.titular-l`, `.titular-m` y `.entradilla`. El interletraje se aprieta según crece el tamaño.
+- **Color:** `--degradado-texto` y `--degradado-marca` (del verde de la marca al azul marino; en oscuro, versiones claras). `.texto-degradado` deja el color sólido debajo para el contraste.
+- **Superficies:** `.baldosa` (blanca, radio 28 px, sombra flotante) y `.baldosa-suave` (gris claro; en oscuro, luz y filo finos). `.cristal` para la cabecera y los paneles flotantes (se vuelve opaco con "reducir transparencia").
+- **Movimiento:** `.escena-3d` y `.objeto-3d` (variable `--giro` de 1 a 0 al deslizar), `FraseLuz` (palabras que se iluminan) y `.carrusel` (desplazamiento nativo con imán). Nada de esto con "reducir movimiento".
+- **Botones:** en píldora; `.enlace-flecha` para la acción secundaria ("Ver la demostración ›").
