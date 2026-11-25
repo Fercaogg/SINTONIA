@@ -24,7 +24,7 @@ function volver() {
   <div class="min-h-screen flex flex-col">
     <SaltarContenido />
     <BandaEntorno />
-    <header class="bg-papel border-b border-surface-200">
+    <header class="cristal sticky top-0 z-30 border-b">
       <div class="mx-auto px-4 py-4 flex items-center justify-between gap-3" :class="props.ancho === 'amplio' ? 'max-w-5xl' : 'max-w-3xl'">
         <RouterLink :to="ruta('/')" class="text-xl" :aria-label="t('SINTONÍA, inicio', 'SINTONÍA, home')"><AppLogo /></RouterLink>
         <div class="flex items-center gap-2">

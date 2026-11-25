@@ -29,7 +29,7 @@ const estilo = (e: Record<string, string>) => e
 </script>
 
 <template>
-  <div ref="raiz" class="ilustracion h-44 rounded-xl bg-surface-100 border border-surface-200 p-4 flex items-center justify-center overflow-hidden" aria-hidden="true">
+  <div ref="raiz" class="ilustracion h-44 sm:h-52 rounded-2xl bg-papel shadow-soft p-4 flex items-center justify-center overflow-hidden" aria-hidden="true">
     <!-- 1. Dos registros por separado -->
     <div v-if="paso === 1" class="grid w-full grid-cols-2 gap-3">
       <div class="rounded-lg bg-papel p-3 shadow-sm">

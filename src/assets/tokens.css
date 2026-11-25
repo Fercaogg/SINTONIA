@@ -50,11 +50,25 @@
   --shadow-soft: 0 1px 3px rgba(0,0,0,0.04), 0 4px 12px rgba(10,74,108,0.06);
   --shadow-card: rgba(10,74,108,0.15) 0px 20px 40px -20px, rgba(0,0,0,0.08) 0px 10px 20px -10px;
   --shadow-elevated: rgba(10,74,108,0.15) 0px 20px 40px -12px, rgba(0,0,0,0.08) 0px 10px 20px -8px;
+  --shadow-flotante: 0 1px 1px rgba(10,74,108,0.04), 0 8px 24px -6px rgba(10,74,108,0.10), 0 40px 80px -30px rgba(10,74,108,0.28);
 
-  /* Radios: WW360 main.css:28 a 30 */
-  --radius-sm: 4px;
-  --radius-md: 6px;
-  --radius-lg: 8px;
+  /* Radios (rediseño del 25/11/2026): más redondeados, como las superficies
+     de iOS. Las tarjetas grandes usan --radius-xl. */
+  --radius-sm: 6px;
+  --radius-md: 12px;
+  --radius-lg: 18px;
+  --radius-xl: 28px;
+
+  /* Degradado de la marca: del verde de identidad al azul marino. Solo para
+     superficies y texto grande (los textos pequeños siguen en color sólido). */
+  --degradado-marca: linear-gradient(120deg, #1d7060 0%, #0A4A6C 55%, #12355f 100%);
+  --degradado-texto: linear-gradient(100deg, #1d7060 10%, #0A5C80 60%, #173f78 100%);
+  --brillo-1: rgba(52, 198, 163, 0.30);
+  --brillo-2: rgba(10, 92, 140, 0.22);
+  --brillo-3: rgba(120, 170, 255, 0.18);
+  /* Cristal: barra superior y paneles flotantes. */
+  --cristal-fondo: rgba(255, 255, 255, 0.72);
+  --cristal-borde: rgba(10, 74, 108, 0.08);
 
   /* Movimiento (skill de Emil Kowalski): curvas fuertes y duraciones cortas */
   --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
@@ -89,6 +103,14 @@
     --shadow-elevated: rgba(0,0,0,0.5) 0px 20px 40px -12px, rgba(0,0,0,0.3) 0px 10px 20px -8px;
 
     --color-graf-tutores: #4ED7C2;
+
+    --degradado-texto: linear-gradient(100deg, #6FE6CF 10%, #8FD3F2 60%, #B4C8FF 100%);
+    --brillo-1: rgba(52, 198, 163, 0.22);
+    --brillo-2: rgba(40, 120, 190, 0.22);
+    --brillo-3: rgba(120, 140, 255, 0.14);
+    --cristal-fondo: rgba(9, 24, 31, 0.68);
+    --cristal-borde: rgba(255, 255, 255, 0.08);
+    --shadow-flotante: 0 1px 1px rgba(0,0,0,0.3), 0 8px 24px -6px rgba(0,0,0,0.4), 0 40px 80px -30px rgba(0,0,0,0.7);
 
     color-scheme: dark;
   }

@@ -43,7 +43,7 @@ const GRUPOS = computed(() => [
 </script>
 
 <template>
-  <footer class="border-t border-surface-200 bg-papel">
+  <footer class="border-t border-surface-200 bg-surface-100">
     <div class="max-w-[1100px] mx-auto px-4 sm:px-6 pt-10 grid gap-8 lg:grid-cols-[1fr_auto] text-sm" :class="WHATSAPP ? 'pb-24' : 'pb-10'">
       <div class="space-y-2">
         <p class="text-surface-900 font-medium">{{ t(AUTORIA, AUTORIA_EN) }}</p>
@@ -52,10 +52,10 @@ const GRUPOS = computed(() => [
       </div>
       <nav :aria-label="t('Información del proyecto', 'Project information')" class="grid grid-cols-2 gap-x-8 gap-y-6 sm:grid-cols-3">
         <div v-for="g in GRUPOS" :key="g.titulo">
-          <h2 class="text-xs font-semibold uppercase tracking-[0.14em] text-surface-800">{{ g.titulo }}</h2>
+          <h2 class="text-sm font-semibold text-surface-900">{{ g.titulo }}</h2>
           <ul class="mt-1">
             <li v-for="e in g.enlaces" :key="e.to">
-              <RouterLink :to="ruta(e.to)" class="enlace inline-flex items-center min-h-tactil" :hreflang="soloEnEspanol(e.to) ? 'es' : undefined"
+              <RouterLink :to="ruta(e.to)" class="enlace-pie inline-flex items-center min-h-tactil" :hreflang="soloEnEspanol(e.to) ? 'es' : undefined"
                 >{{ e.texto }}<span v-if="soloEnEspanol(e.to)" class="texto-suave"> (in Spanish)</span></RouterLink
               >
             </li>

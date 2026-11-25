@@ -84,7 +84,7 @@
 @layer components {
   .card {
     @apply bg-papel border border-surface-200;
-    border-radius: var(--radius-md);
+    border-radius: var(--radius-lg);
     box-shadow: var(--shadow-card);
     transition: box-shadow 0.3s ease, transform 0.3s ease;
   }
@@ -95,7 +95,9 @@
     @apply inline-flex items-center justify-center gap-2 px-[18px] py-[10px] min-h-tactil
            text-white font-medium text-base;
     background-color: var(--color-accion-fondo);
-    border-radius: var(--radius-md);
+    border-radius: 999px;
+    padding-inline: 22px;
+    letter-spacing: -0.005em;
     transition: background-color var(--dur-micro) ease, transform var(--dur-micro) var(--ease-out);
   }
   .btn-primary:hover:not(:disabled) {
@@ -116,7 +118,8 @@
     transition: background-color var(--dur-micro) ease, transform var(--dur-micro) var(--ease-out);
     color: var(--color-accion);
     border-color: var(--color-accion);
-    border-radius: var(--radius-md);
+    border-radius: 999px;
+    padding-inline: 22px;
   }
   .btn-secondary:hover:not(:disabled) {
     background-color: var(--color-primary-tint-08);
@@ -127,7 +130,8 @@
     @apply inline-flex items-center justify-center gap-2 px-[18px] py-[10px] min-h-tactil font-semibold text-base;
     background-color: #ffffff;
     color: #0A4A6C;
-    border-radius: var(--radius-md);
+    border-radius: 999px;
+    padding-inline: 22px;
     transition: background-color var(--dur-micro) ease, transform var(--dur-micro) var(--ease-out);
   }
   .btn-claro:hover {
@@ -141,7 +145,8 @@
     @apply inline-flex items-center justify-center gap-2 px-[18px] py-[10px] min-h-tactil
            bg-red-700 text-white font-medium text-base;
     transition: background-color var(--dur-micro) ease, transform var(--dur-micro) var(--ease-out);
-    border-radius: var(--radius-md);
+    border-radius: 999px;
+    padding-inline: 22px;
   }
   .btn-danger:hover:not(:disabled) {
     @apply bg-red-800;
@@ -175,8 +180,79 @@
   }
 
   .titulo-pagina {
-    @apply font-display text-3xl sm:text-4xl font-bold tracking-tight;
+    @apply font-display text-4xl sm:text-5xl font-bold;
+    letter-spacing: -0.03em;
+    line-height: 1.05;
     color: var(--color-heading);
+  }
+
+  /* ---------- Rediseño del 25/11/2026 (estilo de las páginas de producto de Apple) ---------- */
+
+  /* Titulares grandes: interletraje negativo que crece con el tamaño y
+     interlineado apretado (ver la skill apple-design, apartado 15). */
+  .titular-xl {
+    @apply font-display font-bold text-balance;
+    font-size: clamp(2.75rem, 7.2vw, 6.25rem);
+    line-height: 1;
+    letter-spacing: -0.045em;
+  }
+  .titular-l {
+    @apply font-display font-bold text-balance;
+    font-size: clamp(2.25rem, 5vw, 4.25rem);
+    line-height: 1.03;
+    letter-spacing: -0.035em;
+  }
+  .titular-m {
+    @apply font-display font-semibold text-balance;
+    font-size: clamp(1.75rem, 3vw, 2.5rem);
+    line-height: 1.1;
+    letter-spacing: -0.025em;
+  }
+  .entradilla {
+    @apply font-display text-balance;
+    font-size: clamp(1.2rem, 1.9vw, 1.5rem);
+    line-height: 1.4;
+    letter-spacing: -0.012em;
+    color: var(--color-body);
+  }
+  .etiqueta-seccion {
+    @apply font-display text-base sm:text-lg font-semibold;
+    letter-spacing: -0.01em;
+    color: rgb(var(--rgb-b900));
+  }
+
+  /* Texto con el degradado de la marca. El color sólido queda debajo: es el
+     que leen los lectores de contraste y el que se ve si no hay soporte. */
+  .texto-degradado {
+    color: rgb(var(--rgb-s900));
+  }
+  @supports (-webkit-background-clip: text) or (background-clip: text) {
+    .texto-degradado {
+      background-image: var(--degradado-texto);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+  }
+
+  /* Cristal: capa translúcida que deja ver el contenido que pasa por debajo. */
+  .cristal {
+    background-color: var(--cristal-fondo);
+    -webkit-backdrop-filter: saturate(180%) blur(20px);
+    backdrop-filter: saturate(180%) blur(20px);
+    border-color: var(--cristal-borde);
+  }
+
+  /* Superficie grande del mosaico (bento) y de los carruseles. */
+  .baldosa {
+    @apply relative overflow-hidden bg-papel;
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-flotante);
+  }
+  .baldosa-suave {
+    @apply relative overflow-hidden;
+    border-radius: var(--radius-xl);
+    background-color: rgb(var(--rgb-s100));
   }
 
   .texto-suave {
@@ -374,5 +450,134 @@
     opacity: 1;
     transform: none;
     transition: none;
+  }
+}
+
+/* ---------- Rediseño del 25/11/2026: piezas de la portada ---------- */
+
+/* Fondo de luz: tres manchas de color muy difuminadas detrás del inicio. */
+.fondo-luz {
+  background:
+    radial-gradient(60% 50% at 20% 10%, var(--brillo-1), transparent 70%),
+    radial-gradient(50% 45% at 85% 20%, var(--brillo-2), transparent 70%),
+    radial-gradient(55% 50% at 50% 95%, var(--brillo-3), transparent 70%);
+}
+
+/* Escena 3D: el móvil del inicio se endereza al deslizar (--giro de 0 a 1). */
+.escena-3d {
+  perspective: 1600px;
+  perspective-origin: 50% 0%;
+}
+.objeto-3d {
+  transform-origin: 50% 100%;
+  transform: rotateX(calc(var(--giro, 0) * 22deg)) scale(calc(1 - var(--giro, 0) * 0.08)) translate3d(0, calc(var(--giro, 0) * 40px), 0);
+  will-change: transform;
+}
+
+/* Palabras que se iluminan al deslizar (Apple, "frases que se leen solas"). */
+.palabra-luz {
+  transition: opacity 180ms linear;
+}
+
+/* Carrusel deslizable: arrastre nativo con imán en cada tarjeta. */
+.carrusel {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: min(86vw, 400px);
+  gap: 20px;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scroll-snap-type: x mandatory;
+  scroll-padding-inline: max(16px, calc((100vw - 1180px) / 2 + 24px));
+  padding-inline: max(16px, calc((100vw - 1180px) / 2 + 24px));
+  padding-block: 12px 40px;
+  scrollbar-width: none;
+}
+.carrusel::-webkit-scrollbar {
+  display: none;
+}
+.carrusel > * {
+  scroll-snap-align: start;
+}
+
+/* Botones redondos de los carruseles. */
+.boton-redondo {
+  @apply inline-flex items-center justify-center rounded-full text-surface-900;
+  width: 44px;
+  height: 44px;
+  background-color: rgb(var(--rgb-s200) / 0.7);
+  transition: background-color var(--dur-micro) ease, transform var(--dur-micro) var(--ease-out), opacity var(--dur-micro) ease;
+}
+.boton-redondo:hover:not(:disabled) {
+  background-color: rgb(var(--rgb-s200));
+}
+.boton-redondo:active:not(:disabled) {
+  transform: scale(0.92);
+}
+.boton-redondo:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+/* Banda oscura con profundidad: azul marino que cae hacia casi negro. */
+.banda-profunda {
+  background:
+    radial-gradient(70% 60% at 80% 0%, rgba(52, 198, 163, 0.22), transparent 60%),
+    radial-gradient(60% 60% at 0% 100%, rgba(80, 130, 255, 0.18), transparent 60%),
+    linear-gradient(180deg, #0A4A6C 0%, #062a3d 100%);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .objeto-3d {
+    transform: none;
+  }
+}
+@media (prefers-reduced-transparency: reduce) {
+  .cristal {
+    background-color: rgb(var(--rgb-s50));
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+}
+
+/* Enlace secundario con flecha, como "Más información ›". */
+.enlace-flecha {
+  @apply inline-flex items-center gap-1 min-h-tactil px-1 text-lg font-medium;
+  color: var(--color-accion);
+  letter-spacing: -0.01em;
+}
+.enlace-flecha:hover {
+  @apply underline underline-offset-4;
+}
+.enlace-flecha > span[aria-hidden] {
+  transition: transform var(--dur-micro) var(--ease-out);
+}
+.enlace-flecha:hover > span[aria-hidden] {
+  transform: translateX(3px);
+}
+
+/* Enlaces del pie: discretos, como los pies de página de Apple; se subrayan al pasar. */
+.enlace-pie {
+  @apply text-sm;
+  color: var(--color-body);
+}
+.enlace-pie:hover {
+  @apply underline underline-offset-2;
+  color: var(--color-heading);
+}
+
+/* Páginas interiores: títulos con el mismo carácter que la portada. */
+main h2.font-display.text-xl {
+  letter-spacing: -0.02em;
+}
+
+/* Modo oscuro: las baldosas se separan del fondo con una luz y un filo finos. */
+@media (prefers-color-scheme: dark) {
+  .baldosa-suave {
+    background-color: rgb(255 255 255 / 0.045);
+    box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.07);
+  }
+  .baldosa {
+    box-shadow: var(--shadow-flotante), inset 0 1px 0 rgb(255 255 255 / 0.06);
   }
 }
