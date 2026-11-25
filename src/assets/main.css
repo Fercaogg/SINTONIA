@@ -432,6 +432,25 @@
 .con-luz:hover::after {
   opacity: 1;
 }
+/* Borde que se ilumina bajo el puntero, como las tarjetas de LUMBRA360. */
+.con-luz::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  pointer-events: none;
+  z-index: 2;
+  opacity: 0;
+  background: radial-gradient(260px circle at var(--luz-x, 50%) var(--luz-y, 0%), rgb(var(--rgb-b500)), transparent 70%);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  transition: opacity 400ms var(--ease-out);
+}
+.con-luz:hover::before {
+  opacity: 1;
+}
 .con-luz:hover {
   box-shadow: 0 30px 60px -36px rgb(17 17 17 / 0.35);
 }

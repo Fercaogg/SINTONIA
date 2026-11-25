@@ -10,6 +10,20 @@ export interface Novedad {
 
 export const NOVEDADES: Novedad[] = [
   {
+    version: '0.6.0',
+    fecha: '2026-11-25',
+    cambios: [
+      'Nueva imagen, la misma que LUMBRA360: lienzo blanco, tinta negra, un único acento naranja y las tipografías Instrument Sans e IBM Plex Mono.',
+      'Portada rehecha: cabecera que se difumina al bajar, apartados con más aire y una sección con pantallas reales del panel.',
+      'Apartado «Respaldo»: la trayectoria desde WORKWELL360, los avales de la Universidad de Salamanca y de su Fundación General, y las personas del equipo con foto.',
+      'Todas las páginas públicas comparten la misma cabecera, con acceso directo a cada sección.',
+      'Textos legales completos, iconos para instalar la web en el móvil y datos para buscadores en cada página.',
+      'Analítica de visitas sin cookies y protección de los formularios frente al correo no deseado.',
+      'Documentos en PDF y clips de la demostración actualizados con la nueva imagen.',
+      'Todas las pantallas del panel se recorren con el teclado.',
+    ],
+  },
+  {
     version: '0.5.0',
     fecha: '2026-11-16',
     cambios: [

@@ -1,6 +1,6 @@
 {
   "name": "sintonia",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "private": true,
   "type": "module",
   "description": "SINTONÍA: registro semanal de estudiante y tutor para acompañar trabajos académicos sin vigilar.",
