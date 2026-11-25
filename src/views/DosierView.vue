@@ -5,7 +5,8 @@ import AppLogo from '@/components/comun/AppLogo.vue'
 // Qué es, cómo funciona, garantías éticas, estado del proyecto, dirección
 // (Luis y Ana en igualdad, en orden alfabético) y contacto.
 import OndasSintonia from '@/components/portada/OndasSintonia.vue'
-import { AUTOR, DIRECCION, PASOS } from '@/contenido/portada'
+import { PASOS } from '@/contenido/portada'
+import { AVALES, EQUIPO } from '@/contenido/respaldo'
 import { CORREO_CONTACTO, URL_SITIO, VERSION } from '@/lib/publico'
 
 const GARANTIAS = [
@@ -55,15 +56,18 @@ const GARANTIAS = [
     </section>
 
     <section class="mt-4">
-      <h2 class="titulo">Dirección</h2>
-      <ul class="mt-2 grid grid-cols-2 gap-3">
-        <li v-for="m in DIRECCION" :key="m.nombre" class="rounded-lg border border-surface-200 p-3">
-          <p class="font-display font-semibold text-[#111111]">{{ m.nombre }}</p>
-          <p>{{ m.categoria }}</p>
-          <p class="text-surface-800">{{ m.departamento }}</p>
+      <h2 class="titulo">Equipo</h2>
+      <ul class="mt-2 grid grid-cols-3 gap-3">
+        <li v-for="m in EQUIPO" :key="m.nombre" class="flex gap-3 rounded-lg border border-surface-200 p-3">
+          <img :src="m.foto" alt="" width="40" height="40" class="h-10 w-10 shrink-0 rounded-full object-cover" />
+          <div class="min-w-0">
+            <p class="font-mono text-[0.6rem] uppercase tracking-[0.14em] text-[#b83a0e]">{{ m.papel.es }}</p>
+            <p class="font-display font-semibold leading-snug text-[#111111]">{{ m.nombre }}</p>
+            <p class="text-surface-800">{{ m.cargo.es }}</p>
+          </div>
         </li>
       </ul>
-      <p class="mt-2">{{ AUTOR }}</p>
+      <p class="mt-2"><span class="font-semibold">Respaldo:</span> {{ AVALES.map((a) => a.nombre).join(' · ') }}.</p>
     </section>
 
     <section class="mt-4">

@@ -56,9 +56,9 @@ test('dosier de una página en PDF, descargable desde /instituciones', async ({ 
   expect(cuerpo.startsWith('%PDF-')).toBe(true)
   expect(cuerpo.match(/\/Type\s*\/Page[^s]/g)?.length).toBe(1)
   await page.goto('/dosier/imprimir')
-  for (const t of ['Cómo funciona', 'Garantías éticas', 'Estado del proyecto', 'Dirección']) await expect(page.getByRole('heading', { name: t })).toBeVisible()
-  await expect(page.getByText('Dr. Luis Eduardo Andrade Silva')).toBeVisible()
-  await expect(page.getByText('Dra. Ana María Pinto Llorente')).toBeVisible()
+  for (const t of ['Cómo funciona', 'Garantías éticas', 'Estado del proyecto', 'Equipo']) await expect(page.getByRole('heading', { name: t })).toBeVisible()
+  for (const nombre of ['Fernando Martín Vaquero', 'Ana María Pinto Llorente', 'Luis Eduardo Andrade Silva']) await expect(page.getByText(nombre, { exact: true })).toBeVisible()
+  await expect(page.getByText(/Universidad de Salamanca · Fundación General/)).toBeVisible()
   await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', 'noindex, nofollow')
 })
 
