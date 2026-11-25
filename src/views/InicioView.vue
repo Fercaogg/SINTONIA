@@ -13,7 +13,7 @@ import { INICIO_ROL } from '@/lib/tipos'
 import { modoDemo } from '@/lib/supabase'
 import { useVisibleUnaVez } from '@/lib/movimiento'
 import { hayDemostracion } from '@/lib/demo'
-import { DIRECCION, REFERENCIAS } from '@/contenido/portada'
+import { REFERENCIAS } from '@/contenido/portada'
 import { PUENTE as PUENTE_EN } from '@/contenido/en'
 import { useIdioma } from '@/lib/idioma'
 import { useContenido } from '@/lib/contenido'
@@ -34,7 +34,7 @@ import QuienVeBienestar from '@/components/portada/QuienVeBienestar.vue'
 import TarjetasPerfiles from '@/components/portada/TarjetasPerfiles.vue'
 import OndasSintonia from '@/components/portada/OndasSintonia.vue'
 import TituloEnSintonia from '@/components/portada/TituloEnSintonia.vue'
-import TarjetaDireccion from '@/components/portada/TarjetaDireccion.vue'
+import ApartadoRespaldo from '@/components/portada/ApartadoRespaldo.vue'
 import PreguntasFrecuentes from '@/components/portada/PreguntasFrecuentes.vue'
 import FormularioContacto from '@/components/portada/FormularioContacto.vue'
 
@@ -55,15 +55,13 @@ const contenido = useContenido()
 const DATOS_CLAVE = computed(() => contenido.value.DATOS_CLAVE)
 const PARA_QUIEN = computed(() => contenido.value.PARA_QUIEN)
 const PASOS = computed(() => contenido.value.PASOS)
-const AUTOR = computed(() => contenido.value.AUTOR)
-const ANTECEDENTE = computed(() => contenido.value.ANTECEDENTE)
 
 const SECCIONES = computed(() => [
   { id: 'como-funciona', texto: t('Cómo funciona', 'How it works') },
   { id: 'privacidad', texto: t('Privacidad', 'Privacy') },
   { id: 'perfiles', texto: t('Perfiles', 'Profiles') },
   { id: 'puente', texto: t('Puente', 'Bridge') },
-  { id: 'direccion', texto: t('Dirección', 'Team') },
+  { id: 'respaldo', texto: t('Respaldo', 'Backing') },
   { id: 'preguntas', texto: t('Preguntas', 'FAQ') },
   { id: 'contacto', texto: t('Contacto', 'Contact') },
 ])
@@ -401,19 +399,8 @@ const estilo = (e: Record<string, string>) => e
         </div>
       </section>
 
-      <!-- 10. Dirección: dos tarjetas idénticas -->
-      <section id="direccion" class="scroll-mt-20 bg-papel border-y border-surface-200" aria-labelledby="t-direccion">
-        <div class="max-w-[1180px] mx-auto px-4 sm:px-6 py-20 sm:py-28">
-          <CabeceraSeccion id="t-direccion" :etiqueta="t('09 · Equipo', '09 · Team')" :titulo="t('Dirección', 'Supervision')" />
-          <ul class="grid gap-6 md:grid-cols-2 auto-rows-fr">
-            <li v-for="(m, i) in DIRECCION" :key="m.nombre" v-revelar="i" v-cursor="'inclinar'" class="rounded-[var(--radius-md)]"><TarjetaDireccion :miembro="m" /></li>
-          </ul>
-          <div v-revelar class="mt-10 pt-8 border-t border-surface-200 space-y-1">
-            <p class="text-base text-surface-900">{{ AUTOR }}</p>
-            <p class="text-base texto-suave">{{ t('Antecedente', 'Background') }}: {{ ANTECEDENTE }}</p>
-          </div>
-        </div>
-      </section>
+      <!-- 10. Respaldo: lo ya hecho, los avales y el equipo (como en LUMBRA360) -->
+      <ApartadoRespaldo />
 
       <!-- 11. Preguntas frecuentes -->
       <section id="preguntas" class="scroll-mt-20 max-w-[1180px] mx-auto px-4 sm:px-6 py-20 sm:py-28" aria-labelledby="t-preguntas">

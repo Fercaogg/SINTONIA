@@ -9,16 +9,16 @@ test('la portada tiene todos los apartados, enlazados desde la navegación', asy
   for (const [id, titulo] of [
     ['problema', 'El problema'], ['como-funciona', 'Cómo funciona'], ['perfiles', 'Para cada perfil'],
     ['puente', 'Puente al doctorado'], ['privacidad', 'Privacidad y ética'], ['para-quien', 'Para quién es'],
-    ['direccion', 'Dirección'], ['preguntas', 'Preguntas frecuentes'], ['contacto', 'Contacto'],
+    ['respaldo', 'No partimos de cero'], ['preguntas', 'Preguntas frecuentes'], ['contacto', 'Contacto'],
   ]) {
     await expect(page.locator(`#${id}`).getByRole('heading', { level: 2, name: titulo, exact: true })).toBeAttached()
   }
   // La navegación lleva a cada ancla (en móvil, desde el menú).
   const menu = page.getByRole('button', { name: 'Abrir las secciones' })
   if (await menu.isVisible()) await menu.click()
-  await page.getByRole('navigation', { name: 'Secciones' }).getByRole('link', { name: 'Dirección' }).first().click()
-  await expect(page).toHaveURL(/#direccion$/)
-  await expect(page.locator('#direccion')).toBeInViewport()
+  await page.getByRole('navigation', { name: 'Secciones' }).getByRole('link', { name: 'Respaldo' }).first().click()
+  await expect(page).toHaveURL(/#respaldo$/)
+  await expect(page.locator('#respaldo')).toBeInViewport()
   await sinRayasLargas(page)
   await sinErroresDeAccesibilidad(page)
 })
@@ -48,23 +48,28 @@ test('los tres perfiles se ven a la vez, con lo que ve y no ve cada uno', async 
   await expect(tarjetas.nth(2)).toContainText('Ninguna cifra calculada sobre menos de 5 personas')
 })
 
-test('Dirección: dos tarjetas iguales, en orden alfabético y solo con los datos facilitados', async ({ page }) => {
-  await page.goto('/#direccion')
-  const tarjetas = page.locator('#direccion article')
-  await expect(tarjetas).toHaveCount(2)
-  await expect(tarjetas.nth(0)).toContainText('Dr. Luis Eduardo Andrade Silva')
-  await expect(tarjetas.nth(1)).toContainText('Dra. Ana María Pinto Llorente')
-  const cajas = [await tarjetas.nth(0).boundingBox(), await tarjetas.nth(1).boundingBox()]
-  expect(Math.abs(cajas[0]!.height - cajas[1]!.height)).toBeLessThan(1)
-  expect(Math.abs(cajas[0]!.width - cajas[1]!.width)).toBeLessThan(1)
-  for (const t of [tarjetas.nth(0), tarjetas.nth(1)]) {
-    for (const enlace of await t.getByRole('link').all()) {
+test('Respaldo: trayectoria, avales y las tres personas del equipo, como en LUMBRA360', async ({ page }) => {
+  await page.goto('/#respaldo')
+  const respaldo = page.locator('#respaldo')
+  for (const hito of ['WORKWELL360', 'YMCA Salamanca', 'SINTONÍA']) await expect(respaldo.locator('ol')).toContainText(hito)
+  for (const aval of ['Universidad de Salamanca', 'Fundación General de la Universidad de Salamanca', 'Prototipos 2026/2027', 'RIS3 de Castilla y León']) {
+    await expect(respaldo.getByRole('img', { name: aval, exact: true })).toBeAttached()
+  }
+  const tarjetas = page.locator('#equipo article')
+  await expect(tarjetas).toHaveCount(3)
+  await expect(tarjetas.nth(0)).toContainText('Fernando Martín Vaquero')
+  await expect(tarjetas.nth(1)).toContainText('Ana María Pinto Llorente')
+  await expect(tarjetas.nth(2)).toContainText('Luis Eduardo Andrade Silva')
+  for (const n of [0, 1, 2]) {
+    const foto = tarjetas.nth(n).getByRole('img')
+    await foto.scrollIntoViewIfNeeded()
+    await expect.poll(() => foto.evaluate((img: HTMLImageElement) => img.complete && img.naturalWidth > 0)).toBe(true)
+    for (const enlace of await tarjetas.nth(n).getByRole('link').all()) {
       await expect(enlace).toHaveAttribute('target', '_blank')
       await expect(enlace).toHaveAttribute('rel', 'noopener noreferrer')
     }
   }
-  await expect(page.locator('#direccion')).toContainText('Autor: Fernando Martín Vaquero, Máster en Estudios de la Ciencia, la Tecnología y la Innovación, Universidad de Salamanca.')
-  await expect(page.locator('#direccion')).toContainText('WORKWELL360, Trabajo Fin de Grado en Pedagogía, con pilotaje en YMCA Salamanca.')
+  await sinErroresDeAccesibilidad(page)
 })
 
 test('el formulario de contacto envía el mensaje e ignora a los programas', async ({ page }) => {
