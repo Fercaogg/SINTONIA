@@ -1,11 +1,11 @@
 <script setup lang="ts">
+import CabeceraPublica from '@/components/layout/CabeceraPublica.vue'
 import SaltarContenido from '@/components/layout/SaltarContenido.vue'
 // Página 404: las dos ondas, desajustadas, y un camino de vuelta.
 // Las ondas se separan un poco más al entrar y se quedan quietas; con
 // "reducir movimiento", directamente en su sitio.
 import { onMounted, ref } from 'vue'
 import { RouterLink } from 'vue-router'
-import AppLogo from '@/components/comun/AppLogo.vue'
 import BandaEntorno from '@/components/comun/BandaEntorno.vue'
 import OndasSintonia from '@/components/portada/OndasSintonia.vue'
 
@@ -19,11 +19,7 @@ const estilo = (e: Record<string, string>) => e
   <div class="min-h-screen flex flex-col">
     <SaltarContenido />
     <BandaEntorno />
-    <header class="border-b border-surface-200 bg-papel">
-      <div class="max-w-3xl mx-auto px-4 py-4">
-        <RouterLink to="/" class="text-xl" aria-label="SINTONÍA, inicio"><AppLogo /></RouterLink>
-      </div>
-    </header>
+    <CabeceraPublica />
     <main id="contenido" tabindex="-1" class="outline-none flex-1 flex items-center">
       <div class="w-full max-w-xl mx-auto px-4 py-16 text-center">
         <div class="mx-auto max-w-md" :style="estilo({ '--ondas-duracion': '1400ms' })" aria-hidden="true">

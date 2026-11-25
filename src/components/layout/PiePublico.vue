@@ -6,7 +6,8 @@ import { computed } from 'vue'
 import { RouterLink } from 'vue-router'
 import AppLogo from '@/components/comun/AppLogo.vue'
 import { useIdioma } from '@/lib/idioma'
-import { AUTORIA, AUTORIA_EN, CORREO_CONTACTO, VERSION } from '@/lib/publico'
+import BotonWhatsApp from '@/components/comun/BotonWhatsApp.vue'
+import { AUTORIA, AUTORIA_EN, CORREO_CONTACTO, VERSION, WHATSAPP } from '@/lib/publico'
 
 const { t, ruta, soloEnEspanol } = useIdioma()
 
@@ -69,12 +70,13 @@ const GRUPOS = computed(() => [
         </div>
       </nav>
     </div>
-    <div class="max-w-[1264px] mx-auto px-6 sm:px-8">
+    <div class="max-w-[1264px] mx-auto px-6 sm:px-8" :class="WHATSAPP ? 'pb-20' : ''">
       <div class="flex flex-col gap-2 border-t border-surface-200 py-6 text-xs texto-suave sm:flex-row sm:justify-between">
         <p>{{ t(AUTORIA, AUTORIA_EN) }}.</p>
         <p class="flex gap-x-4"><span>{{ t('Versión', 'Version') }} {{ VERSION }}</span><span>© SINTONÍA</span></p>
       </div>
     </div>
+    <BotonWhatsApp />
   </footer>
 </template>
 

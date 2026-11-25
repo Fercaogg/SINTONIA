@@ -9,7 +9,7 @@ import { join, dirname } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 const raiz = join(dirname(fileURLToPath(import.meta.url)), '..')
-const ARCHIVOS = 'api/|robots\\.txt$|sitemap\\.xml$|og\\.png$|favicon\\.svg$|apple-touch-icon\\.png$|assets/|clips/|kit/|dosier/|og/'
+const ARCHIVOS = 'api/|robots\\.txt$|sitemap\\.xml$|og\\.png$|favicon\\.svg$|favicon\\.ico$|icono-[a-z0-9-]+\\.png$|site\\.webmanifest$|apple-touch-icon\\.png$|_vercel/|assets/|clips/|kit/|dosier/|og/'
 
 // Pantallas de la aplicación (src/router/index.ts) que no son páginas públicas.
 const PANTALLAS = 'acceso/confirmar|consentimiento/aceptar|dosier/imprimir|estudiante|tutor|direccion|investigador|calendario|cuenta'

@@ -138,8 +138,8 @@ async function anular(c: Codigo) {
             <li v-for="m in masters" :key="m.id">
               <button
                 type="button"
-                class="w-full text-left p-3 rounded-xl border-2 transition-all min-h-tactil"
-                :class="m.id === seleccionado ? 'border-brand-500 bg-brand-50' : 'border-surface-200 hover:border-surface-300'"
+                class="w-full text-left p-3 rounded-xl border transition-colors min-h-tactil"
+                :class="m.id === seleccionado ? 'border-brand-900 bg-brand-50 ring-1 ring-brand-900' : 'border-surface-200 hover:border-surface-900'"
                 :aria-pressed="m.id === seleccionado"
                 @click="seleccionado = m.id"
               >

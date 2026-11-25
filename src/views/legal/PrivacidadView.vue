@@ -4,7 +4,7 @@
 import { onMounted, ref } from 'vue'
 import { RouterLink } from 'vue-router'
 import { llamar } from '@/lib/api'
-import { estaPendiente } from '@/lib/publico'
+import { estaPendiente, WHATSAPP } from '@/lib/publico'
 import LayoutPublico from '@/components/layout/LayoutPublico.vue'
 import SeccionLegal from '@/components/comun/SeccionLegal.vue'
 
@@ -51,13 +51,23 @@ const texto = (clave: string) => config.value[clave]?.valor
       </ul>
     </SeccionLegal>
 
+    <SeccionLegal id="web" titulo="Si solo visitas la web">
+      <ul class="list-disc pl-5 space-y-1.5">
+        <li><strong>Estadísticas de visitas sin cookies.</strong> Contamos cuántas veces se ve cada página pública, de qué país (no de qué ciudad) y desde qué tipo de dispositivo, con Vercel Web Analytics. No usa cookies ni guarda nada en tu navegador, no crea un perfil tuyo y no permite saber quién eres. Nunca se cuentan las pantallas de tu panel. Si tu navegador pide "No rastrear" o Global Privacy Control, no se cuenta nada.</li>
+        <li><strong>Formularios de contacto y de demostración.</strong> Lo que escribes se envía por correo a la persona responsable del proyecto y no se guarda en la base de datos. Para frenar el correo basura, se guarda durante 24 horas una huella cifrada de tu correo y de tu conexión, que no permite recuperarlos.</li>
+        <li v-if="WHATSAPP"><strong>WhatsApp.</strong> Si nos escribes por WhatsApp, la conversación la gestiona WhatsApp (Meta) según su propia política de privacidad. La web solo abre el enlace: no carga nada de WhatsApp hasta que pulsas el botón.</li>
+        <li><strong>Registros técnicos.</strong> Como cualquier web, el servidor anota durante un tiempo breve las peticiones que recibe, para detectar fallos y ataques.</li>
+      </ul>
+      <p>Detalle de lo que se guarda en tu navegador: <RouterLink to="/cookies" class="enlace">Cookies</RouterLink>.</p>
+    </SeccionLegal>
+
     <SeccionLegal id="conservacion" titulo="Conservación" pendiente />
 
     <SeccionLegal id="destinatarios" titulo="Destinatarios" pendiente>
       <p>Dentro de SINTONÍA, cada dato solo lo ve quien indica la tabla "Quién ve qué". Para funcionar, SINTONÍA usa estos servicios técnicos:</p>
       <ul class="list-disc pl-5 space-y-1.5">
         <li>Supabase: base de datos y acceso con enlace por correo.</li>
-        <li>Vercel: publicación de la web y tareas automáticas.</li>
+        <li>Vercel: publicación de la web, tareas automáticas y estadísticas de visitas sin cookies.</li>
         <li>Un servicio de envío de correo, para los enlaces de acceso y los recordatorios.</li>
       </ul>
       <p>Si se activa el programa de redacción de preguntas, no recibe ningún dato personal.</p>

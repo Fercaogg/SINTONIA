@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { RouterLink } from 'vue-router'
 // Avisos de "Necesito apoyo" para la dirección del máster.
 // Solo aparece el nombre si el estudiante lo ha autorizado.
 import { onMounted, ref } from 'vue'
@@ -63,6 +64,9 @@ async function atender(id: string) {
           <button v-else type="button" class="btn-secondary text-sm" @click="atender(a.id)">Marcar como atendido</button>
         </li>
       </ul>
+      <p class="mt-8 text-sm">
+        <RouterLink to="/como-funciona" class="enlace inline-flex items-center min-h-tactil">Cómo funcionan los avisos y qué datos se comparten</RouterLink>
+      </p>
     </template>
   </div>
 </template>

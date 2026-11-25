@@ -8,8 +8,6 @@ import SaltarContenido from '@/components/layout/SaltarContenido.vue'
 import { computed, defineAsyncComponent, onBeforeUnmount, onMounted, ref } from 'vue'
 import { alAvanzar, desfasarOndas, sinMovimiento, vCursor, vRevelar } from '@/lib/efectos'
 import { RouterLink, useRoute } from 'vue-router'
-import { useSesion } from '@/stores/sesion'
-import { INICIO_ROL } from '@/lib/tipos'
 import { modoDemo } from '@/lib/supabase'
 import { useVisibleUnaVez } from '@/lib/movimiento'
 import { hayDemostracion } from '@/lib/demo'
@@ -17,13 +15,12 @@ import { REFERENCIAS } from '@/contenido/portada'
 import { PUENTE as PUENTE_EN } from '@/contenido/en'
 import { useIdioma } from '@/lib/idioma'
 import { useContenido } from '@/lib/contenido'
-import AppLogo from '@/components/comun/AppLogo.vue'
 import AppIcon from '@/components/comun/AppIcon.vue'
 import BandaEntorno from '@/components/comun/BandaEntorno.vue'
 import AccesosDemo from '@/components/comun/AccesosDemo.vue'
 import PiePublico from '@/components/layout/PiePublico.vue'
+import CabeceraPublica from '@/components/layout/CabeceraPublica.vue'
 import CabeceraSeccion from '@/components/portada/CabeceraSeccion.vue'
-import SelectorIdioma from '@/components/comun/SelectorIdioma.vue'
 import CalculadoraTiempo from '@/components/portada/CalculadoraTiempo.vue'
 import ComparativaHonesta from '@/components/portada/ComparativaHonesta.vue'
 import RecorridoProducto from '@/components/portada/RecorridoProducto.vue'
@@ -35,15 +32,14 @@ import TarjetasPerfiles from '@/components/portada/TarjetasPerfiles.vue'
 import OndasSintonia from '@/components/portada/OndasSintonia.vue'
 import TituloEnSintonia from '@/components/portada/TituloEnSintonia.vue'
 import ApartadoRespaldo from '@/components/portada/ApartadoRespaldo.vue'
+import AplicacionPorDentro from '@/components/portada/AplicacionPorDentro.vue'
 import PreguntasFrecuentes from '@/components/portada/PreguntasFrecuentes.vue'
 import FormularioContacto from '@/components/portada/FormularioContacto.vue'
 
 // Efecto del fondo del inicio (WebGL), cargado aparte para no retrasar la página.
 const CampoSintonia = defineAsyncComponent(() => import('@/components/portada/CampoSintonia.vue'))
 
-const sesion = useSesion()
 const route = useRoute()
-const menuAbierto = ref(false)
 // Cierre: las ondas se juntan la primera vez que se ve.
 const cierre = ref<HTMLElement | null>(null)
 const cierreVisto = useVisibleUnaVez(cierre)
@@ -56,22 +52,12 @@ const DATOS_CLAVE = computed(() => contenido.value.DATOS_CLAVE)
 const PARA_QUIEN = computed(() => contenido.value.PARA_QUIEN)
 const PASOS = computed(() => contenido.value.PASOS)
 
-const SECCIONES = computed(() => [
-  { id: 'como-funciona', texto: t('Cómo funciona', 'How it works') },
-  { id: 'privacidad', texto: t('Privacidad', 'Privacy') },
-  { id: 'perfiles', texto: t('Perfiles', 'Profiles') },
-  { id: 'puente', texto: t('Puente', 'Bridge') },
-  { id: 'respaldo', texto: t('Respaldo', 'Backing') },
-  { id: 'preguntas', texto: t('Preguntas', 'FAQ') },
-  { id: 'contacto', texto: t('Contacto', 'Contact') },
-])
 
 const PUENTE_LARGO = 3
 
 // ---------- Movimiento ligado al desplazamiento (DISENO.md 12.1) ----------
 const limitar = (v: number) => Math.min(1, Math.max(0, v))
 const tramo = (v: number, a: number, b: number) => limitar((v - a) / (b - a))
-const plegada = ref(false)
 const ondasProblema = ref<HTMLElement | null>(null)
 const ondasBanda = ref<HTMLElement | null>(null)
 const banda = ref<HTMLElement | null>(null)
@@ -80,18 +66,7 @@ const puenteRelleno = ref<HTMLElement | null>(null)
 const puenteActivo = ref(sinMovimiento() ? PUENTE_LARGO : 0)
 const ondasCierre = ref<HTMLElement | null>(null)
 const quitar: (() => void)[] = []
-let marcoProgreso = 0
-// Cabecera: transparente arriba y con fondo difuminado al bajar (LUMBRA360).
-function pintarProgreso() {
-  marcoProgreso = 0
-  plegada.value = window.scrollY > 8
-}
-const pedirProgreso = () => {
-  if (!marcoProgreso) marcoProgreso = requestAnimationFrame(pintarProgreso)
-}
 onMounted(() => {
-  window.addEventListener('scroll', pedirProgreso, { passive: true })
-  pintarProgreso()
   if (sinMovimiento()) return
   // El problema: las dos miradas se acercan algo al leer, sin llegar a coincidir.
   if (ondasProblema.value) {
@@ -120,8 +95,6 @@ onMounted(() => {
   }
 })
 onBeforeUnmount(() => {
-  window.removeEventListener('scroll', pedirProgreso)
-  cancelAnimationFrame(marcoProgreso)
   quitar.forEach((q) => q())
 })
 
@@ -142,45 +115,7 @@ const estilo = (e: Record<string, string>) => e
   <div class="min-h-screen flex flex-col">
     <SaltarContenido />
     <BandaEntorno />
-    <!-- Cabecera como la de LUMBRA360: transparente arriba; al bajar, fondo difuminado y filete. -->
-    <header class="cabecera sticky top-0 z-30" :data-plegada="plegada || menuAbierto">
-      <div class="max-w-[1264px] mx-auto px-6 sm:px-8 h-16 flex items-center justify-between gap-6">
-        <RouterLink :to="ruta('/')" class="text-xl rounded-md py-2" :aria-label="t('SINTONÍA, inicio', 'SINTONÍA, home')"><AppLogo /></RouterLink>
-        <nav :aria-label="t('Secciones', 'Sections')" class="hidden lg:block">
-          <ul class="flex items-center gap-7">
-            <li v-for="s in SECCIONES" :key="s.id">
-              <a :href="`#${s.id}`" class="enlace-nav">{{ s.texto }}</a>
-            </li>
-          </ul>
-        </nav>
-        <div class="flex items-center gap-2">
-          <SelectorIdioma class="hidden sm:inline-flex" />
-          <RouterLink v-if="sesion.rol" :to="INICIO_ROL[sesion.rol]" class="btn-primary min-h-10 px-5 text-sm">{{ t('Ir a mi panel', 'My dashboard') }}</RouterLink>
-          <template v-else>
-            <!-- «Iniciar sesión» es para quien ya tiene cuenta: discreto. El botón destacado es el código o la demo. -->
-            <RouterLink to="/acceso" class="enlace-nav font-medium" :lang="idioma === 'en' ? 'es' : undefined">{{ t('Iniciar sesión', 'Sign in') }}</RouterLink>
-            <a v-if="modoDemo" href="#entrar" class="btn-primary min-h-10 px-5 text-sm hidden sm:inline-flex">{{ t('Probar', 'Try it') }}</a>
-            <RouterLink v-else to="/registro" class="btn-primary min-h-10 px-5 text-sm hidden sm:inline-flex">{{ t('Tengo un código', 'I have a code') }}</RouterLink>
-          </template>
-          <button
-            type="button"
-            class="lg:hidden min-w-tactil min-h-tactil inline-flex items-center justify-center rounded-full text-surface-900 hover:bg-surface-100"
-            :aria-expanded="menuAbierto"
-            aria-controls="menu-secciones"
-            @click="menuAbierto = !menuAbierto"
-          >
-            <AppIcon :name="menuAbierto ? 'close' : 'menu'" :size="22" :etiqueta="menuAbierto ? t('Cerrar las secciones', 'Close sections') : t('Abrir las secciones', 'Open sections')" />
-          </button>
-        </div>
-      </div>
-      <nav v-show="menuAbierto" id="menu-secciones" :aria-label="t('Secciones', 'Sections')" class="lg:hidden border-t border-surface-200">
-        <ul class="max-w-[1264px] mx-auto px-6 py-2 grid grid-cols-2 gap-1 text-sm">
-          <li v-for="s in SECCIONES" :key="s.id">
-            <a :href="`#${s.id}`" class="px-2 min-h-tactil flex items-center rounded-md text-surface-900 hover:bg-surface-100" @click="menuAbierto = false">{{ s.texto }}</a>
-          </li>
-        </ul>
-      </nav>
-    </header>
+    <CabeceraPublica en-portada />
 
     <main id="contenido" tabindex="-1" class="outline-none flex-1 overflow-x-clip">
       <p v-if="route.query.borrado" class="aviso-exito max-w-[900px] mx-4 sm:mx-auto mt-6" role="status">
@@ -294,6 +229,16 @@ const estilo = (e: Record<string, string>) => e
               <p class="text-sm leading-relaxed texto-suave text-pretty">{{ p.detalle }}</p>
             </li>
           </ol>
+        </div>
+      </section>
+
+      <!-- 5b. La aplicación por dentro: pantallas reales en un portátil (como en LUMBRA360) -->
+      <section id="aplicacion" class="seccion" aria-labelledby="t-aplicacion">
+        <div class="contenedor">
+          <CabeceraSeccion id="t-aplicacion" :etiqueta="t('La aplicación por dentro', 'Inside the app')" :titulo="t('Todo en un panel claro', 'Everything in one clear dashboard')">
+            {{ t('Pantallas reales de la demostración, con datos ficticios.', 'Real screens from the demo, with fictitious data.') }}
+          </CabeceraSeccion>
+          <AplicacionPorDentro />
         </div>
       </section>
 
@@ -482,20 +427,6 @@ const estilo = (e: Record<string, string>) => e
   }
 }
 
-.enlace-nav {
-  display: inline-flex;
-  align-items: center;
-  min-height: 44px;
-  white-space: nowrap;
-  font-size: 0.875rem;
-  color: rgb(var(--rgb-s600));
-  text-decoration: none;
-  transition: color var(--dur-micro) ease;
-}
-.enlace-nav:hover {
-  color: rgb(var(--rgb-s900));
-}
-
 /* Enlace secundario con flecha, subrayado fino (LUMBRA360). */
 .enlace-flecha {
   display: inline-flex;
@@ -539,18 +470,6 @@ const estilo = (e: Record<string, string>) => e
   .contenedor {
     padding-inline: 2rem;
   }
-}
-
-/* Cabecera: transparente arriba; al bajar, fondo difuminado y filete. */
-.cabecera {
-  background: transparent;
-  border-bottom: 1px solid transparent;
-  transition: background-color 240ms var(--ease-out), border-color 240ms var(--ease-out);
-}
-.cabecera[data-plegada='true'] {
-  background: color-mix(in srgb, rgb(var(--rgb-s50)) 88%, transparent);
-  border-bottom-color: rgb(var(--rgb-s200));
-  backdrop-filter: blur(14px) saturate(1.3);
 }
 
 /* Iconos en cuadrado de lumbre suave (LUMBRA360). */
