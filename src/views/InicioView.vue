@@ -32,6 +32,7 @@ import TarjetasPerfiles from '@/components/portada/TarjetasPerfiles.vue'
 import OndasSintonia from '@/components/portada/OndasSintonia.vue'
 import TituloEnSintonia from '@/components/portada/TituloEnSintonia.vue'
 import ApartadoRespaldo from '@/components/portada/ApartadoRespaldo.vue'
+import AplicacionPorDentro from '@/components/portada/AplicacionPorDentro.vue'
 import PreguntasFrecuentes from '@/components/portada/PreguntasFrecuentes.vue'
 import FormularioContacto from '@/components/portada/FormularioContacto.vue'
 
@@ -228,6 +229,16 @@ const estilo = (e: Record<string, string>) => e
               <p class="text-sm leading-relaxed texto-suave text-pretty">{{ p.detalle }}</p>
             </li>
           </ol>
+        </div>
+      </section>
+
+      <!-- 5b. La aplicación por dentro: pantallas reales en un portátil (como en LUMBRA360) -->
+      <section id="aplicacion" class="seccion" aria-labelledby="t-aplicacion">
+        <div class="contenedor">
+          <CabeceraSeccion id="t-aplicacion" :etiqueta="t('La aplicación por dentro', 'Inside the app')" :titulo="t('Todo en un panel claro', 'Everything in one clear dashboard')">
+            {{ t('Pantallas reales de la demostración, con datos ficticios.', 'Real screens from the demo, with fictitious data.') }}
+          </CabeceraSeccion>
+          <AplicacionPorDentro />
         </div>
       </section>
 
