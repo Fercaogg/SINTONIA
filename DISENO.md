@@ -26,7 +26,9 @@ Desde el 24/11/2026 SINTONÍA usa el sistema visual de LUMBRA360 (`brand/DESIGN.
 
 Los nombres de clase (`brand-*`, `surface-*`, `papel`, `marino`) no cambian: solo su valor. Por eso las pantallas apenas se han tocado. Todos los perfiles usan ahora el mismo menú lateral claro, con el elemento activo en blanco y un filete de lumbre.
 
-Ya regenerados con el nuevo sistema: `public/og/*.png` y `public/apple-touch-icon.png`. Pendiente: los vídeos y documentos de `public/clips`, `public/kit` y `public/dosier`, que aún muestran la paleta anterior.
+**Portada con la maqueta de LUMBRA360:** cabecera transparente que se difumina al bajar, titular centrado con el producto debajo, apartados con cabecera centrada (antetítulo en mono, sin numerar), fondos que alternan blanco y piedra con 160 px de aire en escritorio, iconos en cuadrado de lumbre suave, pasos con número en círculo y línea de lumbre, un único bloque de tinta con resplandor de lumbre («Pruébalo»), apartado «Respaldo» (trayectoria, avales y equipo) y pie en columnas.
+
+Ya regenerados con el nuevo sistema: `public/og/*.png`, `public/apple-touch-icon.png` y los clips de `public/clips` (`npm run clips`, que graba en modo demostración y convierte con ffmpeg). Pendiente: los documentos de `public/kit` y `public/dosier`.
 
 ---
 

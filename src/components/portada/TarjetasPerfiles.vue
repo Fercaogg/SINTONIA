@@ -20,7 +20,7 @@ const { t } = useIdioma()
     <li v-for="(p, i) in PERFILES" :key="p.clave" v-revelar="i" v-cursor="'inclinar'" class="card p-6 sm:p-7 flex flex-col">
       <ClipPerfil :rol="p.clave" class="mb-6" />
       <div class="flex items-center gap-3">
-        <span class="h-11 w-11 shrink-0 rounded-xl bg-brand-100 text-brand-900 flex items-center justify-center"><AppIcon :name="ICONOS[p.clave]" :size="22" /></span>
+        <span class="h-11 w-11 shrink-0 rounded-xl bg-lumbre-suave text-lumbre-texto flex items-center justify-center"><AppIcon :name="ICONOS[p.clave]" :size="22" /></span>
         <h3 class="font-display text-2xl font-semibold text-surface-900">{{ p.nombre }}</h3>
       </div>
       <p class="mt-5 flex items-start gap-2 rounded-lg bg-surface-100 px-3 py-2.5 text-sm font-medium text-surface-900">

@@ -13,9 +13,9 @@ const tx = (v: Texto) => (idioma.value === 'en' ? v.en : v.es)
 </script>
 
 <template>
-  <section id="respaldo" class="scroll-mt-20 bg-papel border-y border-surface-200" aria-labelledby="t-respaldo">
-    <div class="max-w-[1180px] mx-auto px-4 sm:px-6 py-20 sm:py-28">
-      <CabeceraSeccion id="t-respaldo" :etiqueta="t('09 · Respaldo', '09 · Backing')" :titulo="t('No partimos de cero', 'We are not starting from scratch')" />
+  <section id="respaldo" class="scroll-mt-20 bg-surface-100 py-16 sm:py-24 lg:py-40" aria-labelledby="t-respaldo">
+    <div class="max-w-[1264px] mx-auto px-6 sm:px-8">
+      <CabeceraSeccion id="t-respaldo" :etiqueta="t('Respaldo', 'Backing')" :titulo="t('No partimos de cero', 'We are not starting from scratch')" />
 
       <!-- Lo ya hecho -->
       <div v-revelar class="relative overflow-hidden rounded-[28px] bg-marino p-8 text-white sm:p-10 lg:p-14">

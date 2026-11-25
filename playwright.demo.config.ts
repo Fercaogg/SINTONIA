@@ -4,12 +4,13 @@ import { CLAVE_ANON_LOCAL } from './scripts/local/servidor-local.mjs'
 // Pruebas y capturas con la instalación de DEMOSTRACIÓN (datos ficticios).
 //   npm run test:demo   comprobaciones (accesos, accesibilidad, criterios)
 //   npm run capturas    capturas de todas las pantallas en docs/capturas
+//   npm run clips       clips de la portada en public/clips
 const PUERTO_APP = 5175
 const PUERTO_API = 54323
 
 export default defineConfig({
   testDir: 'tests/demo',
-  testMatch: process.env.CAPTURAS ? /capturas\.ts/ : /\.spec\.ts/,
+  testMatch: process.env.CLIPS ? /clips\.ts/ : process.env.CAPTURAS ? /capturas\.ts/ : /\.spec\.ts/,
   fullyParallel: false,
   workers: 1,
   reporter: [['list']],

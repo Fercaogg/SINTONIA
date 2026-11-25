@@ -75,7 +75,7 @@
   --color-primary-tint-15: rgb(var(--rgb-b100));
   --color-primary-tint-40: rgb(var(--rgb-b200));
   --color-lumbre-texto: var(--lumbre-600);
-  --color-lumbre-suave: var(--lumbre-100);
+  --color-lumbre-suave: var(--lumbre-50); /* fondo de iconos, como en LUMBRA360 */
   --color-foco: var(--lumbre-500);
   --color-borde-control: var(--piedra-500);     /* bordes de campos: 3:1 */
 

@@ -18,7 +18,7 @@ import { DOCUMENTOS } from '@/contenido/participantes'
       <li v-for="d in DOCUMENTOS" :key="d.clave" class="card p-5">
         <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div class="flex gap-3">
-            <span class="h-10 w-10 shrink-0 rounded-lg bg-brand-100 text-brand-900 flex items-center justify-center"><AppIcon name="document" :size="20" /></span>
+            <span class="h-11 w-11 shrink-0 rounded-xl bg-lumbre-suave text-lumbre-texto flex items-center justify-center"><AppIcon name="document" :size="20" /></span>
             <div>
               <h2 class="font-display text-lg font-semibold text-surface-900">{{ d.titulo }}</h2>
               <p class="text-sm texto-suave">{{ d.descripcion }}</p>

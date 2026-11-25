@@ -40,7 +40,7 @@ const RESUMEN_EN = [
 
     <ul class="grid gap-3 sm:grid-cols-2 mb-10">
       <li v-for="r in RESUMEN" :key="r.titulo" class="card p-4 flex gap-3">
-        <span class="h-10 w-10 shrink-0 rounded-lg bg-brand-100 text-brand-900 flex items-center justify-center"><AppIcon :name="r.icono" :size="20" /></span>
+        <span class="h-11 w-11 shrink-0 rounded-xl bg-lumbre-suave text-lumbre-texto flex items-center justify-center"><AppIcon :name="r.icono" :size="20" /></span>
         <span>
           <span class="block font-semibold text-surface-900">{{ r.titulo }}</span>
           <span class="block text-sm texto-suave">{{ r.texto }}</span>
@@ -123,7 +123,7 @@ const RESUMEN_EN = [
 
     <ul class="grid gap-3 sm:grid-cols-2 mb-10">
       <li v-for="r in RESUMEN_EN" :key="r.titulo" class="card p-4 flex gap-3">
-        <span class="h-10 w-10 shrink-0 rounded-lg bg-brand-100 text-brand-900 flex items-center justify-center"><AppIcon :name="r.icono" :size="20" /></span>
+        <span class="h-11 w-11 shrink-0 rounded-xl bg-lumbre-suave text-lumbre-texto flex items-center justify-center"><AppIcon :name="r.icono" :size="20" /></span>
         <span>
           <span class="block font-semibold text-surface-900">{{ r.titulo }}</span>
           <span class="block text-sm texto-suave">{{ r.texto }}</span>
