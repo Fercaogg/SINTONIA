@@ -53,7 +53,26 @@ const AUTOR = {
   '@type': 'Person',
   name: 'Fernando Martín Vaquero',
   affiliation: { '@type': 'CollegeOrUniversity', name: 'Universidad de Salamanca', url: 'https://www.usal.es' },
+  sameAs: ['https://www.linkedin.com/in/fermartvaq/'],
 }
+
+/** Dirección del TFM (src/contenido/respaldo.ts): también forman parte del proyecto. */
+const DIRECCION_TFM = [
+  {
+    '@type': 'Person',
+    name: 'Ana María Pinto Llorente',
+    jobTitle: 'Profesora Titular de Universidad',
+    affiliation: AUTOR.affiliation,
+    sameAs: ['https://orcid.org/0000-0002-8538-9902', 'https://produccioncientifica.usal.es/investigadores/57371/detalle'],
+  },
+  {
+    '@type': 'Person',
+    name: 'Luis Eduardo Andrade Silva',
+    jobTitle: 'Profesor Ayudante Doctor',
+    affiliation: AUTOR.affiliation,
+    sameAs: ['https://orcid.org/0000-0001-8553-9002', 'https://produccioncientifica.usal.es/investigadores/148334/detalle'],
+  },
+]
 
 /**
  * Datos estructurados (schema.org, JSON-LD) para que los buscadores entiendan
@@ -116,7 +135,7 @@ export function datosEstructurados(pagina, todas, base) {
         name: en ? 'SINTONÍA: study of weekly student and supervisor check-ins' : 'SINTONÍA: estudio del registro semanal de estudiante y tutor/a',
         url: `${base}${en ? '/en/research' : '/investigacion'}`,
         parentOrganization: AUTOR.affiliation,
-        member: AUTOR,
+        member: [AUTOR, ...DIRECCION_TFM],
       },
     )
   }

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import CabeceraPublica from '@/components/layout/CabeceraPublica.vue'
 import SaltarContenido from '@/components/layout/SaltarContenido.vue'
 // /demo: entrada a la demostración, con datos ficticios en una instalación
 // totalmente separada de la real (otro proyecto de Supabase y de Vercel) que
@@ -6,7 +7,6 @@ import SaltarContenido from '@/components/layout/SaltarContenido.vue'
 import { RouterLink } from 'vue-router'
 import { ACCESOS_DEMO, enlaceEntrada, hayDemostracion } from '@/lib/demo'
 import { EN_ELABORACION_PROYECTO } from '@/lib/publico'
-import AppLogo from '@/components/comun/AppLogo.vue'
 import AppIcon from '@/components/comun/AppIcon.vue'
 import PiePublico from '@/components/layout/PiePublico.vue'
 import OndasSintonia from '@/components/portada/OndasSintonia.vue'
@@ -20,12 +20,7 @@ const ICONOS = { estudiante: 'person', tutor: 'users', direccion: 'chart', inves
     <p class="sticky top-0 z-30 bg-amber-100 text-amber-900 text-sm font-semibold text-center px-4 py-2 border-b border-amber-200" role="note" data-banda-demo>
       Demostración: datos ficticios
     </p>
-    <header class="border-b border-surface-200">
-      <div class="max-w-[1180px] mx-auto px-4 sm:px-6 py-4 flex items-center justify-between">
-        <RouterLink to="/" class="text-xl" aria-label="SINTONÍA, inicio"><AppLogo /></RouterLink>
-        <RouterLink to="/" class="btn-secondary text-sm"><AppIcon name="back" :size="16" /> Volver al inicio</RouterLink>
-      </div>
-    </header>
+    <CabeceraPublica />
 
     <main id="contenido" tabindex="-1" class="outline-none flex-1">
       <section class="max-w-[1180px] mx-auto px-4 sm:px-6 py-14 sm:py-20 grid gap-12 lg:grid-cols-[5fr_7fr] items-start">
