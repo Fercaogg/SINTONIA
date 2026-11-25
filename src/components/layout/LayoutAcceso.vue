@@ -35,6 +35,9 @@ import BandaEntorno from '@/components/comun/BandaEntorno.vue'
               <p class="font-mono text-xs uppercase tracking-[0.14em] text-brand-400 mt-1">para la tutoría</p>
             </div>
           </div>
+          <p class="mt-14 border-t border-white/15 pt-6 text-sm text-white/70">
+            Con el aval de la Universidad de Salamanca y de su Fundación General.
+          </p>
         </div>
       </div>
 
