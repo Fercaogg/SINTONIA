@@ -13,9 +13,13 @@ import EstadoVacio from '@/components/comun/EstadoVacio.vue'
 import EscalaTactil from '@/components/checkin/EscalaTactil.vue'
 import EstadoCalendario from '@/components/checkin/EstadoCalendario.vue'
 import { useTerminos } from '@/lib/terminos'
+import { useSesion } from '@/stores/sesion'
+import { claveBorrador } from '@/lib/borrador'
+import { useBorrador } from '@/lib/usar-borrador'
 
 const datos = ref<CheckinTutor | null>(null)
-const respuestas = ref<Record<string, { avance: number | null; siguiente_paso: number | null }>>({})
+type Respuestas = Record<string, { avance: number | null; siguiente_paso: number | null }>
+const respuestas = ref<Respuestas>({})
 const cargando = ref(true)
 const enviando = ref(false)
 const guardado = ref(false)
@@ -28,11 +32,38 @@ const respondidos = computed(() => estudiantes.value.filter((e) => respuestas.va
 const faltan = computed(() => estudiantes.value.length - respondidos.value)
 const yaRespondido = computed(() => estudiantes.value.some((e) => e.avance != null))
 
+// Borrador: lo marcado y aún no enviado se guarda en este navegador (solo las
+// cifras y el identificador de la pareja, sin nombres). Ver src/lib/borrador.ts.
+const sesion = useSesion()
+const enviadas = computed<Respuestas>(() =>
+  Object.fromEntries(estudiantes.value.map((e) => [e.pareja_id, { avance: e.avance, siguiente_paso: e.siguiente_paso }])),
+)
+const borrador = useBorrador(respuestas, {
+  clave: computed(() => {
+    const usuario = sesion.sesion?.user.id
+    const c = datos.value?.calendario
+    return usuario && c?.estado === 'abierta' && c.semana ? claveBorrador('tutor', usuario, c.semana) : null
+  }),
+  caduca: computed(() => datos.value?.calendario.cierra),
+  enviado: enviadas,
+  guardable: (v) => v,
+})
+const recuperado = ref(false)
+
 onMounted(async () => {
   try {
     datos.value = await llamar<CheckinTutor>('checkin_tutor')
-    for (const e of datos.value.estudiantes) {
-      respuestas.value[e.pareja_id] = { avance: e.avance, siguiente_paso: e.siguiente_paso }
+    respuestas.value = structuredClone(enviadas.value)
+    const b = borrador.recuperar()
+    if (b) {
+      // Solo las parejas que siguen existiendo.
+      for (const [id, r] of Object.entries(b)) {
+        const actual = respuestas.value[id]
+        if (!actual || !r) continue
+        if (r.avance != null) actual.avance = r.avance
+        if (r.siguiente_paso != null) actual.siguiente_paso = r.siguiente_paso
+      }
+      recuperado.value = borrador.pendiente.value
     }
   } catch (e) {
     error.value = mensajeDeError(e)
@@ -49,7 +80,10 @@ async function enviar() {
     await llamar('guardar_checkin_tutor', {
       p_respuestas: estudiantes.value.map((e) => ({ pareja_id: e.pareja_id, ...respuestas.value[e.pareja_id] })),
     })
+    borrador.descartar()
     datos.value = await llamar<CheckinTutor>('checkin_tutor')
+    respuestas.value = structuredClone(enviadas.value)
+    recuperado.value = false
     guardado.value = true
     window.scrollTo({ top: 0 })
   } catch (e) {
@@ -94,6 +128,10 @@ const { t } = useTerminos()
         hasta el {{ hastaCierre(datos.calendario.cierra!) }}.
       </p>
 
+      <div v-if="recuperado" class="p-4 mb-6 text-sm flex items-start gap-3 rounded-xl border bg-brand-50 border-brand-200 text-surface-900" role="status">
+        <AppIcon name="history" :size="18" class="flex-shrink-0 mt-0.5" />
+        <span>Hemos recuperado lo que marcaste y no llegaste a enviar. Revísalo y pulsa «{{ yaRespondido ? 'Guardar cambios' : 'Enviar todo' }}».</span>
+      </div>
       <AvisoError v-if="error" :mensaje="error" class="mb-6" />
 
       <ul class="space-y-4">

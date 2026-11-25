@@ -8,6 +8,7 @@ import { URL_SITIO } from '@/lib/publico'
 import { createRouter, createWebHistory, type RouteRecordRaw } from 'vue-router'
 import { useSesion } from '@/stores/sesion'
 import { INICIO_ROL, necesitaConsentimiento, type Rol } from '@/lib/tipos'
+import { recordarVolver } from '@/lib/volver'
 
 declare module 'vue-router' {
   interface RouteMeta {
@@ -131,7 +132,16 @@ router.beforeEach(async (to) => {
   if (to.meta.soloSinSesion && perfil) return INICIO_ROL[perfil.rol]
   if (to.meta.publica) return true
 
-  if (!sesion.conectado || !perfil) return { path: '/acceso', query: { volver: to.fullPath } }
+  // Hay sesión pero el perfil no se ha podido cargar (sin conexión, por
+  // ejemplo): no es motivo para pedir que entre otra vez. LayoutPanel muestra
+  // el aviso con el botón de reintentar.
+  if (sesion.conectado && !perfil && sesion.errorCarga) return true
+
+  if (!sesion.conectado || !perfil) {
+    // Al entrar, volverá a esta pantalla (src/lib/volver.ts).
+    recordarVolver(to.fullPath)
+    return { path: '/acceso', query: { volver: to.fullPath } }
+  }
 
   // Quien se ha retirado solo puede ver su cuenta (para descargar o borrar sus datos).
   if (perfil.retirado) return to.path === '/cuenta' ? true : '/cuenta'

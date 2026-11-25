@@ -13,9 +13,14 @@ import EscalaTactil from '@/components/checkin/EscalaTactil.vue'
 import EstadoCalendario from '@/components/checkin/EstadoCalendario.vue'
 import AvisoBienestar from '@/components/checkin/AvisoBienestar.vue'
 import { useTerminos } from '@/lib/terminos'
+import { useSesion } from '@/stores/sesion'
+import { claveBorrador } from '@/lib/borrador'
+import { useBorrador } from '@/lib/usar-borrador'
 
 const datos = ref<CheckinEstudiante | null>(null)
-const respuestas = ref<Record<string, number | null>>({ avance: null, siguiente_paso: null, apoyo: null, bienestar: null })
+type Respuestas = Record<string, number | null>
+const VACIAS: Respuestas = { avance: null, siguiente_paso: null, apoyo: null, bienestar: null }
+const respuestas = ref<Respuestas>({ ...VACIAS })
 const cargando = ref(true)
 const enviando = ref(false)
 const guardado = ref(false)
@@ -28,11 +33,39 @@ const faltan = computed(() => items.value.length - respondidas.value)
 const bienestarBajo = computed(() => (respuestas.value.bienestar ?? 5) <= 2)
 const yaRespondido = computed(() => !!datos.value?.respuesta)
 
+// Borrador: lo marcado y aún no enviado se guarda en este navegador, salvo
+// las preguntas privadas (el bienestar). Ver src/lib/borrador.ts.
+const sesion = useSesion()
+const enviadas = computed<Respuestas>(() => {
+  const r = datos.value?.respuesta
+  return r ? { avance: r.avance, siguiente_paso: r.siguiente_paso, apoyo: r.apoyo, bienestar: r.bienestar } : { ...VACIAS }
+})
+const privadas = computed(() => new Set(items.value.filter((i) => i.privado).map((i) => i.clave)))
+const borrador = useBorrador(respuestas, {
+  clave: computed(() => {
+    const usuario = sesion.sesion?.user.id
+    const c = datos.value?.calendario
+    return usuario && c?.estado === 'abierta' && c.semana ? claveBorrador('estudiante', usuario, c.semana) : null
+  }),
+  caduca: computed(() => datos.value?.calendario.cierra),
+  enviado: enviadas,
+  guardable: (v) => Object.fromEntries(Object.entries(v).map(([k, n]) => [k, privadas.value.has(k) ? null : n])),
+})
+/** Se han recuperado respuestas sin enviar de una visita anterior. */
+const recuperado = ref(false)
+const faltaPrivada = computed(() => items.value.some((i) => i.privado && respuestas.value[i.clave] == null))
+
 onMounted(async () => {
   try {
     datos.value = await llamar<CheckinEstudiante>('mi_checkin')
-    const r = datos.value.respuesta
-    if (r) respuestas.value = { avance: r.avance, siguiente_paso: r.siguiente_paso, apoyo: r.apoyo, bienestar: r.bienestar }
+    respuestas.value = { ...enviadas.value }
+    const b = borrador.recuperar()
+    if (b) {
+      for (const [k, n] of Object.entries(b)) {
+        if (n != null && k in respuestas.value && !privadas.value.has(k)) respuestas.value[k] = n
+      }
+      recuperado.value = borrador.pendiente.value
+    }
   } catch (e) {
     error.value = mensajeDeError(e)
   } finally {
@@ -51,7 +84,10 @@ async function enviar() {
       p_apoyo: respuestas.value.apoyo,
       p_bienestar: respuestas.value.bienestar,
     })
+    borrador.descartar()
     datos.value = await llamar<CheckinEstudiante>('mi_checkin')
+    respuestas.value = { ...enviadas.value }
+    recuperado.value = false
     guardado.value = true
     window.scrollTo({ top: 0 })
   } catch (e) {
@@ -117,6 +153,13 @@ const { t } = useTerminos()
         </div>
       </div>
 
+      <div v-if="recuperado" class="p-4 mb-6 text-sm flex items-start gap-3 rounded-xl border bg-brand-50 border-brand-200 text-surface-900" role="status">
+        <AppIcon name="history" :size="18" class="flex-shrink-0 mt-0.5" />
+        <span>
+          Hemos recuperado lo que marcaste y no llegaste a enviar. Revísalo y pulsa «{{ yaRespondido ? 'Guardar cambios' : 'Enviar' }}».
+          <template v-if="faltaPrivada"> La pregunta sobre tu bienestar no se guarda en este dispositivo: respóndela de nuevo.</template>
+        </span>
+      </div>
       <AvisoError v-if="error" :mensaje="error" class="mb-6" />
 
       <div class="space-y-4">

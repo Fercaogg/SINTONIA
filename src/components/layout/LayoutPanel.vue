@@ -11,6 +11,7 @@ import { useTerminos } from '@/lib/terminos'
 import AppIcon from '@/components/comun/AppIcon.vue'
 import AppLogo from '@/components/comun/AppLogo.vue'
 import BandaEntorno from '@/components/comun/BandaEntorno.vue'
+import AvisoError from '@/components/comun/AvisoError.vue'
 
 interface Enlace { to: string; label: string; icon: string; exact?: boolean }
 
@@ -67,7 +68,7 @@ const rol = computed(() => sesion.perfil?.rol ?? 'estudiante')
 // Con «Tinta y lumbre» todos los perfiles comparten el menú claro (LUMBRA360).
 const oscuro = computed(() => false)
 const enlaces = computed(() =>
-  (sesion.perfil?.retirado ? [CUENTA, COMO] : MENUS[rol.value]).map((e) => ({ ...e, label: t(e.label) })),
+  (!sesion.perfil ? [COMO] : sesion.perfil.retirado ? [CUENTA, COMO] : MENUS[rol.value]).map((e) => ({ ...e, label: t(e.label) })),
 )
 
 const iniciales = computed(() => {
@@ -80,6 +81,17 @@ function activo(e: Enlace) {
 }
 
 watch(() => route.fullPath, () => { menuAbierto.value = false })
+
+// Hay sesión pero el perfil no ha llegado (sin conexión, por ejemplo).
+const sinPerfil = computed(() => !sesion.perfil && !!sesion.errorCarga)
+const reintentando = ref(false)
+async function reintentar() {
+  reintentando.value = true
+  await sesion.cargar(true)
+  reintentando.value = false
+  // Vuelve a pasar por el router: comprueba perfil, consentimiento y permisos.
+  if (sesion.perfil) router.replace({ path: route.fullPath, force: true })
+}
 
 async function salir() {
   await sesion.salir()
@@ -170,7 +182,15 @@ async function salir() {
         </header>
 
         <main id="contenido" class="p-4 lg:p-8 max-w-5xl mx-auto" tabindex="-1">
-          <RouterView />
+          <div v-if="sinPerfil" class="max-w-lg mx-auto pt-8">
+            <h1 class="titulo-pagina mb-4">No hemos podido cargar tu cuenta</h1>
+            <AvisoError :mensaje="sesion.errorCarga" />
+            <p class="texto-suave mt-4">Tu sesión sigue abierta y no se ha perdido nada.</p>
+            <button type="button" class="btn-primary mt-6" :disabled="reintentando" @click="reintentar">
+              {{ reintentando ? 'Reintentando...' : 'Reintentar' }}
+            </button>
+          </div>
+          <RouterView v-else />
         </main>
       </div>
     </div>
