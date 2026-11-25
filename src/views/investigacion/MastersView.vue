@@ -2,8 +2,9 @@
 // Investigación: másteres y códigos de acceso.
 // El investigador no ve nombres: los tutores aparecen por su seudónimo y por
 // la etiqueta que se puso a su código.
-import { computed, onMounted, ref, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { llamar, mensajeDeError } from '@/lib/api'
+import { useCarga } from '@/lib/usar-carga'
 import type { Rol, TipoTrabajo } from '@/lib/tipos'
 import { NOMBRE_ROL } from '@/lib/tipos'
 import { fechaCorta } from '@/lib/fechas'
@@ -23,8 +24,6 @@ const masters = ref<Master[]>([])
 const seleccionado = ref<string>('')
 const tutores = ref<Tutor[]>([])
 const codigos = ref<Codigo[]>([])
-const cargando = ref(true)
-const error = ref('')
 const aviso = ref('')
 
 const nuevoMaster = ref({ nombre: '', tipo: 'TFM' as TipoTrabajo })
@@ -52,16 +51,10 @@ async function cargarMaster() {
   codigos.value = c
 }
 
-onMounted(async () => {
-  try {
-    await cargarMasters()
-    await cargarMaster()
-  } catch (e) {
-    error.value = mensajeDeError(e)
-  } finally {
-    cargando.value = false
-  }
-})
+const { cargando, error, falloCarga, cargar } = useCarga(async () => {
+  await cargarMasters()
+  await cargarMaster()
+}, { alVolver: false })
 
 watch(seleccionado, () => {
   ultimosCodigos.value = []
@@ -128,7 +121,7 @@ async function anular(c: Codigo) {
 
     <EstadoCarga v-if="cargando" />
     <template v-else>
-      <AvisoError v-if="error" :mensaje="error" class="mb-6" />
+      <AvisoError v-if="error" :mensaje="error" :reintentar="falloCarga ? cargar : undefined" class="mb-6" />
       <p v-if="aviso" class="aviso-exito mb-6" role="status">{{ aviso }}</p>
 
       <div class="grid gap-6 lg:grid-cols-3">

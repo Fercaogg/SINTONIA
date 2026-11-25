@@ -1,9 +1,10 @@
 <script setup lang="ts">
 // Cuestionario inicial (pretest) o final (postest). Todas las respuestas se
 // envían con un único botón y se pueden cambiar mientras esté abierto.
-import { computed, onMounted, ref } from 'vue'
+import { computed, ref } from 'vue'
 import { RouterLink, useRoute } from 'vue-router'
 import { llamar, mensajeDeError } from '@/lib/api'
+import { useCarga } from '@/lib/usar-carga'
 import AppIcon from '@/components/comun/AppIcon.vue'
 import AvisoError from '@/components/comun/AvisoError.vue'
 import EstadoCarga from '@/components/comun/EstadoCarga.vue'
@@ -37,10 +38,8 @@ interface Cuestionario {
 const route = useRoute()
 const datos = ref<Cuestionario | null>(null)
 const respuestas = ref<Record<number, number | boolean | string | null>>({})
-const cargando = ref(true)
 const enviando = ref(false)
 const guardado = ref(false)
-const error = ref('')
 
 const bloques = computed(() => {
   const mapa = new Map<string, ItemCuestionario[]>()
@@ -49,16 +48,10 @@ const bloques = computed(() => {
 })
 const faltan = computed(() => (datos.value?.items ?? []).filter((i) => i.obligatorio && respuestas.value[i.id] == null).length)
 
-onMounted(async () => {
-  try {
-    datos.value = await llamar<Cuestionario>('ver_cuestionario', { p_clave: String(route.params.clave) })
-    for (const i of datos.value.items) respuestas.value[i.id] = i.respuesta
-  } catch (e) {
-    error.value = mensajeDeError(e)
-  } finally {
-    cargando.value = false
-  }
-})
+const { cargando, error, falloCarga, cargar } = useCarga(async () => {
+  datos.value = await llamar<Cuestionario>('ver_cuestionario', { p_clave: String(route.params.clave) })
+  for (const i of datos.value.items) respuestas.value[i.id] = i.respuesta
+}, { alVolver: false })
 
 async function enviar() {
   if (!datos.value || faltan.value > 0) return
@@ -79,7 +72,7 @@ async function enviar() {
 <template>
   <div class="max-w-lg mx-auto fade-in">
     <EstadoCarga v-if="cargando" />
-    <AvisoError v-else-if="!datos" :mensaje="error" />
+    <AvisoError v-else-if="!datos" :mensaje="error" :reintentar="cargar" />
     <template v-else-if="!datos.abierto">
       <h1 class="titulo-pagina mb-6">{{ datos.titulo }}</h1>
       <EstadoVacio icono="document" titulo="Ahora no está abierto" texto="Te avisaremos cuando puedas responderlo." />
@@ -98,7 +91,7 @@ async function enviar() {
       <h1 class="titulo-pagina">{{ datos.titulo }}</h1>
       <p class="texto-suave mt-2 mb-6 text-sm leading-relaxed"><Pendiente :texto="datos.instrucciones" /></p>
 
-      <AvisoError v-if="error" :mensaje="error" class="mb-6" />
+      <AvisoError v-if="error" :mensaje="error" :reintentar="falloCarga ? cargar : undefined" class="mb-6" />
 
       <div v-for="[bloque, items] in bloques" :key="bloque" class="mb-6">
         <h2 class="text-xs font-mono font-normal uppercase tracking-[0.14em] texto-suave mb-3">{{ bloque }}</h2>

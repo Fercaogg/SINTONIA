@@ -1,7 +1,8 @@
 <script setup lang="ts">
 // Puente al doctorado: el estudiante lo activa o desactiva cuando quiere.
-import { onMounted, ref } from 'vue'
+import { ref } from 'vue'
 import { llamar, mensajeDeError } from '@/lib/api'
+import { useCarga } from '@/lib/usar-carga'
 import { fechaCorta } from '@/lib/fechas'
 import AppIcon from '@/components/comun/AppIcon.vue'
 import AvisoError from '@/components/comun/AvisoError.vue'
@@ -22,21 +23,13 @@ interface Convocatoria {
 const activado = ref(false)
 const convocatorias = ref<Convocatoria[]>([])
 const normativa = ref<{ titulo: string; descripcion: string | null; url: string }[]>([])
-const cargando = ref(true)
 const guardando = ref(false)
-const error = ref('')
 
-onMounted(async () => {
-  try {
-    const r = await llamar<{ activado: boolean; convocatorias: Convocatoria[]; normativa: typeof normativa.value }>('mi_puente')
-    activado.value = r.activado
-    convocatorias.value = r.convocatorias
-    normativa.value = r.normativa ?? []
-  } catch (e) {
-    error.value = mensajeDeError(e)
-  } finally {
-    cargando.value = false
-  }
+const { cargando, error, falloCarga, cargar } = useCarga(async () => {
+  const r = await llamar<{ activado: boolean; convocatorias: Convocatoria[]; normativa: typeof normativa.value }>('mi_puente')
+  activado.value = r.activado
+  convocatorias.value = r.convocatorias
+  normativa.value = r.normativa ?? []
 })
 
 async function cambiar() {
@@ -66,7 +59,7 @@ const { t } = useTerminos()
 
     <EstadoCarga v-if="cargando" />
     <template v-else>
-      <AvisoError v-if="error" :mensaje="error" class="mb-6" />
+      <AvisoError v-if="error" :mensaje="error" :reintentar="falloCarga ? cargar : undefined" class="mb-6" />
 
       <section class="card p-5 sm:p-6 mb-6" aria-labelledby="t-activar">
         <div class="flex items-start gap-4">

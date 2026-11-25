@@ -1,9 +1,11 @@
 <script setup lang="ts">
 // Check-in del tutor/a: todos sus estudiantes en una pantalla y un único
 // botón para enviarlo todo. El "siguiente paso" es opcional.
-import { computed, onMounted, ref } from 'vue'
+import { computed, ref } from 'vue'
 import { RouterLink } from 'vue-router'
-import { llamar, mensajeDeError } from '@/lib/api'
+import { ErrorSintonia, llamar, mensajeDeError } from '@/lib/api'
+import { useAlVolver, useCarga } from '@/lib/usar-carga'
+import { avisoCambioSemana } from '@/lib/semana'
 import { hastaCierre } from '@/lib/fechas'
 import type { CheckinTutor } from '@/lib/tipos-checkin'
 import AppIcon from '@/components/comun/AppIcon.vue'
@@ -20,10 +22,8 @@ import { useBorrador } from '@/lib/usar-borrador'
 const datos = ref<CheckinTutor | null>(null)
 type Respuestas = Record<string, { avance: number | null; siguiente_paso: number | null }>
 const respuestas = ref<Respuestas>({})
-const cargando = ref(true)
 const enviando = ref(false)
 const guardado = ref(false)
-const error = ref('')
 
 const itemAvance = computed(() => datos.value?.items.find((i) => i.clave === 'avance'))
 const itemSiguiente = computed(() => datos.value?.items.find((i) => i.clave === 'siguiente_paso'))
@@ -50,33 +50,50 @@ const borrador = useBorrador(respuestas, {
 })
 const recuperado = ref(false)
 
-onMounted(async () => {
-  try {
-    datos.value = await llamar<CheckinTutor>('checkin_tutor')
-    respuestas.value = structuredClone(enviadas.value)
-    const b = borrador.recuperar()
-    if (b) {
-      // Solo las parejas que siguen existiendo.
-      for (const [id, r] of Object.entries(b)) {
-        const actual = respuestas.value[id]
-        if (!actual || !r) continue
-        if (r.avance != null) actual.avance = r.avance
-        if (r.siguiente_paso != null) actual.siguiente_paso = r.siguiente_paso
-      }
-      recuperado.value = borrador.pendiente.value
+/** Pone en pantalla un check-in recién leído: lo enviado y, encima, el borrador. */
+function aplicar(d: CheckinTutor) {
+  datos.value = d
+  respuestas.value = structuredClone(enviadas.value)
+  recuperado.value = false
+  const b = borrador.recuperar()
+  if (b) {
+    // Solo las parejas que siguen existiendo.
+    for (const [id, r] of Object.entries(b)) {
+      const actual = respuestas.value[id]
+      if (!actual || !r) continue
+      if (r.avance != null) actual.avance = r.avance
+      if (r.siguiente_paso != null) actual.siguiente_paso = r.siguiente_paso
     }
-  } catch (e) {
-    error.value = mensajeDeError(e)
-  } finally {
-    cargando.value = false
+    recuperado.value = borrador.pendiente.value
   }
+}
+
+const { cargando, error, cargar } = useCarga(async () => aplicar(await llamar<CheckinTutor>('checkin_tutor')), { alVolver: false })
+
+// La semana puede cerrarse (o empezar otra) con la página abierta: se
+// comprueba al volver a la pestaña y justo antes de enviar.
+const avisoSemana = ref('')
+async function comprobarSemana(): Promise<boolean> {
+  const actual = await llamar<CheckinTutor>('checkin_tutor')
+  const aviso = avisoCambioSemana(datos.value?.calendario, actual.calendario)
+  if (!aviso) return true
+  guardado.value = false
+  aplicar(actual)
+  avisoSemana.value = aviso
+  window.scrollTo({ top: 0 })
+  return false
+}
+useAlVolver(() => {
+  if (datos.value && !enviando.value) comprobarSemana().catch(() => {})
 })
 
 async function enviar() {
   if (faltan.value > 0) return
   enviando.value = true
   error.value = ''
+  avisoSemana.value = ''
   try {
+    if (!(await comprobarSemana())) return
     await llamar('guardar_checkin_tutor', {
       p_respuestas: estudiantes.value.map((e) => ({ pareja_id: e.pareja_id, ...respuestas.value[e.pareja_id] })),
     })
@@ -87,6 +104,8 @@ async function enviar() {
     guardado.value = true
     window.scrollTo({ top: 0 })
   } catch (e) {
+    // Se ha cerrado entre la comprobación y el envío: se explica igual.
+    if (e instanceof ErrorSintonia && e.codigo === 'SEMANA_CERRADA' && !(await comprobarSemana().catch(() => true))) return
     error.value = mensajeDeError(e)
   } finally {
     enviando.value = false
@@ -99,9 +118,10 @@ const { t } = useTerminos()
 <template>
   <div class="max-w-2xl fade-in">
     <EstadoCarga v-if="cargando" />
-    <AvisoError v-else-if="!datos" :mensaje="error" />
+    <AvisoError v-else-if="!datos" :mensaje="error" :reintentar="cargar" />
     <template v-else-if="datos.calendario.estado !== 'abierta'">
       <h1 class="titulo-pagina mb-6">Check-in semanal</h1>
+      <p v-if="avisoSemana" class="p-4 mb-6 text-sm rounded-xl border bg-brand-50 border-brand-200 text-surface-900" role="status">{{ avisoSemana }}</p>
       <EstadoCalendario :calendario="datos.calendario" />
     </template>
     <EstadoVacio v-else-if="!estudiantes.length" icono="users" :titulo="t('Aún no hay estudiantes contigo')" :texto="t('Dale a cada estudiante uno de tus códigos para que se registre.')">
@@ -128,6 +148,7 @@ const { t } = useTerminos()
         hasta el {{ hastaCierre(datos.calendario.cierra!) }}.
       </p>
 
+      <p v-if="avisoSemana" class="p-4 mb-6 text-sm rounded-xl border bg-brand-50 border-brand-200 text-surface-900" role="status">{{ avisoSemana }}</p>
       <div v-if="recuperado" class="p-4 mb-6 text-sm flex items-start gap-3 rounded-xl border bg-brand-50 border-brand-200 text-surface-900" role="status">
         <AppIcon name="history" :size="18" class="flex-shrink-0 mt-0.5" />
         <span>Hemos recuperado lo que marcaste y no llegaste a enviar. Revísalo y pulsa «{{ yaRespondido ? 'Guardar cambios' : 'Enviar todo' }}».</span>

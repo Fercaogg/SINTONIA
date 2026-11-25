@@ -2,8 +2,9 @@
 import { RouterLink } from 'vue-router'
 // Investigación: pretest y postest. Vista previa de los ítems y número de
 // personas que han respondido (nunca respuestas individuales en pantalla).
-import { onMounted, ref } from 'vue'
-import { llamar, mensajeDeError } from '@/lib/api'
+import { ref } from 'vue'
+import { llamar } from '@/lib/api'
+import { useCarga } from '@/lib/usar-carga'
 import AvisoError from '@/components/comun/AvisoError.vue'
 import EstadoCarga from '@/components/comun/EstadoCarga.vue'
 import Pendiente from '@/components/comun/Pendiente.vue'
@@ -13,23 +14,15 @@ interface Item { id: number; bloque: string; texto: string; tipo: string; opcion
 
 const resumen = ref<Resumen[]>([])
 const items = ref<Record<string, Item[]>>({})
-const cargando = ref(true)
-const error = ref('')
 
 const TIPOS: Record<string, string> = { escala: 'Escala', si_no: 'Sí o no', opcion: 'Una opción' }
 
-onMounted(async () => {
-  try {
-    resumen.value = await llamar('resumen_cuestionarios')
-    for (const c of resumen.value) {
-      items.value[c.clave] = (await llamar<{ items: Item[] }>('ver_cuestionario', { p_clave: c.clave })).items
-    }
-  } catch (e) {
-    error.value = mensajeDeError(e)
-  } finally {
-    cargando.value = false
+const { cargando, error, cargar } = useCarga(async () => {
+  resumen.value = await llamar('resumen_cuestionarios')
+  for (const c of resumen.value) {
+    items.value[c.clave] = (await llamar<{ items: Item[] }>('ver_cuestionario', { p_clave: c.clave })).items
   }
-})
+}, { alVolver: false })
 </script>
 
 <template>
@@ -41,7 +34,7 @@ onMounted(async () => {
     </p>
 
     <EstadoCarga v-if="cargando" />
-    <AvisoError v-else-if="error" :mensaje="error" />
+    <AvisoError v-else-if="error" :mensaje="error" :reintentar="cargar" />
     <section v-for="c in resumen" v-else :key="c.clave" class="card p-5 sm:p-6 mb-6" :aria-labelledby="`t-${c.clave}`">
       <h2 :id="`t-${c.clave}`" class="font-semibold text-surface-900">{{ c.titulo }}</h2>
       <p class="text-sm texto-suave mt-1">

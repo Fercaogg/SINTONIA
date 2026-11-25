@@ -3,7 +3,7 @@ import SaltarContenido from '@/components/layout/SaltarContenido.vue'
 // Estructura de las pantallas con sesión iniciada.
 // Basada en WW360 AppLayout.vue (estudiante y tutor: menú blanco) y
 // AdminLayout.vue (dirección e investigación: menú azul marino).
-import { computed, ref, watch } from 'vue'
+import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { RouterLink, RouterView, useRoute, useRouter } from 'vue-router'
 import { useSesion } from '@/stores/sesion'
 import { NOMBRE_ROL, type Rol } from '@/lib/tipos'
@@ -80,7 +80,82 @@ function activo(e: Enlace) {
   return e.exact ? route.path === e.to : route.path.startsWith(e.to)
 }
 
-watch(() => route.fullPath, () => { menuAbierto.value = false })
+// --- Menú del móvil -------------------------------------------------------
+// Al abrirlo, el foco entra en el menú y no sale de él con el tabulador; Esc
+// lo cierra desde cualquier sitio y el foco vuelve al botón que lo abrió.
+// Cerrado en el móvil, queda inerte: el tabulador no pasa por enlaces que no
+// se ven.
+const menu = ref<HTMLElement | null>(null)
+const botonMenu = ref<HTMLButtonElement | null>(null)
+const escritorio = ref(true)
+let consulta: MediaQueryList | null = null
+const alCambiarAncho = () => {
+  escritorio.value = !!consulta?.matches
+  if (escritorio.value) menuAbierto.value = false
+}
+let cerrandoPorNavegacion = false
+
+function enfocables(): HTMLElement[] {
+  return Array.from(menu.value?.querySelectorAll<HTMLElement>('a[href], button:not([disabled])') ?? [])
+}
+function teclaConMenuAbierto(ev: KeyboardEvent) {
+  if (ev.key === 'Escape') {
+    ev.preventDefault()
+    menuAbierto.value = false
+    return
+  }
+  if (ev.key !== 'Tab') return
+  const lista = enfocables()
+  if (!lista.length) return
+  const primero = lista[0]
+  const ultimo = lista[lista.length - 1]
+  const dentro = menu.value?.contains(document.activeElement)
+  if (ev.shiftKey && (document.activeElement === primero || !dentro)) {
+    ev.preventDefault()
+    ultimo.focus()
+  } else if (!ev.shiftKey && (document.activeElement === ultimo || !dentro)) {
+    ev.preventDefault()
+    primero.focus()
+  }
+}
+watch(menuAbierto, async (abierto) => {
+  if (abierto) {
+    document.addEventListener('keydown', teclaConMenuAbierto)
+    await nextTick()
+    enfocables()[0]?.focus()
+  } else {
+    document.removeEventListener('keydown', teclaConMenuAbierto)
+    if (!cerrandoPorNavegacion) botonMenu.value?.focus()
+    cerrandoPorNavegacion = false
+  }
+})
+
+// --- Cambio de pantalla ----------------------------------------------------
+// El foco pasa al contenido nuevo y se anuncia su título a los lectores de
+// pantalla (en una aplicación de una sola página no se recarga nada que lo haga).
+const anuncio = ref('')
+watch(
+  () => route.path,
+  async () => {
+    if (menuAbierto.value) {
+      cerrandoPorNavegacion = true
+      menuAbierto.value = false
+    }
+    await nextTick()
+    document.getElementById('contenido')?.focus({ preventScroll: true })
+    anuncio.value = route.meta.titulo ? `${t(route.meta.titulo)}` : ''
+  },
+)
+
+onMounted(() => {
+  consulta = window.matchMedia('(min-width: 1024px)')
+  alCambiarAncho()
+  consulta.addEventListener('change', alCambiarAncho)
+})
+onBeforeUnmount(() => {
+  consulta?.removeEventListener('change', alCambiarAncho)
+  document.removeEventListener('keydown', teclaConMenuAbierto)
+})
 
 // Hay sesión pero el perfil no ha llegado (sin conexión, por ejemplo).
 const sinPerfil = computed(() => !sesion.perfil && !!sesion.errorCarga)
@@ -109,15 +184,24 @@ async function salir() {
 
       <aside
         id="menu-lateral"
+        ref="menu"
+        :inert="!escritorio && !menuAbierto"
         class="fixed lg:sticky top-0 left-0 z-50 h-[100dvh] w-64 flex flex-col menu-lateral lg:translate-x-0"
         :class="[
           menuAbierto ? 'translate-x-0' : '-translate-x-full',
           oscuro ? 'bg-marino' : 'bg-surface-100 border-r border-surface-200',
         ]"
         aria-label="Menú principal"
-        @keydown.esc="menuAbierto = false"
       >
-        <div class="p-6 pb-4">
+        <div class="p-6 pb-4 relative">
+          <button
+            type="button"
+            class="lg:hidden absolute top-3 right-3 p-2 rounded-xl hover:bg-surface-200 min-h-tactil min-w-tactil flex items-center justify-center"
+            aria-label="Cerrar el menú"
+            @click="menuAbierto = false"
+          >
+            <AppIcon name="close" :size="20" />
+          </button>
           <RouterLink to="/" class="text-xl inline-block" aria-label="SINTONÍA, ir al inicio">
             <AppLogo :variante="oscuro ? 'claro' : 'oscuro'" />
           </RouterLink>
@@ -167,6 +251,7 @@ async function salir() {
       <div class="flex-1 min-w-0">
         <header class="lg:hidden sticky top-0 z-30 bg-papel/90 backdrop-blur-md border-b border-surface-200/60 px-4 py-3 pl-[max(1rem,env(safe-area-inset-left))] pr-[max(1rem,env(safe-area-inset-right))] flex items-center gap-3">
           <button
+            ref="botonMenu"
             type="button"
             class="p-2 rounded-xl hover:bg-surface-100 min-h-tactil min-w-tactil flex items-center justify-center"
             :aria-expanded="menuAbierto"
@@ -181,7 +266,8 @@ async function salir() {
           </div>
         </header>
 
-        <main id="contenido" class="p-4 lg:p-8 max-w-5xl mx-auto" tabindex="-1">
+        <p class="sr-only" aria-live="polite" data-anuncio-pantalla>{{ anuncio }}</p>
+        <main id="contenido" class="p-4 lg:p-8 max-w-5xl mx-auto focus:outline-none" tabindex="-1">
           <div v-if="sinPerfil" class="max-w-lg mx-auto pt-8">
             <h1 class="titulo-pagina mb-4">No hemos podido cargar tu cuenta</h1>
             <AvisoError :mensaje="sesion.errorCarga" />
