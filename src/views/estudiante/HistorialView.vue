@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { RouterLink } from 'vue-router'
 // Histórico del propio estudiante. Sin colores de semáforo ni valoraciones.
 import { onMounted, ref } from 'vue'
 import { llamar, mensajeDeError } from '@/lib/api'
@@ -57,5 +58,9 @@ onMounted(async () => {
         </dl>
       </li>
     </ul>
+    <p v-if="!cargando && !error" class="mt-8 flex flex-wrap gap-x-6 gap-y-2 text-sm">
+      <RouterLink to="/estudiante/checkin" class="enlace inline-flex items-center min-h-tactil">Cambiar las respuestas de esta semana</RouterLink>
+      <RouterLink to="/como-funciona" class="enlace inline-flex items-center min-h-tactil">Quién ve tus respuestas</RouterLink>
+    </p>
   </div>
 </template>

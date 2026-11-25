@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { RouterLink } from 'vue-router'
 // Investigación: pretest y postest. Vista previa de los ítems y número de
 // personas que han respondido (nunca respuestas individuales en pantalla).
 import { onMounted, ref } from 'vue'
@@ -58,5 +59,8 @@ onMounted(async () => {
         </li>
       </ol>
     </section>
+    <p v-if="!cargando" class="text-sm">
+      <RouterLink to="/investigador/datos" class="enlace inline-flex items-center min-h-tactil">Descargar las respuestas en Datos y auditoría</RouterLink>
+    </p>
   </div>
 </template>
