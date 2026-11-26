@@ -21,6 +21,11 @@ test('el estudiante activa y desactiva Puente al doctorado', async ({ page }) =>
   // Las convocatorias oficiales aparecen como pendientes.
   await expect(page.getByRole('heading', { name: /Formación de Profesorado Universitario \(FPU\)/ })).toBeVisible()
   await expect(page.locator('[data-pendiente="true"]').first()).toBeVisible()
+  // Guía del doctorado: datos comprobados en las páginas oficiales.
+  for (const titulo of ['Programas de doctorado de la USAL', 'Cómo acceder y plazos', 'Grupos de investigación', 'Ayudas para hacer el doctorado', 'Contacto de la Escuela de Doctorado']) {
+    await expect(page.getByRole('heading', { level: 2, name: titulo })).toBeVisible()
+  }
+  await expect(page.getByRole('link', { name: /Lógica, Filosofía de la Ciencia y Estudios Sociales de la Ciencia/ }).first()).toBeVisible()
   await sinErroresDeAccesibilidad(page)
   await sinRayasLargas(page)
 })

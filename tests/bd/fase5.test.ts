@@ -35,13 +35,13 @@ describe('Puente al doctorado', () => {
     await expect(bd.como(e.tutor, `select * from public.puente_cambios`)).rejects.toThrow(/permission denied/)
   })
 
-  it('las convocatorias se crean sin fechas y marcadas como pendientes', async () => {
+  it('las convocatorias llevan su enlace oficial, sin fechas y con lo de 2027 pendiente', async () => {
     const { convocatorias } = await bd.rpc(e.estudianteA, 'mi_puente')
-    expect(convocatorias).toHaveLength(5)
+    expect(convocatorias).toHaveLength(6)
     for (const c of convocatorias) {
       expect(c.fecha_apertura).toBeNull()
       expect(c.fecha_cierre).toBeNull()
-      expect(c.enlace).toContain('[PENDIENTE')
+      expect(c.enlace).toMatch(/^https:\/\//)
       expect(c.estado).toContain('[PENDIENTE')
     }
   })

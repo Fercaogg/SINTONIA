@@ -30,7 +30,7 @@ Todo lo que SINTONÍA necesita y que no se puede inventar. En la aplicación, ca
 
 | Dato | Dónde se usa | Dónde se cambia | Quién lo aporta |
 |---|---|---|---|
-| Convocatorias de 2027 (FPU, FPI, contratos predoctorales de la USAL y de la Junta de Castilla y León, admisión al doctorado): fechas y enlace oficial cuando se publiquen. Las de 2026 ya están comprobadas en docs/FUENTES-OFICIALES.md | Puente al doctorado | Investigación > Convocatorias | Fernando (Claude puede comprobarlas cuando salgan) |
+| Convocatorias de 2027 (FPU, FPI, Becas Santander, contratos predoctorales de la USAL y de la Junta de Castilla y León, admisión al doctorado 2027/28): fechas cuando se publiquen. Organismo, enlace y estado de 2026 ya están en la tabla (comprobados el 25/11/2026, docs/FUENTES-OFICIALES.md, apartado 4) | Puente al doctorado | Investigación > Convocatorias | Fernando (Claude puede comprobarlas cuando salgan) |
 | Fecha de inicio del piloto y días de apertura y cierre de cada semana | Calendario | Investigación > Calendario del estudio | Fernando |
 | Nombres de los dos másteres del piloto | Alta de másteres | Investigación > Másteres y códigos | Fernando |
 | Dominios de correo admitidos (ahora solo `usal.es`; ¿hay otro para estudiantes?) | Registro | `configuracion > dominios_permitidos` | Fernando |
@@ -97,3 +97,18 @@ Todo lo que SINTONÍA necesita y que no se puede inventar. En la aplicación, ca
 | Activar Web Analytics en Vercel (proyecto `sintonia360-ferca` > Analytics > Enable). El código ya está; sin activarlo no se cuenta nada | Estadísticas de visitas | Fernando |
 | Alta en Google Search Console y envío del sitemap (pasos en docs/FICHA-GOOGLE.md) | Buscadores | Fernando, con Claude para la etiqueta de verificación |
 | Comprobar los enlaces externos (ORCID, DOI, USAL) con `npm run enlaces -- http://localhost:4173 --externos` desde un ordenador con internet. Los internos ya están comprobados | Portada e /investigacion | Fernando o Claude |
+
+## Puente al doctorado: guía del doctorado (25/11/2026)
+
+Datos de la guía de Puente al doctorado que no se han podido comprobar en la página oficial. Se cambian en `src/contenido/doctorado.ts`; el detalle de cada intento está en docs/FUENTES-OFICIALES.md, apartado 4.6.
+
+| Dato | Por qué falta | Quién lo aporta |
+|---|---|---|
+| Grupos de investigación de las áreas cercanas al TFM (`GRUPOS_CERCANOS`) | produccioncientifica.usal.es no respondió (error 503) | Claude, cuando el portal responda (o Fernando, con la lista) |
+| Importes de la matrícula de doctorado 2026-27 (`TASAS.importes`) y calendario oficial del curso | Los PDF están en posgrado.usal.es, bloqueado en el entorno de Claude | Fernando, o Claude desde un entorno que permita posgrado.usal.es |
+| Cuantía y duración de las Becas Santander para personal investigador predoctoral | Igual: la convocatoria está en posgrado.usal.es | Igual |
+| INPhINIT «la Caixa», Incoming y Retaining: cuantía, duración, requisitos y plazos | fundacionlacaixa.org y lacaixafoundation.org no se pudieron abrir | Claude, con acceso a esos dominios |
+| Contratos predoctorales propios de la USAL y de la Junta de Castilla y León (2026 o 2027) | No se han encontrado publicados | Claude, cuando salgan |
+| Horario de atención de la Escuela de Doctorado | La web de la Escuela no lo publica | Fernando (preguntando a n.doctor@usal.es) |
+| Plazos de preinscripción y matrícula del curso 2027/28 (`PLAZOS_2027_28`) | Sin publicar | Claude, cuando salgan (la Escuela dice que el plazo "suele abrirse en marzo-mayo") |
+
