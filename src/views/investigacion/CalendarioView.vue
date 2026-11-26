@@ -1,7 +1,8 @@
 <script setup lang="ts">
 // Investigación: calendario del estudio (zona horaria Europe/Madrid).
-import { onMounted, ref } from 'vue'
+import { ref } from 'vue'
 import { llamar, mensajeDeError } from '@/lib/api'
+import { useCarga } from '@/lib/usar-carga'
 import { desdeApertura, hastaCierre } from '@/lib/fechas'
 import type { Calendario } from '@/lib/tipos-checkin'
 import AvisoError from '@/components/comun/AvisoError.vue'
@@ -23,9 +24,7 @@ const DIAS = ['lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado', '
 const estudio = ref<Estudio | null>(null)
 const sorteos = ref<{ semana: number; parejas: number; elegibles: number; con_agenda: number; sin_agenda: number; con_desajuste: number }[]>([])
 const form = ref({ fecha_inicio: '', semanas: 10, dia_apertura: 1, dia_cierre: 7 })
-const cargando = ref(true)
 const guardando = ref(false)
-const error = ref('')
 const aviso = ref('')
 
 function rellenar(e: Estudio) {
@@ -33,16 +32,10 @@ function rellenar(e: Estudio) {
   form.value = { fecha_inicio: e.fecha_inicio ?? '', semanas: e.semanas, dia_apertura: e.dia_apertura, dia_cierre: e.dia_cierre }
 }
 
-onMounted(async () => {
-  try {
-    rellenar(await llamar<Estudio>('ver_estudio'))
-    sorteos.value = await llamar('resumen_sorteos')
-  } catch (e) {
-    error.value = mensajeDeError(e)
-  } finally {
-    cargando.value = false
-  }
-})
+const { cargando, error, falloCarga, cargar } = useCarga(async () => {
+  rellenar(await llamar<Estudio>('ver_estudio'))
+  sorteos.value = await llamar('resumen_sorteos')
+}, { alVolver: false })
 
 async function guardar() {
   guardando.value = true
@@ -71,7 +64,7 @@ async function guardar() {
 
     <EstadoCarga v-if="cargando" />
     <template v-else>
-      <AvisoError v-if="error" :mensaje="error" class="mb-6" />
+      <AvisoError v-if="error" :mensaje="error" :reintentar="falloCarga ? cargar : undefined" class="mb-6" />
       <p v-if="aviso" class="aviso-exito mb-6" role="status">{{ aviso }}</p>
 
       <form class="card p-5 sm:p-6 grid gap-4 sm:grid-cols-2" @submit.prevent="guardar">

@@ -21,7 +21,7 @@ const { t, idioma } = useIdioma()
 
 <template>
   <section id="demostracion" class="card p-5 sm:p-7 text-left scroll-mt-24" aria-labelledby="t-demo">
-    <p class="text-xs font-mono font-normal uppercase tracking-[0.14em] text-surface-600">{{ t('Demostración', 'Demo') }}</p>
+    <p class="text-xs font-semibold uppercase tracking-[0.08em] text-surface-600">{{ t('Demostración', 'Demo') }}</p>
     <h2 id="t-demo" class="font-display text-xl font-semibold text-surface-900 mt-1">{{ t('¿Cómo va el trabajo esta semana?', 'How is the work going this week?') }}</h2>
     <p class="text-sm texto-suave mt-1">{{ t('Mueve las dos miradas, de 1 (poco avance) a 5 (mucho). No se guarda nada.', 'Move the two perspectives, from 1 (little progress) to 5 (a lot). Nothing is saved.') }}</p>
 

@@ -5,6 +5,7 @@ import { RouterLink, useRoute, useRouter } from 'vue-router'
 import { supabase } from '@/lib/supabase'
 import { useSesion } from '@/stores/sesion'
 import { INICIO_ROL } from '@/lib/tipos'
+import { destinoTrasEntrar } from '@/lib/volver'
 import LayoutAcceso from '@/components/layout/LayoutAcceso.vue'
 import EstadoCarga from '@/components/comun/EstadoCarga.vue'
 import AvisoError from '@/components/comun/AvisoError.vue'
@@ -28,7 +29,7 @@ onMounted(async () => {
       return
     }
     await sesion.cargar(true)
-    router.replace(sesion.rol ? INICIO_ROL[sesion.rol] : '/')
+    router.replace(destinoTrasEntrar(sesion.rol ? INICIO_ROL[sesion.rol] : null))
     return
   }
   if (fragmento.get('error')) {
@@ -48,7 +49,7 @@ onMounted(async () => {
     return
   }
   await sesion.cargar(true)
-  router.replace(sesion.rol ? INICIO_ROL[sesion.rol] : '/')
+  router.replace(destinoTrasEntrar(sesion.rol ? INICIO_ROL[sesion.rol] : null))
 })
 </script>
 

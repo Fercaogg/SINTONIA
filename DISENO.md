@@ -19,14 +19,14 @@ Desde el 24/11/2026 SINTONÍA usa el sistema visual de LUMBRA360 (`brand/DESIGN.
 | Bloques oscuros | tinta 900 (antes azul marino). La clase `bg-marino` se conserva por compatibilidad | `--rgb-marino` |
 | Foco | anillo de 2 px en lumbre 500 `#D9480F` | `--color-foco` |
 | Estados | verde `#1D6440`/`#E6F2EB`, ámbar `#7A4B00`/`#FBF0D6`, error carmesí `#A3122F`/`#FCE8EC` (no se confunde con la lumbre) | `--correcto-*`, `--aviso-*`, `--error-*` |
-| Tipografía | Instrument Sans (titulares 400–500 con interletraje −0,03 em; cuerpo 17 px) e IBM Plex Mono para antetítulos (12 px, mayúsculas, +0,14 em). Servidas desde el propio sitio (`src/assets/fuentes`, licencia OFL) | `fuentes.css`, `tailwind.config.js` |
+| Tipografía | Una sola familia, Instrument Sans: titulares 400–500 con interletraje −0,03 em; cuerpo 17 px; antetítulos y etiquetas en seminegrita (600), 12 px, mayúsculas, +0,08 em; cifras y códigos con números tabulares. Sin monoespaciada desde el 26/11/2026. Servida desde el propio sitio (`src/assets/fuentes`, licencia OFL) | `fuentes.css`, `tailwind.config.js` |
 | Forma | botones y estados en cápsula; campos 8 px; tarjetas de datos 12 px; paneles 20 px | `--radius-*` |
 | Elevación | ninguna en tarjetas y botones (filete de 1 px); sombra solo en lo que flota | `--shadow-*` |
 | Modo oscuro | negro neutro `#0E0E0E`, superficies `#171716`, texto `#F2F2EF`, acción en blanco roto, lumbre `#FF6A33` | `tokens.css`, `@media (prefers-color-scheme: dark)` |
 
 Los nombres de clase (`brand-*`, `surface-*`, `papel`, `marino`) no cambian: solo su valor. Por eso las pantallas apenas se han tocado. Todos los perfiles usan ahora el mismo menú lateral claro, con el elemento activo en blanco y un filete de lumbre.
 
-**Portada con la maqueta de LUMBRA360:** cabecera transparente que se difumina al bajar, titular centrado con el producto debajo, apartados con cabecera centrada (antetítulo en mono, sin numerar), fondos que alternan blanco y piedra con 160 px de aire en escritorio, iconos en cuadrado de lumbre suave, pasos con número en círculo y línea de lumbre, un único bloque de tinta con resplandor de lumbre («Pruébalo»), apartado «Respaldo» (trayectoria, avales y equipo) y pie en columnas.
+**Portada con la maqueta de LUMBRA360:** cabecera transparente que se difumina al bajar, titular centrado con el producto debajo, apartados con cabecera centrada (antetítulo en mayúsculas, sin numerar), fondos que alternan blanco y piedra con 160 px de aire en escritorio, iconos en cuadrado de lumbre suave, pasos con número en círculo y línea de lumbre, un único bloque de tinta con resplandor de lumbre («Pruébalo»), apartado «Respaldo» (trayectoria, avales y equipo) y pie en columnas.
 
 Ya regenerados con el nuevo sistema: `public/og/*.png`, `public/apple-touch-icon.png` y los clips de `public/clips` (`npm run clips`, que graba en modo demostración y convierte con ffmpeg). Pendiente: los documentos de `public/kit` y `public/dosier`.
 

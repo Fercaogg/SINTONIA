@@ -1,8 +1,9 @@
 <script setup lang="ts">
 // Inicio del tutor/a: estado de la semana y acceso al check-in.
-import { computed, onMounted, ref } from 'vue'
+import { computed, ref } from 'vue'
 import { RouterLink } from 'vue-router'
-import { llamar, mensajeDeError } from '@/lib/api'
+import { llamar } from '@/lib/api'
+import { useCarga } from '@/lib/usar-carga'
 import { hastaCierre } from '@/lib/fechas'
 import { useSesion } from '@/stores/sesion'
 import type { AgendaSemana, CheckinTutor } from '@/lib/tipos-checkin'
@@ -19,21 +20,13 @@ import { useTerminos } from '@/lib/terminos'
 const sesion = useSesion()
 const datos = ref<CheckinTutor | null>(null)
 const agendas = ref<{ pareja_id: string; nombre: string; cotutor?: boolean; agenda: AgendaSemana | null }[]>([])
-const cargando = ref(true)
-const error = ref('')
 
 const respondidos = computed(() => datos.value?.estudiantes.filter((e) => e.avance != null).length ?? 0)
 
-onMounted(async () => {
-  try {
-    const [d, a] = await Promise.all([llamar<CheckinTutor>('checkin_tutor'), llamar<typeof agendas.value>('agendas_tutor')])
-    datos.value = d
-    agendas.value = a
-  } catch (e) {
-    error.value = mensajeDeError(e)
-  } finally {
-    cargando.value = false
-  }
+const { cargando, error, cargar } = useCarga(async () => {
+  const [d, a] = await Promise.all([llamar<CheckinTutor>('checkin_tutor'), llamar<typeof agendas.value>('agendas_tutor')])
+  datos.value = d
+  agendas.value = a
 })
 
 const { t } = useTerminos()
@@ -45,7 +38,7 @@ const { t } = useTerminos()
     <p class="texto-suave mt-1 mb-8">{{ t('Cada semana respondes sobre todos tus estudiantes en una sola pantalla.') }}</p>
 
     <EstadoCarga v-if="cargando" />
-    <AvisoError v-else-if="error" :mensaje="error" />
+    <AvisoError v-else-if="error" :mensaje="error" :reintentar="cargar" />
     <template v-else-if="datos">
       <EstadoVacio
         v-if="!datos.estudiantes.length"

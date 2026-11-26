@@ -18,7 +18,9 @@ test('el estudiante activa y desactiva Puente al doctorado', async ({ page }) =>
   await expect(interruptor).toHaveAttribute('aria-checked', 'false')
   await interruptor.click()
   await expect(interruptor).toHaveAttribute('aria-checked', 'true')
-  // Las convocatorias oficiales aparecen como pendientes.
+  await sinErroresDeAccesibilidad(page)
+  // Las convocatorias oficiales (puerta "Becas y contratos") aparecen como pendientes.
+  await page.getByRole('link', { name: /Becas y contratos/ }).click()
   await expect(page.getByRole('heading', { name: /Formación de Profesorado Universitario \(FPU\)/ })).toBeVisible()
   await expect(page.locator('[data-pendiente="true"]').first()).toBeVisible()
   await sinErroresDeAccesibilidad(page)
@@ -66,9 +68,12 @@ test('el investigador ve los cuestionarios, con los ítems pendientes marcados',
 
 test('el estudiante consulta qué oposiciones puede preparar con sus estudios', async ({ page }, info) => {
   await entrarConContrasena(page, 'ana@usal.es')
-  await page.goto('/estudiante/puente')
+  // Está en el menú, justo debajo de Puente al doctorado.
   await abrirMenuSiMovil(page)
-  await page.getByRole('link', { name: 'Oposiciones' }).click()
+  const menu = page.getByRole('complementary', { name: 'Menú principal' })
+  const textos = (await menu.getByRole('link').allInnerTexts()).map((x) => x.trim())
+  expect(textos.indexOf('Oposiciones')).toBe(textos.indexOf('Puente al doctorado') + 1)
+  await menu.getByRole('link', { name: 'Oposiciones' }).click()
   await expect(page.getByRole('heading', { name: 'Oposiciones', level: 1 })).toBeVisible()
 
   // El mismo caso que la hoja de cálculo: Pedagogía, con el Máster del Profesorado.

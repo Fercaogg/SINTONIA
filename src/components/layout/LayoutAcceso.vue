@@ -28,11 +28,11 @@ import BandaEntorno from '@/components/comun/BandaEntorno.vue'
           <div class="mt-10 flex gap-8">
             <div>
               <p class="font-display text-2xl font-medium text-white">1 minuto</p>
-              <p class="font-mono text-xs uppercase tracking-[0.14em] text-brand-400 mt-1">a la semana</p>
+              <p class="text-xs font-semibold uppercase tracking-[0.08em] text-brand-400 mt-1">a la semana</p>
             </div>
             <div>
               <p class="font-display text-2xl font-medium text-white">3 preguntas</p>
-              <p class="font-mono text-xs uppercase tracking-[0.14em] text-brand-400 mt-1">para la tutoría</p>
+              <p class="text-xs font-semibold uppercase tracking-[0.08em] text-brand-400 mt-1">para la tutoría</p>
             </div>
           </div>
           <p class="mt-14 border-t border-white/15 pt-6 text-sm text-white/70">

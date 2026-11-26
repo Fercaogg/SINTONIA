@@ -103,7 +103,7 @@ function empezarDeNuevo() {
       <Transition name="paso" mode="out-in" @after-enter="enfocarTitulo">
         <!-- 1. Check-in del estudiante -->
         <section v-if="paso === 0" key="0" aria-labelledby="t-paso">
-          <p class="text-xs font-mono font-normal uppercase tracking-[0.14em] text-surface-600">Paso 1 de 4 · Eres estudiante</p>
+          <p class="text-xs font-semibold uppercase tracking-[0.08em] text-surface-600">Paso 1 de 4 · Eres estudiante</p>
           <h1 id="t-paso" ref="titulo" tabindex="-1" class="titulo-pagina mt-2 outline-none">Haz tu check-in de la semana</h1>
           <p class="texto-suave mt-2">Cuatro preguntas de 1 a 5. En el real tardas unos 60 segundos.</p>
           <div class="card p-5 sm:p-6 mt-6 space-y-7">
@@ -119,7 +119,7 @@ function empezarDeNuevo() {
 
         <!-- 2. El tutor/a -->
         <section v-else-if="paso === 1" key="1" aria-labelledby="t-paso">
-          <p class="text-xs font-mono font-normal uppercase tracking-[0.14em] text-surface-600">Paso 2 de 4 · Ahora eres su tutor/a</p>
+          <p class="text-xs font-semibold uppercase tracking-[0.08em] text-surface-600">Paso 2 de 4 · Ahora eres su tutor/a</p>
           <h1 id="t-paso" ref="titulo" tabindex="-1" class="titulo-pagina mt-2 outline-none">Responde por Alex</h1>
           <p class="texto-suave mt-2">
             Alex es el estudiante que acabas de ser (el nombre es inventado). Como tutor/a no ves sus respuestas ni su bienestar: solo dices cómo lo ves tú. Unos
@@ -140,7 +140,7 @@ function empezarDeNuevo() {
 
         <!-- 3. Las dos miradas -->
         <section v-else-if="paso === 2" key="2" aria-labelledby="t-paso">
-          <p class="text-xs font-mono font-normal uppercase tracking-[0.14em] text-surface-600">Paso 3 de 4 · Lo que hace SINTONÍA</p>
+          <p class="text-xs font-semibold uppercase tracking-[0.08em] text-surface-600">Paso 3 de 4 · Lo que hace SINTONÍA</p>
           <h1 id="t-paso" ref="titulo" tabindex="-1" class="titulo-pagina mt-2 outline-none">Dos miradas sobre el avance</h1>
           <div class="card p-5 sm:p-6 mt-6">
             <OndasSintonia :desfase="desfase" :alto="90" etiquetas />
@@ -178,7 +178,7 @@ function empezarDeNuevo() {
 
         <!-- 4. La dirección -->
         <section v-else-if="paso === 3" key="3" aria-labelledby="t-paso">
-          <p class="text-xs font-mono font-normal uppercase tracking-[0.14em] text-surface-600">Paso 4 de 4 · Eres la dirección del máster</p>
+          <p class="text-xs font-semibold uppercase tracking-[0.08em] text-surface-600">Paso 4 de 4 · Eres la dirección del máster</p>
           <h1 id="t-paso" ref="titulo" tabindex="-1" class="titulo-pagina mt-2 outline-none">Solo cifras de todo el máster</h1>
           <p class="texto-suave mt-2">
             La dirección no ve las respuestas de Alex ni el bienestar de nadie. Solo cifras calculadas sobre 5 personas o más. Estas son inventadas para la demostración.

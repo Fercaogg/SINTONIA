@@ -1,9 +1,10 @@
 <script setup lang="ts">
 // Inicio del estudiante: estado de la semana, agenda y apoyo.
-import { computed, onMounted, ref } from 'vue'
+import { computed, ref } from 'vue'
 import { RouterLink } from 'vue-router'
 import { useSesion } from '@/stores/sesion'
-import { llamar, mensajeDeError } from '@/lib/api'
+import { llamar } from '@/lib/api'
+import { useCarga } from '@/lib/usar-carga'
 import { hastaCierre } from '@/lib/fechas'
 import type { AgendaSemana, CheckinEstudiante } from '@/lib/tipos-checkin'
 import AppIcon from '@/components/comun/AppIcon.vue'
@@ -20,26 +21,18 @@ const datos = ref<CheckinEstudiante | null>(null)
 const agenda = ref<AgendaSemana | null>(null)
 const cuestionarios = ref<{ clave: string; titulo: string; abierto: boolean; completado: boolean }[]>([])
 const cuestionarioPendiente = computed(() => cuestionarios.value.find((c) => c.abierto && !c.completado))
-const cargando = ref(true)
-const error = ref('')
 
 const nombre = computed(() => sesion.perfil?.nombre?.split(' ')[0] ?? '')
 
-onMounted(async () => {
-  try {
-    const [d, a, c] = await Promise.all([
-      llamar<CheckinEstudiante>('mi_checkin'),
-      llamar<AgendaSemana | null>('mi_agenda'),
-      llamar<typeof cuestionarios.value>('mis_cuestionarios'),
-    ])
-    datos.value = d
-    agenda.value = a
-    cuestionarios.value = c
-  } catch (e) {
-    error.value = mensajeDeError(e)
-  } finally {
-    cargando.value = false
-  }
+const { cargando, error, cargar } = useCarga(async () => {
+  const [d, a, c] = await Promise.all([
+    llamar<CheckinEstudiante>('mi_checkin'),
+    llamar<AgendaSemana | null>('mi_agenda'),
+    llamar<typeof cuestionarios.value>('mis_cuestionarios'),
+  ])
+  datos.value = d
+  agenda.value = a
+  cuestionarios.value = c
 })
 
 const { t } = useTerminos()
@@ -51,7 +44,7 @@ const { t } = useTerminos()
     <p class="texto-suave mt-2 mb-8">Tu check-in semanal te llevará alrededor de un minuto.</p>
 
     <EstadoCarga v-if="cargando" />
-    <AvisoError v-else-if="error" :mensaje="error" />
+    <AvisoError v-else-if="error" :mensaje="error" :reintentar="cargar" />
     <template v-else-if="datos">
       <section v-if="cuestionarioPendiente" class="card p-5 sm:p-6 mb-4 flex flex-col sm:flex-row sm:items-center gap-4 bg-brand-50 border-brand-200" aria-labelledby="t-cuest">
         <div class="w-12 h-12 rounded-2xl bg-papel flex items-center justify-center shrink-0">

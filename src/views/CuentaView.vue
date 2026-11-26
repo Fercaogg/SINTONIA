@@ -20,10 +20,17 @@ const error = ref('')
 const confirmando = ref<null | 'retirar' | 'borrar'>(null)
 const textoConfirmacion = ref('')
 const trabajando = ref(false)
+const descargando = ref(false)
 
-async function guardarNombre() {
+// Cada acción empieza limpiando los avisos de la anterior: así nunca se ven a
+// la vez un "guardado" y un error que ya no vienen a cuento.
+function empezar() {
   error.value = ''
   aviso.value = ''
+}
+
+async function guardarNombre() {
+  empezar()
   try {
     await llamar('actualizar_mi_nombre', { p_nombre: nombre.value })
     await sesion.cargar(true)
@@ -34,18 +41,22 @@ async function guardarNombre() {
 }
 
 async function cambiarRecordatorios(ev: Event) {
-  error.value = ''
+  empezar()
+  const casilla = ev.target as HTMLInputElement
   try {
-    await llamar('cambiar_recordatorios', { p_activos: (ev.target as HTMLInputElement).checked })
+    await llamar('cambiar_recordatorios', { p_activos: casilla.checked })
     await sesion.cargar(true)
-    aviso.value = 'Preferencia guardada.'
+    aviso.value = casilla.checked ? 'Recibirás los recordatorios por correo.' : 'Ya no recibirás recordatorios por correo.'
   } catch (e) {
+    // No se ha guardado: la casilla vuelve a como estaba.
+    casilla.checked = !casilla.checked
     error.value = mensajeDeError(e)
   }
 }
 
 async function descargar() {
-  error.value = ''
+  empezar()
+  descargando.value = true
   try {
     const datos = await llamar('mis_datos')
     const blob = new Blob([JSON.stringify(datos, null, 2)], { type: 'application/json' })
@@ -54,16 +65,20 @@ async function descargar() {
     a.href = url
     a.download = 'mis-datos-sintonia.json'
     a.click()
-    URL.revokeObjectURL(url)
+    // Algunos navegadores aún no han empezado la descarga al volver de click().
+    setTimeout(() => URL.revokeObjectURL(url), 10_000)
+    aviso.value = 'Descarga lista: «mis-datos-sintonia.json». Búscalo en la carpeta de descargas.'
   } catch (e) {
     error.value = mensajeDeError(e)
+  } finally {
+    descargando.value = false
   }
 }
 
 async function retirarme() {
   if (!confirmando.value) return
   trabajando.value = true
-  error.value = ''
+  empezar()
   try {
     const borrar = confirmando.value === 'borrar'
     await llamar('retirarme', { p_borrar: borrar })
@@ -124,7 +139,9 @@ const { t } = useTerminos()
     <section class="card p-5 sm:p-6 mb-4" aria-labelledby="t-desc">
       <h2 id="t-desc" class="font-semibold text-surface-900 mb-1">Descargar mis datos</h2>
       <p class="text-sm texto-suave mb-4">Un archivo con todo lo que SINTONÍA guarda sobre ti.</p>
-      <button type="button" class="btn-secondary" @click="descargar"><AppIcon name="download" :size="16" /> Descargar</button>
+      <button type="button" class="btn-secondary" :disabled="descargando" @click="descargar">
+        <AppIcon name="download" :size="16" /> {{ descargando ? 'Preparando el archivo...' : 'Descargar' }}
+      </button>
     </section>
 
     <section v-if="participante" class="card p-5 sm:p-6" aria-labelledby="t-ret">

@@ -1,9 +1,11 @@
 <script setup lang="ts">
 // Check-in semanal del estudiante: las 4 preguntas en una sola pantalla y un
 // único botón de envío. Basado en el check-in de WORKWELL360.
-import { computed, onMounted, ref } from 'vue'
+import { computed, ref } from 'vue'
 import { RouterLink } from 'vue-router'
-import { llamar, mensajeDeError } from '@/lib/api'
+import { ErrorSintonia, llamar, mensajeDeError } from '@/lib/api'
+import { useAlVolver, useCarga } from '@/lib/usar-carga'
+import { avisoCambioSemana } from '@/lib/semana'
 import { hastaCierre } from '@/lib/fechas'
 import type { CheckinEstudiante } from '@/lib/tipos-checkin'
 import AppIcon from '@/components/comun/AppIcon.vue'
@@ -13,13 +15,16 @@ import EscalaTactil from '@/components/checkin/EscalaTactil.vue'
 import EstadoCalendario from '@/components/checkin/EstadoCalendario.vue'
 import AvisoBienestar from '@/components/checkin/AvisoBienestar.vue'
 import { useTerminos } from '@/lib/terminos'
+import { useSesion } from '@/stores/sesion'
+import { claveBorrador } from '@/lib/borrador'
+import { useBorrador } from '@/lib/usar-borrador'
 
 const datos = ref<CheckinEstudiante | null>(null)
-const respuestas = ref<Record<string, number | null>>({ avance: null, siguiente_paso: null, apoyo: null, bienestar: null })
-const cargando = ref(true)
+type Respuestas = Record<string, number | null>
+const VACIAS: Respuestas = { avance: null, siguiente_paso: null, apoyo: null, bienestar: null }
+const respuestas = ref<Respuestas>({ ...VACIAS })
 const enviando = ref(false)
 const guardado = ref(false)
-const error = ref('')
 
 const abierta = computed(() => datos.value?.calendario.estado === 'abierta')
 const items = computed(() => datos.value?.items ?? [])
@@ -28,33 +33,84 @@ const faltan = computed(() => items.value.length - respondidas.value)
 const bienestarBajo = computed(() => (respuestas.value.bienestar ?? 5) <= 2)
 const yaRespondido = computed(() => !!datos.value?.respuesta)
 
-onMounted(async () => {
-  try {
-    datos.value = await llamar<CheckinEstudiante>('mi_checkin')
-    const r = datos.value.respuesta
-    if (r) respuestas.value = { avance: r.avance, siguiente_paso: r.siguiente_paso, apoyo: r.apoyo, bienestar: r.bienestar }
-  } catch (e) {
-    error.value = mensajeDeError(e)
-  } finally {
-    cargando.value = false
+// Borrador: lo marcado y aún no enviado se guarda en este navegador, salvo
+// las preguntas privadas (el bienestar). Ver src/lib/borrador.ts.
+const sesion = useSesion()
+const enviadas = computed<Respuestas>(() => {
+  const r = datos.value?.respuesta
+  return r ? { avance: r.avance, siguiente_paso: r.siguiente_paso, apoyo: r.apoyo, bienestar: r.bienestar } : { ...VACIAS }
+})
+const privadas = computed(() => new Set(items.value.filter((i) => i.privado).map((i) => i.clave)))
+const borrador = useBorrador(respuestas, {
+  clave: computed(() => {
+    const usuario = sesion.sesion?.user.id
+    const c = datos.value?.calendario
+    return usuario && c?.estado === 'abierta' && c.semana ? claveBorrador('estudiante', usuario, c.semana) : null
+  }),
+  caduca: computed(() => datos.value?.calendario.cierra),
+  enviado: enviadas,
+  guardable: (v) => Object.fromEntries(Object.entries(v).map(([k, n]) => [k, privadas.value.has(k) ? null : n])),
+})
+/** Se han recuperado respuestas sin enviar de una visita anterior. */
+const recuperado = ref(false)
+const faltaPrivada = computed(() => items.value.some((i) => i.privado && respuestas.value[i.clave] == null))
+
+/** Pone en pantalla un check-in recién leído: lo enviado y, encima, el borrador. */
+function aplicar(d: CheckinEstudiante) {
+  datos.value = d
+  respuestas.value = { ...enviadas.value }
+  recuperado.value = false
+  const b = borrador.recuperar()
+  if (b) {
+    for (const [k, n] of Object.entries(b)) {
+      if (n != null && k in respuestas.value && !privadas.value.has(k)) respuestas.value[k] = n
+    }
+    recuperado.value = borrador.pendiente.value
   }
+}
+
+const { cargando, error, cargar } = useCarga(async () => aplicar(await llamar<CheckinEstudiante>('mi_checkin')), { alVolver: false })
+
+// La semana puede cerrarse (o empezar otra) con la página abierta. Se
+// comprueba al volver a la pestaña y justo antes de enviar, para que unas
+// respuestas pensadas para una semana no acaben guardadas en otra.
+const avisoSemana = ref('')
+async function comprobarSemana(): Promise<boolean> {
+  const actual = await llamar<CheckinEstudiante>('mi_checkin')
+  const aviso = avisoCambioSemana(datos.value?.calendario, actual.calendario)
+  if (!aviso) return true
+  guardado.value = false
+  aplicar(actual)
+  avisoSemana.value = aviso
+  window.scrollTo({ top: 0 })
+  return false
+}
+useAlVolver(() => {
+  if (datos.value && !enviando.value) comprobarSemana().catch(() => {})
 })
 
 async function enviar() {
   if (faltan.value > 0) return
   enviando.value = true
   error.value = ''
+  avisoSemana.value = ''
   try {
+    if (!(await comprobarSemana())) return
     await llamar('guardar_checkin_estudiante', {
       p_avance: respuestas.value.avance,
       p_siguiente_paso: respuestas.value.siguiente_paso,
       p_apoyo: respuestas.value.apoyo,
       p_bienestar: respuestas.value.bienestar,
     })
+    borrador.descartar()
     datos.value = await llamar<CheckinEstudiante>('mi_checkin')
+    respuestas.value = { ...enviadas.value }
+    recuperado.value = false
     guardado.value = true
     window.scrollTo({ top: 0 })
   } catch (e) {
+    // Se ha cerrado entre la comprobación y el envío: se explica igual.
+    if (e instanceof ErrorSintonia && e.codigo === 'SEMANA_CERRADA' && !(await comprobarSemana().catch(() => true))) return
     error.value = mensajeDeError(e)
   } finally {
     enviando.value = false
@@ -67,9 +123,10 @@ const { t } = useTerminos()
 <template>
   <div class="max-w-lg mx-auto fade-in">
     <EstadoCarga v-if="cargando" />
-    <AvisoError v-else-if="!datos" :mensaje="error" />
+    <AvisoError v-else-if="!datos" :mensaje="error" :reintentar="cargar" />
     <template v-else-if="!abierta">
       <h1 class="titulo-pagina mb-6">Check-in semanal</h1>
+      <p v-if="avisoSemana" class="p-4 mb-6 text-sm rounded-xl border bg-brand-50 border-brand-200 text-surface-900" role="status">{{ avisoSemana }}</p>
       <EstadoCalendario :calendario="datos.calendario" />
     </template>
 
@@ -117,6 +174,14 @@ const { t } = useTerminos()
         </div>
       </div>
 
+      <p v-if="avisoSemana" class="p-4 mb-6 text-sm rounded-xl border bg-brand-50 border-brand-200 text-surface-900" role="status">{{ avisoSemana }}</p>
+      <div v-if="recuperado" class="p-4 mb-6 text-sm flex items-start gap-3 rounded-xl border bg-brand-50 border-brand-200 text-surface-900" role="status">
+        <AppIcon name="history" :size="18" class="flex-shrink-0 mt-0.5" />
+        <span>
+          Hemos recuperado lo que marcaste y no llegaste a enviar. Revísalo y pulsa «{{ yaRespondido ? 'Guardar cambios' : 'Enviar' }}».
+          <template v-if="faltaPrivada"> La pregunta sobre tu bienestar no se guarda en este dispositivo: respóndela de nuevo.</template>
+        </span>
+      </div>
       <AvisoError v-if="error" :mensaje="error" class="mb-6" />
 
       <div class="space-y-4">

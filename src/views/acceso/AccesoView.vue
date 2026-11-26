@@ -1,10 +1,11 @@
 <script setup lang="ts">
 // Iniciar sesión con un enlace enviado al correo (sin contraseña).
 import { ref } from 'vue'
-import { RouterLink, useRouter } from 'vue-router'
+import { RouterLink, useRoute, useRouter } from 'vue-router'
 import { supabase, entornoLocal, modoDemo } from '@/lib/supabase'
 import { useSesion } from '@/stores/sesion'
 import { INICIO_ROL } from '@/lib/tipos'
+import { destinoTrasEntrar } from '@/lib/volver'
 import LayoutAcceso from '@/components/layout/LayoutAcceso.vue'
 import AppIcon from '@/components/comun/AppIcon.vue'
 import AvisoError from '@/components/comun/AvisoError.vue'
@@ -13,6 +14,8 @@ import CampoTrampa from '@/components/comun/CampoTrampa.vue'
 import { enviarAlServidor } from '@/lib/servidor'
 
 const router = useRouter()
+// Llega aquí porque su sesión ha caducado o se cerró en otro sitio (src/lib/vigilar-sesion.ts).
+const sesionTerminada = useRoute().query.motivo === 'sesion'
 const sesion = useSesion()
 
 const email = ref('')
@@ -49,7 +52,7 @@ async function entrarConContrasena() {
     return
   }
   await sesion.cargar(true)
-  router.push(sesion.rol ? INICIO_ROL[sesion.rol] : '/')
+  router.push(destinoTrasEntrar(sesion.rol ? INICIO_ROL[sesion.rol] : null))
 }
 </script>
 
@@ -60,6 +63,10 @@ async function entrarConContrasena() {
       <h1 class="titulo-pagina mb-2">Iniciar sesión</h1>
       <p class="texto-suave mb-8">Te enviaremos un enlace a tu correo para entrar. No necesitas contraseña.</p>
 
+      <div v-if="sesionTerminada" class="p-4 mb-6 text-sm flex items-start gap-3 rounded-xl border bg-brand-50 border-brand-200 text-surface-900" role="status">
+        <AppIcon name="clock" :size="18" class="flex-shrink-0 mt-0.5" />
+        <span>Tu sesión ha terminado. Vuelve a entrar y seguirás donde lo dejaste.</span>
+      </div>
       <AvisoError v-if="error" :mensaje="error" class="mb-6" />
 
       <form class="space-y-5" @submit.prevent="usarContrasena ? entrarConContrasena() : enviarEnlace()">

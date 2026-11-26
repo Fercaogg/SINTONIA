@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import { RouterLink } from 'vue-router'
 // Histórico del propio estudiante. Sin colores de semáforo ni valoraciones.
-import { onMounted, ref } from 'vue'
-import { llamar, mensajeDeError } from '@/lib/api'
+import { ref } from 'vue'
+import { llamar } from '@/lib/api'
+import { useCarga } from '@/lib/usar-carga'
 import { fechaCorta } from '@/lib/fechas'
 import AppIcon from '@/components/comun/AppIcon.vue'
 import AvisoError from '@/components/comun/AvisoError.vue'
@@ -12,8 +13,6 @@ import EstadoVacio from '@/components/comun/EstadoVacio.vue'
 interface Semana { semana: number; avance: number; siguiente_paso: number; apoyo: number; bienestar: number | null; actualizado_at: string }
 
 const semanas = ref<Semana[]>([])
-const cargando = ref(true)
-const error = ref('')
 
 const columnas: { clave: keyof Semana; texto: string; privado?: boolean }[] = [
   { clave: 'avance', texto: 'Avance' },
@@ -22,14 +21,8 @@ const columnas: { clave: keyof Semana; texto: string; privado?: boolean }[] = [
   { clave: 'bienestar', texto: 'Bienestar', privado: true },
 ]
 
-onMounted(async () => {
-  try {
-    semanas.value = await llamar('mi_historial')
-  } catch (e) {
-    error.value = mensajeDeError(e)
-  } finally {
-    cargando.value = false
-  }
+const { cargando, error, cargar } = useCarga(async () => {
+  semanas.value = await llamar('mi_historial')
 })
 </script>
 
@@ -39,7 +32,7 @@ onMounted(async () => {
     <p class="texto-suave mt-1 mb-8">Tus respuestas de cada semana, de 1 a 5. Solo las ves tú.</p>
 
     <EstadoCarga v-if="cargando" />
-    <AvisoError v-else-if="error" :mensaje="error" />
+    <AvisoError v-else-if="error" :mensaje="error" :reintentar="cargar" />
     <EstadoVacio v-else-if="!semanas.length" icono="history" titulo="Aún no hay semanas" texto="Haz tu primer check-in para empezar a ver tu histórico." />
     <ul v-else class="space-y-3">
       <li v-for="s in semanas" :key="s.semana" class="card p-4 sm:p-5">

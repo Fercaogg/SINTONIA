@@ -1,8 +1,9 @@
 <script setup lang="ts">
 // Investigación: calendario de convocatorias de Puente al doctorado.
 // Las fechas y enlaces se rellenan a partir de las convocatorias oficiales.
-import { onMounted, ref } from 'vue'
+import { ref } from 'vue'
 import { llamar, mensajeDeError } from '@/lib/api'
+import { useCarga } from '@/lib/usar-carga'
 import AppIcon from '@/components/comun/AppIcon.vue'
 import AvisoError from '@/components/comun/AvisoError.vue'
 import EstadoCarga from '@/components/comun/EstadoCarga.vue'
@@ -19,23 +20,15 @@ interface Convocatoria {
 }
 
 const lista = ref<Convocatoria[]>([])
-const cargando = ref(true)
-const error = ref('')
 const aviso = ref('')
 
 async function cargar() {
   lista.value = await llamar('listar_convocatorias')
 }
 
-onMounted(async () => {
-  try {
-    await cargar()
-  } catch (e) {
-    error.value = mensajeDeError(e)
-  } finally {
-    cargando.value = false
-  }
-})
+const { cargando, error, falloCarga, cargar: recargar } = useCarga(async () => {
+  await cargar()
+}, { alVolver: false })
 
 function nueva() {
   lista.value.push({ nombre: '', organismo: '', fecha_apertura: null, fecha_cierre: null, enlace: '', estado: '', activa: true })
@@ -64,7 +57,7 @@ async function guardar(c: Convocatoria) {
 
     <EstadoCarga v-if="cargando" />
     <template v-else>
-      <AvisoError v-if="error" :mensaje="error" class="mb-6" />
+      <AvisoError v-if="error" :mensaje="error" :reintentar="falloCarga ? recargar : undefined" class="mb-6" />
       <p v-if="aviso" class="aviso-exito mb-6" role="status">{{ aviso }}</p>
 
       <ul class="space-y-4">

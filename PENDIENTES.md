@@ -98,3 +98,9 @@ Todo lo que SINTONÍA necesita y que no se puede inventar. En la aplicación, ca
 | Activar Web Analytics en Vercel (proyecto `sintonia360-ferca` > Analytics > Enable). El código ya está; sin activarlo no se cuenta nada | Estadísticas de visitas | Fernando |
 | Alta en Google Search Console y envío del sitemap (pasos en docs/FICHA-GOOGLE.md) | Buscadores | Fernando, con Claude para la etiqueta de verificación |
 | Comprobar los enlaces externos (ORCID, DOI, USAL) con `npm run enlaces -- http://localhost:4173 --externos` desde un ordenador con internet. Los internos ya están comprobados | Portada e /investigacion | Fernando o Claude |
+
+## Puente al doctorado por puertas (26/11/2026)
+
+| Dato | Dónde se usa | Quién lo aporta |
+|---|---|---|
+| Cómo y cuándo se pide la admisión (preinscripción) en un programa de doctorado de la USAL. Lo demás de Puente ya está comprobado en el BOE (docs/FUENTES-OFICIALES.md, apartado 4) | Puente > Qué necesito (`src/contenido/puente.ts`, `NECESITO`) | Claude, desde una sesión que pueda abrir doctorado.usal.es (el entorno "SINTONIA" lo permite), o Fernando |

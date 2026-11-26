@@ -2,8 +2,9 @@
 import { RouterLink } from 'vue-router'
 // Avisos de "Necesito apoyo" para la dirección del máster.
 // Solo aparece el nombre si el estudiante lo ha autorizado.
-import { onMounted, ref } from 'vue'
+import { ref } from 'vue'
 import { llamar, mensajeDeError } from '@/lib/api'
+import { useCarga } from '@/lib/usar-carga'
 import { fechaLarga, horaDe } from '@/lib/fechas'
 import AppIcon from '@/components/comun/AppIcon.vue'
 import AvisoError from '@/components/comun/AvisoError.vue'
@@ -13,21 +14,13 @@ import EstadoVacio from '@/components/comun/EstadoVacio.vue'
 interface Aviso { id: string; created_at: string; nombre: string | null; atendido_at: string | null }
 
 const avisos = ref<Aviso[]>([])
-const cargando = ref(true)
-const error = ref('')
 
 async function cargar() {
   avisos.value = await llamar('avisos_apoyo_direccion')
 }
 
-onMounted(async () => {
-  try {
-    await cargar()
-  } catch (e) {
-    error.value = mensajeDeError(e)
-  } finally {
-    cargando.value = false
-  }
+const { cargando, error, falloCarga, cargar: recargar } = useCarga(async () => {
+  await cargar()
 })
 
 async function atender(id: string) {
@@ -49,7 +42,7 @@ async function atender(id: string) {
 
     <EstadoCarga v-if="cargando" />
     <template v-else>
-      <AvisoError v-if="error" :mensaje="error" class="mb-6" />
+      <AvisoError v-if="error" :mensaje="error" :reintentar="falloCarga ? recargar : undefined" class="mb-6" />
       <EstadoVacio v-if="!avisos.length" icono="inbox" titulo="No hay avisos" texto="Cuando un estudiante pida apoyo, lo verás aquí." />
       <ul v-else class="space-y-3">
         <li v-for="a in avisos" :key="a.id" class="card p-5 flex flex-col sm:flex-row sm:items-center gap-3">

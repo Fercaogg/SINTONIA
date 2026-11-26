@@ -91,7 +91,7 @@ const FILAS = computed<{ aspecto: string; valores: [string, string, string] }[]>
       <h3 class="font-display text-lg font-semibold text-surface-900">{{ f.aspecto }}</h3>
       <dl class="mt-3 space-y-3">
         <div v-for="(v, i) in f.valores" :key="i" :class="i === 1 ? 'rounded-lg bg-brand-50 border border-brand-200 p-3 -mx-1' : ''">
-          <dt class="text-xs font-mono font-normal uppercase tracking-[0.14em]" :class="i === 1 ? 'text-brand-900' : 'text-surface-800'">{{ COLUMNAS[i] }}</dt>
+          <dt class="text-xs font-semibold uppercase tracking-[0.08em]" :class="i === 1 ? 'text-brand-900' : 'text-surface-800'">{{ COLUMNAS[i] }}</dt>
           <dd class="mt-0.5 leading-relaxed" :class="i === 1 ? 'text-surface-900 font-medium' : 'texto-suave'">{{ v }}</dd>
         </div>
       </dl>
