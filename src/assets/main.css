@@ -535,3 +535,47 @@
     }
   }
 }
+
+/* ---------- Puente al doctorado: la biblioteca ---------- */
+.cabecera-biblioteca {
+  background:
+    radial-gradient(60% 80% at 85% 10%, rgb(var(--rgb-b500) / 0.10), transparent 70%),
+    rgb(var(--rgb-s100));
+  border: 1px solid rgb(var(--rgb-s200));
+}
+.indice {
+  border-top: 1px solid rgb(var(--rgb-s200));
+}
+.indice > li {
+  border-bottom: 1px solid rgb(var(--rgb-s200));
+}
+.entrada-indice {
+  display: flex;
+  align-items: flex-start;
+  gap: 1.25rem;
+  padding: 1.125rem 0.75rem;
+  margin: 0 -0.75rem;
+  border-radius: var(--radius-sm);
+  text-decoration: none;
+  transition: background-color var(--dur-ui) ease;
+}
+.entrada-indice.activa {
+  background-color: rgb(var(--rgb-s100));
+}
+.num-indice {
+  width: 2.25rem;
+  flex-shrink: 0;
+  padding-top: 0.2rem;
+  font-weight: 600;
+  font-size: 0.875rem;
+  letter-spacing: 0.04em;
+  color: var(--color-lumbre-texto);
+  font-variant-numeric: tabular-nums;
+}
+/* Puntos guía entre el título y el resumen, como en un índice impreso. */
+.puntos {
+  flex: 1;
+  min-width: 1rem;
+  border-bottom: 2px dotted rgb(var(--rgb-s300));
+  transform: translateY(-0.3rem);
+}

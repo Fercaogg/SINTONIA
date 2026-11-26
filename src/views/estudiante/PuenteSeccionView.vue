@@ -8,7 +8,8 @@ import { hoy, type Entrada } from '@/lib/calendario'
 import { NECESITO, PUERTAS, TIPOS_DOCTORADO, type Apartado, type SeccionPuente } from '@/contenido/puente'
 import { useSesion } from '@/stores/sesion'
 import AppIcon from '@/components/comun/AppIcon.vue'
-import PuenteEscena from '@/components/puente/PuenteEscena.vue'
+import LibroPuente from '@/components/puente/LibroPuente.vue'
+import { ESTILOS, VOLUMENES } from '@/components/puente/libros'
 import AvisoError from '@/components/comun/AvisoError.vue'
 import EstadoCarga from '@/components/comun/EstadoCarga.vue'
 import EstadoVacio from '@/components/comun/EstadoVacio.vue'
@@ -42,19 +43,16 @@ const tituloPuerta = (clave: SeccionPuente) => PUERTAS.find((p) => p.clave === c
     <RouterLink to="/estudiante/puente" class="enlace text-sm inline-flex items-center gap-1 mb-4">
       <AppIcon name="back" :size="16" /> Puente al doctorado
     </RouterLink>
-    <section class="cabecera-puente relative overflow-hidden rounded-panel bg-marino text-white mb-8" :aria-labelledby="`t-${seccion}`">
-      <div class="relative grid sm:grid-cols-[minmax(0,3fr)_minmax(0,2fr)] items-center">
+    <section class="cabecera-biblioteca relative overflow-hidden rounded-panel mb-8" :aria-labelledby="`t-${seccion}`">
+      <div class="relative grid sm:grid-cols-[minmax(0,1fr)_auto] items-center">
         <div class="p-6 sm:p-8 relative z-10">
-          <p class="antetitulo-lumbre">Tramo {{ indice + 1 }} de {{ PUERTAS.length }}</p>
-          <div class="flex items-center gap-3 mt-3">
-            <span class="icono-tramo !bg-white/10 !text-white" aria-hidden="true">
-              <AppIcon :name="puerta.icono" :size="22" />
-            </span>
-            <h1 :id="`t-${seccion}`" class="titulo-pagina !text-white">{{ puerta.titulo }}</h1>
-          </div>
-          <p class="text-white/80 mt-3 leading-relaxed">{{ puerta.descripcion }}</p>
+          <p class="antetitulo text-[color:var(--color-lumbre-texto)]">Volumen {{ VOLUMENES[indice] }} de {{ PUERTAS.length }}</p>
+          <h1 :id="`t-${seccion}`" class="titulo-pagina mt-3">{{ puerta.titulo }}</h1>
+          <p class="texto-suave mt-3 leading-relaxed">{{ puerta.descripcion }}</p>
         </div>
-        <PuenteEscena :activa="indice" compacta class="hidden sm:block" />
+        <div class="hidden sm:block pr-36 pl-4 py-6 libro-seccion" aria-hidden="true">
+          <LibroPuente :titulo="puerta.titulo" :volumen="VOLUMENES[indice]" :icono="puerta.icono" :estilo="ESTILOS[seccion]" fuera />
+        </div>
       </div>
     </section>
 
@@ -159,3 +157,12 @@ const tituloPuerta = (clave: SeccionPuente) => PUERTAS.find((p) => p.clave === c
     </nav>
   </div>
 </template>
+
+<style scoped>
+.libro-seccion {
+  perspective: 900px;
+  perspective-origin: 50% -10%;
+  transform: scale(0.8);
+  transform-origin: right center;
+}
+</style>
