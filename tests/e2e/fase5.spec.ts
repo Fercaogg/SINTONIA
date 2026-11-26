@@ -1,7 +1,7 @@
 // Puente al doctorado, cuestionarios y pantallas del investigador.
 
 import { expect, test } from '@playwright/test'
-import { entrarConContrasena, sinErroresDeAccesibilidad, sinRayasLargas } from './ayudantes'
+import { abrirMenuSiMovil, entrarConContrasena, sinErroresDeAccesibilidad, sinRayasLargas } from './ayudantes'
 
 test('la línea de Puente aparece en la agenda de Ana y en la de su tutora', async ({ page }) => {
   await entrarConContrasena(page, 'ana@usal.es')
@@ -62,4 +62,39 @@ test('el investigador ve los cuestionarios, con los ítems pendientes marcados',
   await expect(page.getByRole('heading', { name: 'Cuestionario final' })).toBeVisible()
   await expect(page.getByText('[PENDIENTE: ítems de la escala validada]').first()).toBeVisible()
   await sinErroresDeAccesibilidad(page)
+})
+
+test('el estudiante consulta qué oposiciones puede preparar con sus estudios', async ({ page }, info) => {
+  await entrarConContrasena(page, 'ana@usal.es')
+  await page.goto('/estudiante/puente')
+  await abrirMenuSiMovil(page)
+  await page.getByRole('link', { name: 'Oposiciones' }).click()
+  await expect(page.getByRole('heading', { name: 'Oposiciones', level: 1 })).toBeVisible()
+
+  // El mismo caso que la hoja de cálculo: Pedagogía, con el Máster del Profesorado.
+  await page.getByLabel('Nivel de estudios más alto').selectOption({ label: 'Grado universitario o Licenciatura' })
+  await page.getByLabel('Tu titulación de grado').selectOption('Pedagogía')
+  await page.getByRole('radio', { name: 'Sí', exact: true }).check({ force: true })
+  await expect(page.locator('[data-recuento]')).toHaveText('34 oposiciones para tu perfil')
+  const afines = page.locator('[data-encaje="afin"] li')
+  await expect(afines).toHaveCount(2)
+  await expect(afines.first()).toContainText('Secundaria, especialidad Orientación Educativa')
+  await expect(page.locator('[data-encaje="general"] li').first()).toContainText('970')
+
+  // Sin el Máster, desaparecen las de Secundaria y se dice cuántas abriría.
+  await page.getByRole('radio', { name: 'No', exact: true }).check({ force: true })
+  await expect(page.locator('[data-recuento]')).toHaveText('32 oposiciones para tu perfil')
+  await expect(page.getByText('podrías presentarte a 2 más')).toBeVisible()
+
+  // Filtro por ámbito.
+  await page.getByRole('radio', { name: 'Castilla y León' }).check({ force: true })
+  await expect(page.locator('[data-recuento]')).toHaveText('4 oposiciones para tu perfil')
+
+  await sinErroresDeAccesibilidad(page)
+  await sinRayasLargas(page)
+  if (process.env.CAPTURA_OPOSICIONES) {
+    await page.getByRole('radio', { name: 'Todos' }).check({ force: true })
+    await page.getByRole('radio', { name: 'Sí', exact: true }).check({ force: true })
+    await page.screenshot({ path: `.local/oposiciones-${info.project.name}.png`, fullPage: true })
+  }
 })

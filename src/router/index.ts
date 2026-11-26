@@ -68,6 +68,7 @@ const routes: RouteRecordRaw[] = [
       { path: 'historial', component: () => import('@/views/estudiante/HistorialView.vue'), meta: { titulo: 'Mi histórico' } },
       { path: 'apoyo', component: () => import('@/views/estudiante/ApoyoView.vue'), meta: { titulo: 'Necesito apoyo' } },
       { path: 'puente', component: () => import('@/views/estudiante/PuenteView.vue'), meta: { titulo: 'Puente al doctorado' } },
+      { path: 'oposiciones', component: () => import('@/views/estudiante/OposicionesView.vue'), meta: { titulo: 'Oposiciones' } },
       { path: 'cuestionario/:clave', component: () => import('@/views/estudiante/CuestionarioView.vue'), meta: { titulo: 'Cuestionario' } },
     ],
   },

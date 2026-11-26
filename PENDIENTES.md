@@ -31,6 +31,7 @@ Todo lo que SINTONÍA necesita y que no se puede inventar. En la aplicación, ca
 | Dato | Dónde se usa | Dónde se cambia | Quién lo aporta |
 |---|---|---|---|
 | Convocatorias de 2027 (FPU, FPI, contratos predoctorales de la USAL y de la Junta de Castilla y León, admisión al doctorado): fechas y enlace oficial cuando se publiquen. Las de 2026 ya están comprobadas en docs/FUENTES-OFICIALES.md | Puente al doctorado | Investigación > Convocatorias | Fernando (Claude puede comprobarlas cuando salgan) |
+| Oposiciones: año y boletín de la oferta de empleo pública de la que salen las plazas; grupo de Policía Nacional (Escala Básica) y Guardia Civil (Cabos y Guardias); afinidades de las demás titulaciones (ahora solo están las de Pedagogía y la rama de Ciencias Sociales y Jurídicas) | Estudiante > Oposiciones | `src/contenido/oposiciones.ts` | Fernando (de la base de datos de la fase 1) |
 | Fecha de inicio del piloto y días de apertura y cierre de cada semana | Calendario | Investigación > Calendario del estudio | Fernando |
 | Nombres de los dos másteres del piloto | Alta de másteres | Investigación > Másteres y códigos | Fernando |
 | Dominios de correo admitidos (ahora solo `usal.es`; ¿hay otro para estudiantes?) | Registro | `configuracion > dominios_permitidos` | Fernando |
