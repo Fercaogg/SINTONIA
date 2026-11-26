@@ -33,7 +33,7 @@ const trazo = computed(() => `${Math.max(0, Math.min(1, props.progreso)) * PERIM
     </div>
     <div class="relative grid gap-6 sm:grid-cols-[1fr_auto] items-start">
       <div>
-        <p class="text-xs font-mono font-normal uppercase tracking-[0.14em] text-brand-400">{{ etiqueta }}</p>
+        <p class="text-xs font-semibold uppercase tracking-[0.08em] text-brand-400">{{ etiqueta }}</p>
         <p class="font-display text-5xl sm:text-6xl font-medium tracking-tight leading-none mt-3 tabular-nums">{{ cifra }}</p>
         <h2 class="font-display text-xl sm:text-2xl font-semibold mt-4">{{ titulo }}</h2>
         <p class="mt-1 text-white/85">{{ texto }}</p>

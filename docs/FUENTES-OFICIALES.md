@@ -40,3 +40,18 @@ Información que no depende de Fernando ni de sus directores y que se ha comprob
 1. Tratar como "director/a" a quien acompaña la tesis es coherente con la USAL: en el caso habitual, director y tutor son la misma persona (art. 13.5).
 2. Cuando el tutor es otra persona, puede añadirse como cotutor.
 3. SINTONÍA admite hoy dos personas en la dirección (dirección y codirección); el reglamento permite hasta tres. Solo importa si se usa con tesis de tres directores.
+
+## 4. Real Decreto 99/2011: acceso, duración y menciones
+
+**Fuente:** texto consolidado del BOE (https://www.boe.es/buscar/pdf/2011/BOE-A-2011-2541-consolidado.pdf), "Última modificación: 18 de julio de 2023". Lo facilitó Fernando el 26 de noviembre de 2026 y se leyó entero para estos artículos.
+
+- **Artículo 3.2 a 3.6 (duración):** "un máximo de cuatro años a tiempo completo, a contar desde la fecha de matrícula [...] hasta la fecha del depósito de la tesis doctoral". A tiempo parcial, con autorización de la Comisión académica, "una duración máxima de siete años". Con discapacidad igual o superior al 33 %, "seis años a tiempo completo y de nueve años a tiempo parcial". Prórroga de "un año más"; bajas temporales "hasta un total de dos años"; la incapacidad temporal, el nacimiento, la adopción, la violencia de género y otras situaciones "interrumpirán el cómputo del plazo".
+- **Artículo 6 (acceso):** "Con carácter general [...] títulos oficiales españoles de Grado, o equivalente, y de Máster universitario, o equivalente, siempre que se hayan superado, al menos, 300 créditos ECTS en el conjunto de estas dos enseñanzas". Otras vías: títulos del EEES de nivel 7 "sin necesidad de su homologación", títulos de fuera del EEES "previa comprobación por la universidad" de que equivalen a un máster, "otro título de Doctora o Doctor" y la formación sanitaria especializada (dos años superados).
+- **Artículo 7 (admisión):** requisitos y criterios adicionales de cada programa, por ejemplo "el aval de una investigadora o investigador como posible Directora o Director"; complementos de formación que se superan "en un plazo máximo de un curso académico".
+- **Artículo 11 (seguimiento):** matrícula anual; la Comisión académica asigna director/a y tutor/a, que "podrá ser coincidente o no"; "Antes de la finalización del primer año [...] un plan de investigación y un plan de formación personal"; evaluación anual del progreso.
+- **Artículo 15.1 (Mención "Doctorado internacional"):** estancias de "al menos, tres meses de duración fuera de España" (si son varias, "al menos una de ellas tendrá una duración mínima de un mes"); "al menos el resumen y las conclusiones" en una lengua habitual de la comunicación científica distinta de las oficiales en España; "al menos dos" expertos informantes de instituciones no españolas; "al menos una persona experta" de una institución no española en el tribunal.
+- **Artículo 15.2 (cotutela internacional):** supervisión de doctores "de dos o más universidades, de las cuales una deberá ser española"; "dos o más títulos"; "estancia mínima de seis meses en cada una de las instituciones".
+- **Artículo 15 bis (Mención "Doctorado Industrial"):** proyecto "de interés industrial, comercial, social o cultural" de una entidad, empresa o administración (excluidas las universidades); convenio con la universidad; contrato "al menos un año"; persona tutora de la universidad y responsable de la entidad.
+
+**En SINTONÍA:** Puente al doctorado > Qué necesito y Tipos de doctorado (`src/contenido/puente.ts`).
+

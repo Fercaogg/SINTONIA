@@ -28,7 +28,7 @@ const dominio = URL_SITIO.replace('https://', '')
       <h1 class="mt-[46px] max-w-[960px] font-display text-[76px] font-normal leading-[0.98] tracking-[-0.03em]">{{ pagina.imagen.titulo }}</h1>
       <p class="mt-[22px] max-w-[900px] text-[32px] leading-snug text-white/85">{{ pagina.imagen.subtitulo }}</p>
     </div>
-    <p class="absolute bottom-[34px] right-[80px] font-mono text-[20px] uppercase tracking-[0.14em] text-[#ff9670]">{{ dominio }}</p>
+    <p class="absolute bottom-[34px] right-[80px] text-[20px] font-semibold uppercase tracking-[0.08em] text-[#ff9670]">{{ dominio }}</p>
   </div>
 </template>
 

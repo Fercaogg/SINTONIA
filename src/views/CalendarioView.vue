@@ -1,8 +1,9 @@
 <script setup lang="ts">
 // Calendario compartido: mes, día elegido y próximas fechas.
 // Cada persona anota tutorías, entregas, congresos... y decide quién lo ve.
-import { computed, onMounted, ref, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { llamar, mensajeDeError } from '@/lib/api'
+import { useCarga } from '@/lib/usar-carga'
 import {
   DIAS_CORTOS, DIAS_SEMANA, TIPOS, delDia, entradas, hoy, inicioMes, nombreDia, nombreMes, proximas,
   semanasDelMes, sumarDias, sumarMeses, type Calendario, type Entrada, type Evento, type TipoCalendario,
@@ -21,8 +22,6 @@ const mes = ref(inicioMes(HOY))
 const diaElegido = ref(HOY)
 const datosMes = ref<Calendario | null>(null)
 const datosProximos = ref<Calendario | null>(null)
-const cargando = ref(true)
-const error = ref('')
 const aviso = ref('')
 const formulario = ref<{ evento: Evento | null } | null>(null)
 
@@ -52,18 +51,8 @@ async function cargarProximos() {
   datosProximos.value = await llamar<Calendario>('mi_calendario', { p_desde: HOY, p_hasta: sumarDias(HOY, 90) })
 }
 
-async function cargarTodo() {
-  error.value = ''
-  try {
-    await Promise.all([cargarMes(), cargarProximos()])
-  } catch (e) {
-    error.value = mensajeDeError(e)
-  } finally {
-    cargando.value = false
-  }
-}
-
-onMounted(cargarTodo)
+// Al volver a la pestaña tras un rato se refresca (eventos nuevos de la pareja o del máster).
+const { cargando, error, falloCarga, cargar: cargarTodo, refrescar } = useCarga(() => Promise.all([cargarMes(), cargarProximos()]))
 watch(mes, async () => {
   try {
     await cargarMes()
@@ -108,7 +97,8 @@ function editar(e: Entrada) {
 async function guardado(mensaje: string) {
   formulario.value = null
   aviso.value = mensaje
-  await cargarTodo()
+  // Sin la rueda de carga: la pantalla ya está a la vista.
+  await refrescar()
 }
 
 const textoIntro = computed(() => {
@@ -137,7 +127,7 @@ const textoIntro = computed(() => {
 
     <EstadoCarga v-if="cargando" />
     <template v-else>
-      <AvisoError v-if="error" :mensaje="error" class="mt-6" />
+      <AvisoError v-if="error" :mensaje="error" :reintentar="falloCarga ? cargarTodo : undefined" class="mt-6" />
       <p v-if="aviso" class="aviso-exito mt-6" role="status">{{ aviso }}</p>
 
       <FormularioEvento

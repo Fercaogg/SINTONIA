@@ -3,8 +3,9 @@
 // comisión académica: cotutoría (hasta dos cotutores además del principal) y
 // cambio de tutor. Todo queda en la auditoría y las respuestas anteriores se
 // conservan. El investigador no ve nombres: solo códigos y etiquetas.
-import { computed, onMounted, ref, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { llamar, mensajeDeError } from '@/lib/api'
+import { useCarga } from '@/lib/usar-carga'
 import AppIcon from '@/components/comun/AppIcon.vue'
 import AvisoError from '@/components/comun/AvisoError.vue'
 import EstadoCarga from '@/components/comun/EstadoCarga.vue'
@@ -25,8 +26,6 @@ const masters = ref<{ id: string; nombre: string }[]>([])
 const master = ref('')
 const parejas = ref<Pareja[]>([])
 const tutores = ref<TutorRef[]>([])
-const cargando = ref(true)
-const error = ref('')
 const aviso = ref('')
 const nuevoPrincipal = ref<Record<string, string>>({})
 const nuevoCotutor = ref<Record<string, string>>({})
@@ -46,17 +45,11 @@ async function cargarParejas() {
   tutores.value = t
 }
 
-onMounted(async () => {
-  try {
-    masters.value = await llamar('listar_masters')
-    master.value = masters.value[0]?.id ?? ''
-    await cargarParejas()
-  } catch (e) {
-    error.value = mensajeDeError(e)
-  } finally {
-    cargando.value = false
-  }
-})
+const { cargando, error, falloCarga, cargar } = useCarga(async () => {
+  masters.value = await llamar('listar_masters')
+  master.value = masters.value[0]?.id ?? ''
+  await cargarParejas()
+}, { alVolver: false })
 
 watch(master, () => cargarParejas().catch((e) => (error.value = mensajeDeError(e))))
 
@@ -83,7 +76,7 @@ async function accion(funcion: string, args: Record<string, unknown>, mensaje: s
 
     <EstadoCarga v-if="cargando" />
     <template v-else>
-      <AvisoError v-if="error" :mensaje="error" class="mb-6" />
+      <AvisoError v-if="error" :mensaje="error" :reintentar="falloCarga ? cargar : undefined" class="mb-6" />
       <p v-if="aviso" class="aviso-exito mb-6" role="status">{{ aviso }}</p>
 
       <div v-if="masters.length > 1" class="mb-6 max-w-sm">
@@ -99,7 +92,7 @@ async function accion(funcion: string, args: Record<string, unknown>, mensaje: s
         <ul class="space-y-4">
           <li v-for="p in parejas" :key="p.pareja_id" class="card p-5">
             <div class="flex flex-wrap items-baseline justify-between gap-2 mb-4">
-              <h2 class="font-semibold text-surface-900 font-mono tracking-wide">{{ p.pareja }}</h2>
+              <h2 class="font-semibold text-surface-900 tracking-wide tabular-nums">{{ p.pareja }}</h2>
               <span class="text-sm texto-suave">
                 Estudiante {{ p.estudiante }}<template v-if="p.estudiante_retirado"> · retirado/a</template>
                 <template v-if="p.cambios"> · {{ p.cambios }} {{ p.cambios === 1 ? 'cambio de tutor' : 'cambios de tutor' }}</template>

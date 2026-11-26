@@ -2,8 +2,9 @@
 // Investigación: másteres y códigos de acceso.
 // El investigador no ve nombres: los tutores aparecen por su seudónimo y por
 // la etiqueta que se puso a su código.
-import { computed, onMounted, ref, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { llamar, mensajeDeError } from '@/lib/api'
+import { useCarga } from '@/lib/usar-carga'
 import type { Rol, TipoTrabajo } from '@/lib/tipos'
 import { NOMBRE_ROL } from '@/lib/tipos'
 import { fechaCorta } from '@/lib/fechas'
@@ -23,8 +24,6 @@ const masters = ref<Master[]>([])
 const seleccionado = ref<string>('')
 const tutores = ref<Tutor[]>([])
 const codigos = ref<Codigo[]>([])
-const cargando = ref(true)
-const error = ref('')
 const aviso = ref('')
 
 const nuevoMaster = ref({ nombre: '', tipo: 'TFM' as TipoTrabajo })
@@ -52,16 +51,10 @@ async function cargarMaster() {
   codigos.value = c
 }
 
-onMounted(async () => {
-  try {
-    await cargarMasters()
-    await cargarMaster()
-  } catch (e) {
-    error.value = mensajeDeError(e)
-  } finally {
-    cargando.value = false
-  }
-})
+const { cargando, error, falloCarga, cargar } = useCarga(async () => {
+  await cargarMasters()
+  await cargarMaster()
+}, { alVolver: false })
 
 watch(seleccionado, () => {
   ultimosCodigos.value = []
@@ -128,7 +121,7 @@ async function anular(c: Codigo) {
 
     <EstadoCarga v-if="cargando" />
     <template v-else>
-      <AvisoError v-if="error" :mensaje="error" class="mb-6" />
+      <AvisoError v-if="error" :mensaje="error" :reintentar="falloCarga ? cargar : undefined" class="mb-6" />
       <p v-if="aviso" class="aviso-exito mb-6" role="status">{{ aviso }}</p>
 
       <div class="grid gap-6 lg:grid-cols-3">
@@ -214,7 +207,7 @@ async function anular(c: Codigo) {
             <div v-if="ultimosCodigos.length" class="aviso-exito mt-4" role="status">
               <div>
                 <p class="font-medium mb-1">Códigos creados:</p>
-                <p class="font-mono tracking-widest">{{ ultimosCodigos.join(' · ') }}</p>
+                <p class="tracking-widest tabular-nums">{{ ultimosCodigos.join(' · ') }}</p>
               </div>
             </div>
           </section>
@@ -238,7 +231,7 @@ async function anular(c: Codigo) {
                 </thead>
                 <tbody>
                   <tr v-for="c in codigos" :key="c.codigo" class="border-b border-surface-200 last:border-0">
-                    <td class="py-2 pr-3 font-mono tracking-wider">{{ c.codigo }}</td>
+                    <td class="py-2 pr-3 tracking-wider tabular-nums">{{ c.codigo }}</td>
                     <td class="py-2 pr-3">{{ NOMBRE_ROL[c.rol] }}</td>
                     <td class="py-2 pr-3">{{ c.etiqueta || '' }}</td>
                     <td class="py-2 pr-3">{{ c.tutor || '' }}</td>

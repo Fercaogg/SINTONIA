@@ -98,7 +98,7 @@ const corriendo = computed(() => automatico.value && visible.value)
       <li v-for="(c, i) in CAPITULOS" :key="c.imagen" class="capitulo border-t border-surface-200 first:border-t-0" :data-activo="i === activo">
         <button type="button" class="flex w-full flex-col py-4 text-left" :aria-pressed="i === activo" @click="elegir(i)">
           <span class="flex items-center gap-4">
-            <span class="capitulo-numero grid h-9 w-9 shrink-0 place-items-center rounded-full font-mono text-xs">{{ String(i + 1).padStart(2, '0') }}</span>
+            <span class="capitulo-numero grid h-9 w-9 shrink-0 place-items-center rounded-full text-xs tabular-nums">{{ String(i + 1).padStart(2, '0') }}</span>
             <span class="capitulo-titulo font-display text-lg font-semibold leading-snug">{{ c.titulo }}</span>
           </span>
           <span class="capitulo-cuerpo">

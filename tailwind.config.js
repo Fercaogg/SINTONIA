@@ -44,7 +44,8 @@ export default {
       fontFamily: {
         display: ['"Instrument Sans"', '"Helvetica Neue"', 'Arial', 'sans-serif'],
         body: ['"Instrument Sans"', 'system-ui', '"Segoe UI"', 'sans-serif'],
-        mono: ['"IBM Plex Mono"', 'ui-monospace', 'SFMono-Regular', 'monospace'],
+        // Sin tipografía de ancho fijo: la familia "mono" también es Instrument Sans (DECISIONES.md, 26/11/2026).
+        mono: ['"Instrument Sans"', 'system-ui', '"Segoe UI"', 'sans-serif'],
       },
       // Las utilidades rounded-* van un escalón por debajo de los tokens (las usan
       // piezas pequeñas); tarjetas y paneles usan --radius-md/--radius-lg en main.css.

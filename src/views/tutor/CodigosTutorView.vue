@@ -1,7 +1,8 @@
 <script setup lang="ts">
 // Códigos de pareja que el tutor/a puede dar a sus estudiantes.
-import { onMounted, ref } from 'vue'
-import { llamar, mensajeDeError } from '@/lib/api'
+import { ref } from 'vue'
+import { llamar } from '@/lib/api'
+import { useCarga } from '@/lib/usar-carga'
 import AppIcon from '@/components/comun/AppIcon.vue'
 import EstadoCarga from '@/components/comun/EstadoCarga.vue'
 import EstadoVacio from '@/components/comun/EstadoVacio.vue'
@@ -10,18 +11,10 @@ import { useTerminos } from '@/lib/terminos'
 import { fechaCorta } from '@/lib/fechas'
 
 const codigos = ref<{ codigo: string; caduca_at: string | null; usos: number; usos_max: number }[]>([])
-const cargando = ref(true)
-const error = ref('')
 const copiado = ref('')
 
-onMounted(async () => {
-  try {
-    codigos.value = await llamar('mis_codigos_pareja')
-  } catch (e) {
-    error.value = mensajeDeError(e)
-  } finally {
-    cargando.value = false
-  }
+const { cargando, error, cargar } = useCarga(async () => {
+  codigos.value = await llamar('mis_codigos_pareja')
 })
 
 async function copiar(codigo: string) {
@@ -45,12 +38,12 @@ const { t } = useTerminos()
     </p>
 
     <EstadoCarga v-if="cargando" />
-    <AvisoError v-else-if="error" :mensaje="error" />
+    <AvisoError v-else-if="error" :mensaje="error" :reintentar="cargar" />
     <EstadoVacio v-else-if="codigos.length === 0" icono="key" titulo="Ya has repartido todos tus códigos" texto="Si necesitas más, escribe a la persona responsable del estudio y te enviará otros." />
     <ul v-else class="grid gap-3 sm:grid-cols-2">
       <li v-for="c in codigos" :key="c.codigo" class="card p-4 flex items-center justify-between gap-3">
         <span class="min-w-0">
-          <span class="block font-mono text-lg font-semibold tracking-wider text-surface-900 break-all">{{ c.codigo }}</span>
+          <span class="block text-lg font-semibold tracking-wider text-surface-900 break-all tabular-nums">{{ c.codigo }}</span>
           <span v-if="c.caduca_at" class="block text-xs texto-suave">Caduca el {{ fechaCorta(c.caduca_at) }}</span>
         </span>
         <button type="button" class="btn-secondary text-sm px-3 shrink-0" :aria-label="`Copiar el código ${c.codigo}`" @click="copiar(c.codigo)">

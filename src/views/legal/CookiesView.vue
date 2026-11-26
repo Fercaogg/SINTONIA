@@ -34,7 +34,7 @@ const FECHA_REVISION = '24 de noviembre de 2026'
           </thead>
           <tbody>
             <tr class="border-t border-surface-200 align-top">
-              <th scope="row" class="p-3 font-mono text-xs font-medium">sb-…-auth-token</th>
+              <th scope="row" class="p-3 text-xs font-medium tabular-nums">sb-…-auth-token</th>
               <td class="p-3">Almacenamiento local, propio</td>
               <td class="p-3">Mantener tu sesión iniciada</td>
               <td class="p-3">Hasta que cierres la sesión</td>

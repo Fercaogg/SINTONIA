@@ -31,6 +31,7 @@ Todo lo que SINTONÍA necesita y que no se puede inventar. En la aplicación, ca
 | Dato | Dónde se usa | Dónde se cambia | Quién lo aporta |
 |---|---|---|---|
 | Convocatorias de 2027 (FPU, FPI, contratos predoctorales de la USAL y de la Junta de Castilla y León, admisión al doctorado): fechas y enlace oficial cuando se publiquen. Las de 2026 ya están comprobadas en docs/FUENTES-OFICIALES.md | Puente al doctorado | Investigación > Convocatorias | Fernando (Claude puede comprobarlas cuando salgan) |
+| Oposiciones: año y boletín de la oferta de empleo pública de la que salen las plazas; grupo de Policía Nacional (Escala Básica) y Guardia Civil (Cabos y Guardias); afinidades de las demás titulaciones (ahora solo están las de Pedagogía y la rama de Ciencias Sociales y Jurídicas) | Estudiante > Oposiciones | `src/contenido/oposiciones.ts` | Fernando (de la base de datos de la fase 1) |
 | Fecha de inicio del piloto y días de apertura y cierre de cada semana | Calendario | Investigación > Calendario del estudio | Fernando |
 | Nombres de los dos másteres del piloto | Alta de másteres | Investigación > Másteres y códigos | Fernando |
 | Dominios de correo admitidos (ahora solo `usal.es`; ¿hay otro para estudiantes?) | Registro | `configuracion > dominios_permitidos` | Fernando |
@@ -97,3 +98,9 @@ Todo lo que SINTONÍA necesita y que no se puede inventar. En la aplicación, ca
 | Activar Web Analytics en Vercel (proyecto `sintonia360-ferca` > Analytics > Enable). El código ya está; sin activarlo no se cuenta nada | Estadísticas de visitas | Fernando |
 | Alta en Google Search Console y envío del sitemap (pasos en docs/FICHA-GOOGLE.md) | Buscadores | Fernando, con Claude para la etiqueta de verificación |
 | Comprobar los enlaces externos (ORCID, DOI, USAL) con `npm run enlaces -- http://localhost:4173 --externos` desde un ordenador con internet. Los internos ya están comprobados | Portada e /investigacion | Fernando o Claude |
+
+## Puente al doctorado por puertas (26/11/2026)
+
+| Dato | Dónde se usa | Quién lo aporta |
+|---|---|---|
+| Cómo y cuándo se pide la admisión (preinscripción) en un programa de doctorado de la USAL. Lo demás de Puente ya está comprobado en el BOE (docs/FUENTES-OFICIALES.md, apartado 4) | Puente > Qué necesito (`src/contenido/puente.ts`, `NECESITO`) | Claude, desde una sesión que pueda abrir doctorado.usal.es (el entorno "SINTONIA" lo permite), o Fernando |

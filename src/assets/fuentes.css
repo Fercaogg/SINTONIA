@@ -1,7 +1,8 @@
 /*
-  Tipografías de «Tinta y lumbre» (LUMBRA360), servidas desde el propio sitio.
-  Instrument Sans (titulares e interfaz) e IBM Plex Mono (antetítulos y cifras).
-  Licencia SIL Open Font License 1.1: ver LICENSE-*.txt en src/assets/fuentes.
+  Tipografía de SINTONÍA, servida desde el propio sitio: Instrument Sans para
+  todo (titulares, interfaz, antetítulos y cifras, con números tabulares).
+  Una sola familia: desde el 26/11/2026 no se usa ninguna monoespaciada.
+  Licencia SIL Open Font License 1.1: ver LICENSE-Instrument-Sans.txt.
   El archivo 600 cubre también el 700: los titulares no usan negrita sintética.
 */
 @font-face {
@@ -24,18 +25,4 @@
   font-weight: 600 800;
   font-display: swap;
   src: url('./fuentes/instrument-sans-latin-600-normal.woff2') format('woff2');
-}
-@font-face {
-  font-family: 'IBM Plex Mono';
-  font-style: normal;
-  font-weight: 400;
-  font-display: swap;
-  src: url('./fuentes/ibm-plex-mono-latin-400-normal.woff2') format('woff2');
-}
-@font-face {
-  font-family: 'IBM Plex Mono';
-  font-style: normal;
-  font-weight: 500 700;
-  font-display: swap;
-  src: url('./fuentes/ibm-plex-mono-latin-500-normal.woff2') format('woff2');
 }

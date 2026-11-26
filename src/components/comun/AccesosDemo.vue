@@ -6,6 +6,7 @@ import { supabase } from '@/lib/supabase'
 import { ACCESOS_DEMO, CONTRASENA_DEMO, accesosDisponibles, comprobarModoServidor } from '@/lib/demo'
 import { useSesion } from '@/stores/sesion'
 import { INICIO_ROL } from '@/lib/tipos'
+import { destinoTrasEntrar } from '@/lib/volver'
 import AppIcon from './AppIcon.vue'
 import AvisoError from './AvisoError.vue'
 
@@ -48,7 +49,7 @@ async function entrar(email: string) {
     return
   }
   await sesion.cargar(true)
-  router.push(sesion.rol ? INICIO_ROL[sesion.rol] : '/')
+  router.push(destinoTrasEntrar(sesion.rol ? INICIO_ROL[sesion.rol] : null))
 }
 </script>
 

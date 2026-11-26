@@ -4,9 +4,10 @@ import AppIcon from '@/components/comun/AppIcon.vue'
 // La base de datos ya ha suprimido toda cifra calculada sobre menos de 5
 // personas: aquí aparecen como "Datos insuficientes para garantizar el anonimato".
 // Sin rankings, sin semáforos, sin datos por tutor y sin bienestar.
-import { computed, onMounted, ref } from 'vue'
+import { computed, ref } from 'vue'
 import { RouterLink } from 'vue-router'
-import { llamar, mensajeDeError } from '@/lib/api'
+import { llamar } from '@/lib/api'
+import { useCarga } from '@/lib/usar-carga'
 import AvisoError from '@/components/comun/AvisoError.vue'
 import EstadoCarga from '@/components/comun/EstadoCarga.vue'
 import EstadoVacio from '@/components/comun/EstadoVacio.vue'
@@ -31,17 +32,9 @@ const COLOR_TUTORES = 'var(--color-graf-tutores)'
 const SUPRIMIDA = 'Datos insuficientes para garantizar el anonimato'
 
 const datos = ref<{ master: string; minimo: number; semanas: Semana[] } | null>(null)
-const cargando = ref(true)
-const error = ref('')
 
-onMounted(async () => {
-  try {
-    datos.value = await llamar('resumen_direccion')
-  } catch (e) {
-    error.value = mensajeDeError(e)
-  } finally {
-    cargando.value = false
-  }
+const { cargando, error, cargar } = useCarga(async () => {
+  datos.value = await llamar('resumen_direccion')
 })
 
 const semanas = computed(() => datos.value?.semanas ?? [])
@@ -88,7 +81,7 @@ const filasTabla = computed(() =>
     </p>
 
     <EstadoCarga v-if="cargando" />
-    <AvisoError v-else-if="error" :mensaje="error" />
+    <AvisoError v-else-if="error" :mensaje="error" :reintentar="cargar" />
     <EstadoVacio v-else-if="!semanas.length" icono="chart" titulo="Todavía no hay datos" texto="Los resúmenes aparecerán cuando se cierre la primera semana del estudio." />
 
     <template v-else>

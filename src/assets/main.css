@@ -231,9 +231,9 @@
     color: var(--color-body);
   }
 
-  /* Antetítulo: mono en mayúsculas, como en LUMBRA360. */
+  /* Antetítulo: Instrument Sans seminegrita en mayúsculas (una sola familia en todo el sitio). */
   .antetitulo {
-    @apply font-mono text-xs uppercase;
+    @apply font-semibold text-xs uppercase;
     letter-spacing: var(--tracking-mayusculas);
     color: var(--color-body);
   }
@@ -273,7 +273,7 @@
     color: var(--color-heading);
   }
   .stat-label {
-    @apply font-mono text-xs uppercase;
+    @apply font-semibold text-xs uppercase;
     letter-spacing: var(--tracking-mayusculas);
     color: var(--color-body);
   }

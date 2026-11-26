@@ -10,6 +10,21 @@ export interface Novedad {
 
 export const NOVEDADES: Novedad[] = [
   {
+    version: '0.7.0',
+    fecha: '2026-11-25',
+    cambios: [
+      'Si la sesión caduca, la aplicación lo dice y, al volver a entrar, te lleva a la misma pantalla.',
+      'El check-in no se pierde: lo que marcas y aún no has enviado se guarda en tu navegador (salvo el bienestar) y se recupera al volver.',
+      'Si la semana se cierra con el check-in abierto, no se guarda en otra semana: te lo explicamos.',
+      'Sin conexión, el aviso lo dice claramente y cada pantalla ofrece "Reintentar" sin recargar la página.',
+      'Los paneles se ponen al día solos al volver a la pestaña.',
+      'Tras publicar una versión nueva, la pantalla se recarga sola en vez de quedarse en blanco.',
+      'Menú del móvil más cómodo con el teclado y con lectores de pantalla, que ahora anuncian cada cambio de pantalla.',
+      'Puente al doctorado por apartados: becas y contratos, plazos, qué necesito, tipos de doctorado, congresos y eventos, y normativa.',
+      'Una sola tipografía en toda la plataforma, Instrument Sans: las etiquetas en mayúsculas ya no usan letra de ancho fijo.',
+    ],
+  },
+  {
     version: '0.6.0',
     fecha: '2026-11-25',
     cambios: [
