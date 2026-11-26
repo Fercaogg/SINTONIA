@@ -6,7 +6,8 @@ import { TIPOS, cuando, nombreDia, type Entrada } from '@/lib/calendario'
 import { useTerminos } from '@/lib/terminos'
 import AppIcon from '@/components/comun/AppIcon.vue'
 
-const props = withDefaults(defineProps<{ entrada: Entrada; conDia?: boolean; compacta?: boolean }>(), { conDia: false, compacta: false })
+// sinEditar: para mostrarla fuera del calendario (Puente), donde no se edita.
+const props = withDefaults(defineProps<{ entrada: Entrada; conDia?: boolean; compacta?: boolean; sinEditar?: boolean }>(), { conDia: false, compacta: false, sinEditar: false })
 defineEmits<{ editar: [] }>()
 
 const { t } = useTerminos()
@@ -57,7 +58,7 @@ const enlace = computed(() => {
       </template>
     </div>
     <button
-      v-if="ev?.editable && !compacta"
+      v-if="ev?.editable && !compacta && !sinEditar"
       type="button"
       class="btn-secondary self-start !px-3"
       @click="$emit('editar')"

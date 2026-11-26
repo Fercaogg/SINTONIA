@@ -20,6 +20,7 @@ export const NOVEDADES: Novedad[] = [
       'Los paneles se ponen al día solos al volver a la pestaña.',
       'Tras publicar una versión nueva, la pantalla se recarga sola en vez de quedarse en blanco.',
       'Menú del móvil más cómodo con el teclado y con lectores de pantalla, que ahora anuncian cada cambio de pantalla.',
+      'Puente al doctorado por apartados: becas y contratos, plazos, qué necesito, tipos de doctorado, congresos y eventos, y normativa.',
     ],
   },
   {

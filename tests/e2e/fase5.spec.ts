@@ -18,7 +18,9 @@ test('el estudiante activa y desactiva Puente al doctorado', async ({ page }) =>
   await expect(interruptor).toHaveAttribute('aria-checked', 'false')
   await interruptor.click()
   await expect(interruptor).toHaveAttribute('aria-checked', 'true')
-  // Las convocatorias oficiales aparecen como pendientes.
+  await sinErroresDeAccesibilidad(page)
+  // Las convocatorias oficiales (puerta "Becas y contratos") aparecen como pendientes.
+  await page.getByRole('link', { name: /Becas y contratos/ }).click()
   await expect(page.getByRole('heading', { name: /Formación de Profesorado Universitario \(FPU\)/ })).toBeVisible()
   await expect(page.locator('[data-pendiente="true"]').first()).toBeVisible()
   await sinErroresDeAccesibilidad(page)

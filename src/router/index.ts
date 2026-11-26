@@ -9,6 +9,7 @@ import { createRouter, createWebHistory, type RouteRecordRaw } from 'vue-router'
 import { useSesion } from '@/stores/sesion'
 import { INICIO_ROL, necesitaConsentimiento, type Rol } from '@/lib/tipos'
 import { recordarVolver } from '@/lib/volver'
+import { PUERTAS } from '@/contenido/puente'
 
 declare module 'vue-router' {
   interface RouteMeta {
@@ -69,6 +70,13 @@ const routes: RouteRecordRaw[] = [
       { path: 'historial', component: () => import('@/views/estudiante/HistorialView.vue'), meta: { titulo: 'Mi histórico' } },
       { path: 'apoyo', component: () => import('@/views/estudiante/ApoyoView.vue'), meta: { titulo: 'Necesito apoyo' } },
       { path: 'puente', component: () => import('@/views/estudiante/PuenteView.vue'), meta: { titulo: 'Puente al doctorado' } },
+      // Una ruta por puerta de Puente (cada una con su título).
+      ...PUERTAS.map((p) => ({
+        path: `puente/${p.clave}`,
+        component: () => import('@/views/estudiante/PuenteSeccionView.vue'),
+        props: { seccion: p.clave },
+        meta: { titulo: `${p.titulo} · Puente al doctorado` },
+      })),
       { path: 'cuestionario/:clave', component: () => import('@/views/estudiante/CuestionarioView.vue'), meta: { titulo: 'Cuestionario' } },
     ],
   },
