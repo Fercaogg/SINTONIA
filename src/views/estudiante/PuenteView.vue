@@ -11,6 +11,7 @@ import AppIcon from '@/components/comun/AppIcon.vue'
 import AvisoError from '@/components/comun/AvisoError.vue'
 import EstadoCarga from '@/components/comun/EstadoCarga.vue'
 import InterruptorPuente from '@/components/puente/InterruptorPuente.vue'
+import PuenteEscena from '@/components/puente/PuenteEscena.vue'
 
 const datos = ref<DatosPuente | null>(null)
 const eventos = ref<Entrada[] | null>(null)
@@ -21,6 +22,9 @@ const { cargando, error, cargar } = useCarga(async () => {
   datos.value = d
   eventos.value = e
 })
+
+// El tramo del puente que se enciende: el de la puerta que señalas o enfocas.
+const activa = ref<number | null>(null)
 
 const plural = (n: number, uno: string, varios: string) => `${n} ${n === 1 ? uno : varios}`
 
@@ -39,26 +43,47 @@ const resumen = computed<Record<SeccionPuente, string>>(() => {
 </script>
 
 <template>
-  <div class="fade-in max-w-3xl">
-    <h1 class="titulo-pagina">Puente al doctorado</h1>
-    <p class="texto-suave mt-1 mb-8">Todo lo que necesitas para dar el paso al doctorado, a tu ritmo. Elige por dónde empezar.</p>
+  <div class="fade-in max-w-4xl">
+    <section class="cabecera-puente relative overflow-hidden rounded-panel bg-marino text-white mb-8" aria-labelledby="t-puente">
+      <div class="relative grid lg:grid-cols-[minmax(0,5fr)_minmax(0,6fr)] items-center">
+        <div class="p-6 sm:p-8 lg:p-10 lg:pr-0 relative z-10">
+          <p class="antetitulo-lumbre">Del máster al doctorado</p>
+          <h1 id="t-puente" class="titulo-pagina !text-white mt-3">Puente al doctorado</h1>
+          <p class="text-white/80 mt-3 leading-relaxed max-w-md">
+            Seis tramos con todo lo que necesitas para dar el paso, a tu ritmo. Empieza por el que quieras.
+          </p>
+        </div>
+        <PuenteEscena :activa="activa" class="-mt-6 lg:mt-0" />
+      </div>
+    </section>
 
     <EstadoCarga v-if="cargando" />
     <AvisoError v-else-if="!datos" :mensaje="error" :reintentar="cargar" />
     <template v-else>
       <nav aria-label="Apartados de Puente al doctorado">
-        <ul class="grid gap-4 sm:grid-cols-2">
-          <li v-for="p in PUERTAS" :key="p.clave">
-            <RouterLink :to="`/estudiante/puente/${p.clave}`" class="card tarjeta-enlace p-5 no-underline h-full flex flex-col" :data-puerta="p.clave">
-              <span class="flex items-center gap-3">
-                <span class="w-11 h-11 rounded-2xl bg-brand-50 flex items-center justify-center shrink-0" aria-hidden="true">
-                  <AppIcon :name="p.icono" :size="22" class="text-surface-900" />
+        <ul class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <li v-for="(p, i) in PUERTAS" :key="p.clave" class="entrar" :style="{ '--retraso': `${i * 50}ms` }">
+            <RouterLink
+              :to="`/estudiante/puente/${p.clave}`"
+              class="card tarjeta-enlace tarjeta-tramo group p-5 no-underline h-full flex flex-col"
+              :data-puerta="p.clave"
+              @pointerenter="activa = i"
+              @pointerleave="activa = null"
+              @focus="activa = i"
+              @blur="activa = null"
+            >
+              <span class="flex items-start justify-between gap-3">
+                <span class="icono-tramo" aria-hidden="true">
+                  <AppIcon :name="p.icono" :size="22" />
                 </span>
-                <span class="font-semibold text-surface-900 flex-1">{{ p.titulo }}</span>
-                <AppIcon name="back" :size="18" class="text-surface-900 rotate-180 shrink-0" aria-hidden="true" />
+                <span class="text-xs font-semibold uppercase tracking-[0.08em] texto-suave tabular-nums pt-1">Tramo {{ i + 1 }}</span>
               </span>
-              <span class="text-sm texto-suave mt-3 flex-1">{{ p.descripcion }}</span>
-              <span v-if="resumen[p.clave]" class="text-sm font-medium text-surface-800 mt-3 tabular-nums">{{ resumen[p.clave] }}</span>
+              <span class="font-semibold text-surface-900 text-lg mt-4 flex items-center gap-2">
+                {{ p.titulo }}
+                <AppIcon name="arrow_right" :size="16" class="flecha-tramo shrink-0" aria-hidden="true" />
+              </span>
+              <span class="text-sm texto-suave mt-1.5 flex-1 leading-relaxed">{{ p.descripcion }}</span>
+              <span v-if="resumen[p.clave]" class="resumen-tramo mt-4 tabular-nums">{{ resumen[p.clave] }}</span>
             </RouterLink>
           </li>
         </ul>

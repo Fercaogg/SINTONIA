@@ -8,6 +8,7 @@ import { hoy, type Entrada } from '@/lib/calendario'
 import { NECESITO, PUERTAS, TIPOS_DOCTORADO, type Apartado, type SeccionPuente } from '@/contenido/puente'
 import { useSesion } from '@/stores/sesion'
 import AppIcon from '@/components/comun/AppIcon.vue'
+import PuenteEscena from '@/components/puente/PuenteEscena.vue'
 import AvisoError from '@/components/comun/AvisoError.vue'
 import EstadoCarga from '@/components/comun/EstadoCarga.vue'
 import EstadoVacio from '@/components/comun/EstadoVacio.vue'
@@ -18,6 +19,7 @@ import TarjetaConvocatoria from '@/components/puente/TarjetaConvocatoria.vue'
 
 const props = defineProps<{ seccion: SeccionPuente }>()
 const puerta = computed(() => PUERTAS.find((p) => p.clave === props.seccion)!)
+const indice = computed(() => PUERTAS.findIndex((p) => p.clave === props.seccion))
 const otras = computed(() => PUERTAS.filter((p) => p.clave !== props.seccion))
 
 const datos = ref<DatosPuente | null>(null)
@@ -40,13 +42,21 @@ const tituloPuerta = (clave: SeccionPuente) => PUERTAS.find((p) => p.clave === c
     <RouterLink to="/estudiante/puente" class="enlace text-sm inline-flex items-center gap-1 mb-4">
       <AppIcon name="back" :size="16" /> Puente al doctorado
     </RouterLink>
-    <div class="flex items-center gap-3">
-      <span class="w-11 h-11 rounded-2xl bg-brand-50 flex items-center justify-center shrink-0" aria-hidden="true">
-        <AppIcon :name="puerta.icono" :size="22" class="text-surface-900" />
-      </span>
-      <h1 class="titulo-pagina">{{ puerta.titulo }}</h1>
-    </div>
-    <p class="texto-suave mt-2 mb-8">{{ puerta.descripcion }}</p>
+    <section class="cabecera-puente relative overflow-hidden rounded-panel bg-marino text-white mb-8" :aria-labelledby="`t-${seccion}`">
+      <div class="relative grid sm:grid-cols-[minmax(0,3fr)_minmax(0,2fr)] items-center">
+        <div class="p-6 sm:p-8 relative z-10">
+          <p class="antetitulo-lumbre">Tramo {{ indice + 1 }} de {{ PUERTAS.length }}</p>
+          <div class="flex items-center gap-3 mt-3">
+            <span class="icono-tramo !bg-white/10 !text-white" aria-hidden="true">
+              <AppIcon :name="puerta.icono" :size="22" />
+            </span>
+            <h1 :id="`t-${seccion}`" class="titulo-pagina !text-white">{{ puerta.titulo }}</h1>
+          </div>
+          <p class="text-white/80 mt-3 leading-relaxed">{{ puerta.descripcion }}</p>
+        </div>
+        <PuenteEscena :activa="indice" compacta class="hidden sm:block" />
+      </div>
+    </section>
 
     <EstadoCarga v-if="cargando" />
     <AvisoError v-else-if="error" :mensaje="error" :reintentar="cargar" />
