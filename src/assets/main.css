@@ -465,64 +465,7 @@
   }
 }
 
-/* ---------- Puente al doctorado: cabecera con la escena 3D y tramos ---------- */
-.cabecera-puente::before {
-  /* Resplandor de lumbre detrás de la puerta del doctorado. */
-  content: '';
-  position: absolute;
-  right: -10%;
-  top: -30%;
-  width: 70%;
-  height: 140%;
-  background: radial-gradient(closest-side, rgb(var(--rgb-b500) / 0.28), transparent);
-  pointer-events: none;
-}
-.antetitulo-lumbre {
-  font-size: 0.75rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: var(--lumbre-300);
-}
-.icono-tramo {
-  width: 2.75rem;
-  height: 2.75rem;
-  border-radius: var(--radius-sm);
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  background-color: var(--color-lumbre-suave);
-  color: var(--color-lumbre-texto);
-  transition: background-color var(--dur-ui) ease, color var(--dur-ui) ease;
-}
-.resumen-tramo {
-  align-self: flex-start;
-  font-size: 0.8125rem;
-  font-weight: 500;
-  padding: 0.25rem 0.75rem;
-  border-radius: var(--radius-pill);
-  background-color: rgb(var(--rgb-s100));
-  color: var(--color-heading);
-}
-.flecha-tramo {
-  color: var(--color-lumbre-texto);
-  transition: transform var(--dur-ui) var(--ease-out);
-}
-@media (hover: hover) and (pointer: fine) {
-  .tarjeta-tramo:hover .icono-tramo {
-    background-color: rgb(var(--rgb-b500));
-    color: #fff;
-  }
-  .tarjeta-tramo:hover .flecha-tramo {
-    transform: translateX(3px);
-  }
-}
-.tarjeta-tramo:focus-visible .icono-tramo {
-  background-color: rgb(var(--rgb-b500));
-  color: #fff;
-}
-/* Las tarjetas entran escalonadas, una vez (30-80 ms entre cada una). */
+/* ---------- Puente al doctorado: entrada escalonada del índice ---------- */
 @media (prefers-reduced-motion: no-preference) {
   .entrar {
     animation: entrar-tramo 420ms var(--ease-out) backwards;
