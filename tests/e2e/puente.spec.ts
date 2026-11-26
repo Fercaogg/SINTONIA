@@ -1,4 +1,4 @@
-// Puente al doctorado por puertas: seis cajas en la entrada y, al pulsar
+// Puente al doctorado por puertas: estantería e índice en la entrada y, al pulsar
 // cada una, toda su información.
 
 import { expect, test } from '@playwright/test'
@@ -22,7 +22,7 @@ test('la entrada muestra seis puertas, cada una con lo que hay dentro', async ({
   for (const [titulo, resumen] of PUERTAS) {
     const puerta = puertas.filter({ hasText: titulo })
     await expect(puerta).toHaveCount(1)
-    await expect(puerta.locator('span').last()).toHaveText(resumen)
+    await expect(puerta.locator('[data-resumen]')).toHaveText(resumen)
   }
   await sinErroresDeAccesibilidad(page)
   await sinRayasLargas(page)

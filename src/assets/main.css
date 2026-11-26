@@ -465,64 +465,7 @@
   }
 }
 
-/* ---------- Puente al doctorado: cabecera con la escena 3D y tramos ---------- */
-.cabecera-puente::before {
-  /* Resplandor de lumbre detrás de la puerta del doctorado. */
-  content: '';
-  position: absolute;
-  right: -10%;
-  top: -30%;
-  width: 70%;
-  height: 140%;
-  background: radial-gradient(closest-side, rgb(var(--rgb-b500) / 0.28), transparent);
-  pointer-events: none;
-}
-.antetitulo-lumbre {
-  font-size: 0.75rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: var(--lumbre-300);
-}
-.icono-tramo {
-  width: 2.75rem;
-  height: 2.75rem;
-  border-radius: var(--radius-sm);
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  background-color: var(--color-lumbre-suave);
-  color: var(--color-lumbre-texto);
-  transition: background-color var(--dur-ui) ease, color var(--dur-ui) ease;
-}
-.resumen-tramo {
-  align-self: flex-start;
-  font-size: 0.8125rem;
-  font-weight: 500;
-  padding: 0.25rem 0.75rem;
-  border-radius: var(--radius-pill);
-  background-color: rgb(var(--rgb-s100));
-  color: var(--color-heading);
-}
-.flecha-tramo {
-  color: var(--color-lumbre-texto);
-  transition: transform var(--dur-ui) var(--ease-out);
-}
-@media (hover: hover) and (pointer: fine) {
-  .tarjeta-tramo:hover .icono-tramo {
-    background-color: rgb(var(--rgb-b500));
-    color: #fff;
-  }
-  .tarjeta-tramo:hover .flecha-tramo {
-    transform: translateX(3px);
-  }
-}
-.tarjeta-tramo:focus-visible .icono-tramo {
-  background-color: rgb(var(--rgb-b500));
-  color: #fff;
-}
-/* Las tarjetas entran escalonadas, una vez (30-80 ms entre cada una). */
+/* ---------- Puente al doctorado: entrada escalonada del índice ---------- */
 @media (prefers-reduced-motion: no-preference) {
   .entrar {
     animation: entrar-tramo 420ms var(--ease-out) backwards;
@@ -534,4 +477,48 @@
       transform: translateY(10px);
     }
   }
+}
+
+/* ---------- Puente al doctorado: la biblioteca ---------- */
+.cabecera-biblioteca {
+  background:
+    radial-gradient(60% 80% at 85% 10%, rgb(var(--rgb-b500) / 0.10), transparent 70%),
+    rgb(var(--rgb-s100));
+  border: 1px solid rgb(var(--rgb-s200));
+}
+.indice {
+  border-top: 1px solid rgb(var(--rgb-s200));
+}
+.indice > li {
+  border-bottom: 1px solid rgb(var(--rgb-s200));
+}
+.entrada-indice {
+  display: flex;
+  align-items: flex-start;
+  gap: 1.25rem;
+  padding: 1.125rem 0.75rem;
+  margin: 0 -0.75rem;
+  border-radius: var(--radius-sm);
+  text-decoration: none;
+  transition: background-color var(--dur-ui) ease;
+}
+.entrada-indice.activa {
+  background-color: rgb(var(--rgb-s100));
+}
+.num-indice {
+  width: 2.25rem;
+  flex-shrink: 0;
+  padding-top: 0.2rem;
+  font-weight: 600;
+  font-size: 0.875rem;
+  letter-spacing: 0.04em;
+  color: var(--color-lumbre-texto);
+  font-variant-numeric: tabular-nums;
+}
+/* Puntos guía entre el título y el resumen, como en un índice impreso. */
+.puntos {
+  flex: 1;
+  min-width: 1rem;
+  border-bottom: 2px dotted rgb(var(--rgb-s300));
+  transform: translateY(-0.3rem);
 }
