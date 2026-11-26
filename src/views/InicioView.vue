@@ -127,7 +127,7 @@ const estilo = (e: Record<string, string>) => e
         <CampoSintonia />
         <div class="relative z-10 max-w-[1264px] mx-auto px-6 sm:px-8 pt-14 pb-16 sm:pt-20 lg:pt-24">
           <div class="entrada mx-auto flex max-w-[52rem] flex-col items-center gap-6 text-center">
-            <p class="font-mono text-xs uppercase tracking-[0.14em] text-surface-600">{{ t('Tutoría de TFM, TFG y tesis', 'Supervision of Master\'s theses, final projects and PhDs') }}</p>
+            <p class="text-xs font-semibold uppercase tracking-[0.08em] text-surface-600">{{ t('Tutoría de TFM, TFG y tesis', 'Supervision of Master\'s theses, final projects and PhDs') }}</p>
             <h1 id="t-inicio" class="font-display text-[2.4rem] leading-[1.04] sm:text-5xl lg:text-[3.75rem] font-medium tracking-[-0.035em] text-surface-900 text-balance">
               {{ t('Acompañar el trabajo académico,', 'Supporting academic work,') }}
               {{ t('sin vigilar', 'without surveillance') }}
@@ -217,7 +217,7 @@ const estilo = (e: Record<string, string>) => e
             <li v-for="(p, i) in PASOS" :key="p.titulo" v-revelar="i" class="flex flex-col gap-4">
               <div v-cursor="'inclinar'" class="rounded-[12px] border border-surface-200 bg-surface-50 p-4 shadow-soft"><IlustracionPaso :paso="(i + 1) as 1 | 2 | 3" /></div>
               <div class="flex items-center gap-3" aria-hidden="true">
-                <span class="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-brand-900 font-mono text-xs text-papel">{{ i + 1 }}</span>
+                <span class="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-brand-900 text-xs text-papel tabular-nums">{{ i + 1 }}</span>
                 <span class="relative hidden h-0.5 flex-1 overflow-hidden rounded-full bg-surface-200 lg:block" :class="i === PASOS.length - 1 ? 'lg:invisible' : ''">
                   <span class="absolute inset-0 bg-brand-500" />
                 </span>
@@ -336,7 +336,7 @@ const estilo = (e: Record<string, string>) => e
             <span ref="puenteRelleno" class="absolute left-6 top-6 bottom-6 w-0.5 -translate-x-1/2 origin-top bg-brand-500" :style="{ transform: `scaleY(${puenteActivo === PUENTE_LARGO ? 1 : 0})` }" aria-hidden="true" />
             <li v-for="(p, i) in PUENTE" :key="p.titulo" class="relative grid grid-cols-[3rem_1fr] gap-x-5 pb-10 last:pb-0">
               <span
-                class="paso-puente relative z-10 h-12 w-12 rounded-full flex items-center justify-center font-mono text-sm"
+                class="paso-puente relative z-10 h-12 w-12 rounded-full flex items-center justify-center text-sm tabular-nums"
                 :class="i < puenteActivo ? 'bg-brand-500 text-[#111111] encendido' : 'bg-papel text-surface-900 ring-1 ring-surface-300'"
                 aria-hidden="true"
               >{{ String(i + 1).padStart(2, '0') }}</span>
@@ -393,7 +393,7 @@ const estilo = (e: Record<string, string>) => e
       <!-- Referencias citadas en esta página -->
       <section class="max-w-[1264px] mx-auto px-6 sm:px-8 pb-12 w-full" aria-labelledby="t-refs">
         <div class="border-t border-surface-200 pt-8">
-          <h2 id="t-refs" class="font-mono text-xs font-normal uppercase tracking-[0.14em] text-surface-600 mb-4">{{ t('Referencias citadas', 'References cited') }}</h2>
+          <h2 id="t-refs" class="text-xs font-semibold uppercase tracking-[0.08em] text-surface-600 mb-4">{{ t('Referencias citadas', 'References cited') }}</h2>
           <ul class="space-y-2 text-sm texto-suave max-w-4xl">
             <li v-for="r in CITADAS" :key="r.clave" class="pl-6 -indent-6">
               {{ r.texto }} <a v-if="r.enlace" :href="r.enlace" target="_blank" rel="noopener noreferrer" class="enlace break-all">{{ r.enlace }}<span class="sr-only">{{ t(' (se abre en otra pestaña)', ' (opens in a new tab)') }}</span></a>

@@ -94,7 +94,7 @@ async function enviar() {
       <AvisoError v-if="error" :mensaje="error" :reintentar="falloCarga ? cargar : undefined" class="mb-6" />
 
       <div v-for="[bloque, items] in bloques" :key="bloque" class="mb-6">
-        <h2 class="text-xs font-mono font-normal uppercase tracking-[0.14em] texto-suave mb-3">{{ bloque }}</h2>
+        <h2 class="text-xs font-semibold uppercase tracking-[0.08em] texto-suave mb-3">{{ bloque }}</h2>
         <div class="space-y-4">
           <section v-for="item in items" :key="item.id" class="card p-5">
             <p :id="`c-${item.id}`" class="font-display text-lg font-semibold text-surface-900 leading-snug mb-4">

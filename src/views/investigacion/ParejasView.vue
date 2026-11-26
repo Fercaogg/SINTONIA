@@ -92,7 +92,7 @@ async function accion(funcion: string, args: Record<string, unknown>, mensaje: s
         <ul class="space-y-4">
           <li v-for="p in parejas" :key="p.pareja_id" class="card p-5">
             <div class="flex flex-wrap items-baseline justify-between gap-2 mb-4">
-              <h2 class="font-semibold text-surface-900 font-mono tracking-wide">{{ p.pareja }}</h2>
+              <h2 class="font-semibold text-surface-900 tracking-wide tabular-nums">{{ p.pareja }}</h2>
               <span class="text-sm texto-suave">
                 Estudiante {{ p.estudiante }}<template v-if="p.estudiante_retirado"> · retirado/a</template>
                 <template v-if="p.cambios"> · {{ p.cambios }} {{ p.cambios === 1 ? 'cambio de tutor' : 'cambios de tutor' }}</template>

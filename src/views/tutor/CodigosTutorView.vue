@@ -43,7 +43,7 @@ const { t } = useTerminos()
     <ul v-else class="grid gap-3 sm:grid-cols-2">
       <li v-for="c in codigos" :key="c.codigo" class="card p-4 flex items-center justify-between gap-3">
         <span class="min-w-0">
-          <span class="block font-mono text-lg font-semibold tracking-wider text-surface-900 break-all">{{ c.codigo }}</span>
+          <span class="block text-lg font-semibold tracking-wider text-surface-900 break-all tabular-nums">{{ c.codigo }}</span>
           <span v-if="c.caduca_at" class="block text-xs texto-suave">Caduca el {{ fechaCorta(c.caduca_at) }}</span>
         </span>
         <button type="button" class="btn-secondary text-sm px-3 shrink-0" :aria-label="`Copiar el código ${c.codigo}`" @click="copiar(c.codigo)">

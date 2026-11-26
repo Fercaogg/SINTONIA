@@ -87,7 +87,7 @@ const tituloPuerta = (clave: SeccionPuente) => PUERTAS.find((p) => p.clave === c
         <component :is="seccion === 'necesito' ? 'ol' : 'ul'" class="space-y-3">
           <li v-for="(a, i) in apartados" :key="a.titulo" class="card p-5 sm:p-6">
             <h2 class="font-semibold text-surface-900 flex items-start gap-3">
-              <span v-if="seccion === 'necesito'" class="w-7 h-7 rounded-full bg-brand-50 text-sm font-mono flex items-center justify-center shrink-0" aria-hidden="true">{{ i + 1 }}</span>
+              <span v-if="seccion === 'necesito'" class="w-7 h-7 rounded-full bg-brand-50 text-sm flex items-center justify-center shrink-0 tabular-nums" aria-hidden="true">{{ i + 1 }}</span>
               <span class="pt-0.5">{{ a.titulo }}</span>
             </h2>
             <p v-if="a.texto" class="text-sm leading-relaxed mt-2">{{ a.texto }}</p>
@@ -138,7 +138,7 @@ const tituloPuerta = (clave: SeccionPuente) => PUERTAS.find((p) => p.clave === c
     </template>
 
     <nav class="mt-12 pt-6 border-t border-surface-200" aria-label="Otros apartados de Puente al doctorado">
-      <p class="text-xs font-mono uppercase tracking-[0.14em] texto-suave mb-3">Otros apartados</p>
+      <p class="text-xs font-semibold uppercase tracking-[0.08em] texto-suave mb-3">Otros apartados</p>
       <ul class="flex flex-wrap gap-2">
         <li v-for="p in otras" :key="p.clave">
           <RouterLink :to="`/estudiante/puente/${p.clave}`" class="btn-secondary !py-2 text-sm">

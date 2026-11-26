@@ -207,7 +207,7 @@ async function anular(c: Codigo) {
             <div v-if="ultimosCodigos.length" class="aviso-exito mt-4" role="status">
               <div>
                 <p class="font-medium mb-1">Códigos creados:</p>
-                <p class="font-mono tracking-widest">{{ ultimosCodigos.join(' · ') }}</p>
+                <p class="tracking-widest tabular-nums">{{ ultimosCodigos.join(' · ') }}</p>
               </div>
             </div>
           </section>
@@ -231,7 +231,7 @@ async function anular(c: Codigo) {
                 </thead>
                 <tbody>
                   <tr v-for="c in codigos" :key="c.codigo" class="border-b border-surface-200 last:border-0">
-                    <td class="py-2 pr-3 font-mono tracking-wider">{{ c.codigo }}</td>
+                    <td class="py-2 pr-3 tracking-wider tabular-nums">{{ c.codigo }}</td>
                     <td class="py-2 pr-3">{{ NOMBRE_ROL[c.rol] }}</td>
                     <td class="py-2 pr-3">{{ c.etiqueta || '' }}</td>
                     <td class="py-2 pr-3">{{ c.tutor || '' }}</td>

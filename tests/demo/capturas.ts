@@ -12,6 +12,15 @@ async function foto(page: Page, nombre: string, proyecto: string, completa = tru
   await page.waitForLoadState('networkidle')
   await page.evaluate(() => document.fonts.ready)
   await page.mouse.move(0, 0)
+  // Las imágenes diferidas (loading="lazy") solo se cargan al acercarse: en una
+  // captura de página completa saldrían vacías. Se cargan todas antes.
+  if (completa) {
+    await page.evaluate(async () => {
+      const imgs = Array.from(document.querySelectorAll<HTMLImageElement>('img[loading="lazy"]'))
+      imgs.forEach((i) => (i.loading = 'eager'))
+      await Promise.all(imgs.map((i) => (i.complete ? null : new Promise((r) => { i.onload = i.onerror = r }))))
+    })
+  }
   // En una captura de página completa, los elementos fijos (cabecera del móvil,
   // botón de envío) aparecerían a mitad de imagen: se dejan en su sitio normal.
   if (completa) await page.addStyleTag({ content: '.sticky { position: static !important; }' })

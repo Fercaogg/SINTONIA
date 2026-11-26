@@ -118,10 +118,9 @@
 
   /* Tipografía */
   --fuente-titular: 'Instrument Sans', 'Helvetica Neue', Arial, sans-serif;
-  --fuente-datos: 'IBM Plex Mono', ui-monospace, 'SFMono-Regular', monospace;
   --tracking-heroe: -0.045em;
   --tracking-titular: -0.03em;
-  --tracking-mayusculas: 0.14em;
+  --tracking-mayusculas: 0.08em;
 
   /* Movimiento */
   --ease-out: cubic-bezier(0.23, 1, 0.32, 1);

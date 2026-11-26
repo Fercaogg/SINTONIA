@@ -21,7 +21,7 @@ const tx = (v: Texto) => (idioma.value === 'en' ? v.en : v.es)
       <div v-revelar class="relative overflow-hidden rounded-[28px] bg-marino p-8 text-white sm:p-10 lg:p-14">
         <div class="grid items-center gap-12 lg:grid-cols-12 lg:gap-16">
           <div class="flex flex-col gap-5 lg:col-span-5">
-            <p class="font-mono text-xs uppercase tracking-[0.14em] text-brand-400">{{ t('Ya lo hemos hecho', 'We have done it before') }}</p>
+            <p class="text-xs font-semibold uppercase tracking-[0.08em] text-brand-400">{{ t('Ya lo hemos hecho', 'We have done it before') }}</p>
             <h3 class="font-display text-[1.875rem] lg:text-[2.5rem] font-medium leading-[1.08] tracking-tight text-balance">
               {{ t('Antes de SINTONÍA, ya pusimos a prueba WORKWELL360', 'Before SINTONÍA, we put WORKWELL360 to the test') }}
             </h3>
@@ -44,7 +44,7 @@ const tx = (v: Texto) => (idioma.value === 'en' ? v.en : v.es)
                 <img v-else-if="h.logo === 'ymca'" src="/marca/terceros/ymca.svg" alt="YMCA" width="40" height="12" class="h-auto w-10" />
                 <SimboloSintonia v-else class="h-7 w-7 text-[#111111] [&_path]:fill-[#111111]" />
               </span>
-              <span class="font-mono text-xs uppercase tracking-[0.14em] text-white/70">{{ tx(h.etiqueta) }}</span>
+              <span class="text-xs font-semibold uppercase tracking-[0.08em] text-white/70">{{ tx(h.etiqueta) }}</span>
               <span class="text-lg font-semibold leading-snug">{{ h.titulo }}</span>
               <span class="text-sm text-white/80">{{ tx(h.texto) }}</span>
             </li>
@@ -72,7 +72,7 @@ const tx = (v: Texto) => (idioma.value === 'en' ? v.en : v.es)
             />
           </div>
           <div class="flex flex-col gap-0.5">
-            <span class="font-mono text-[0.68rem] uppercase tracking-[0.14em] text-surface-600">{{ tx(a.tipo) }}</span>
+            <span class="text-[0.68rem] font-semibold uppercase tracking-[0.08em] text-surface-600">{{ tx(a.tipo) }}</span>
             <span class="text-sm font-medium leading-snug text-surface-900">{{ a.nombre }}</span>
           </div>
         </li>
@@ -81,7 +81,7 @@ const tx = (v: Texto) => (idioma.value === 'en' ? v.en : v.es)
       <!-- Equipo -->
       <div id="equipo" class="mt-16 flex scroll-mt-24 flex-col items-center gap-8 lg:mt-20">
         <div v-revelar class="flex flex-col items-center gap-3 text-center">
-          <p class="font-mono text-xs uppercase tracking-[0.14em] text-surface-600">{{ t('Quiénes somos', 'Who we are') }}</p>
+          <p class="text-xs font-semibold uppercase tracking-[0.08em] text-surface-600">{{ t('Quiénes somos', 'Who we are') }}</p>
           <h3 class="font-display text-2xl lg:text-[1.75rem] font-medium tracking-tight text-surface-900">
             {{ t('Las personas detrás del proyecto', 'The people behind the project') }}
           </h3>
@@ -100,7 +100,7 @@ const tx = (v: Texto) => (idioma.value === 'en' ? v.en : v.es)
                   class="h-16 w-16 shrink-0 rounded-full object-cover"
                 />
                 <div class="flex min-w-0 flex-col">
-                  <p class="font-mono text-[0.68rem] uppercase tracking-[0.14em] text-lumbre-texto">{{ tx(m.papel) }}</p>
+                  <p class="text-[0.68rem] font-semibold uppercase tracking-[0.08em] text-lumbre-texto">{{ tx(m.papel) }}</p>
                   <h4 class="font-semibold leading-snug text-surface-900">{{ m.nombre }}</h4>
                   <p class="text-sm texto-suave">{{ tx(m.cargo) }}</p>
                 </div>

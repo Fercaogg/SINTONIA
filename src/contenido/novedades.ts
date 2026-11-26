@@ -21,6 +21,7 @@ export const NOVEDADES: Novedad[] = [
       'Tras publicar una versión nueva, la pantalla se recarga sola en vez de quedarse en blanco.',
       'Menú del móvil más cómodo con el teclado y con lectores de pantalla, que ahora anuncian cada cambio de pantalla.',
       'Puente al doctorado por apartados: becas y contratos, plazos, qué necesito, tipos de doctorado, congresos y eventos, y normativa.',
+      'Una sola tipografía en toda la plataforma, Instrument Sans: las etiquetas en mayúsculas ya no usan letra de ancho fijo.',
     ],
   },
   {

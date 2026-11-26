@@ -61,7 +61,7 @@ const GARANTIAS = [
         <li v-for="m in EQUIPO" :key="m.nombre" class="flex gap-3 rounded-lg border border-surface-200 p-3">
           <img :src="m.foto" alt="" width="40" height="40" class="h-10 w-10 shrink-0 rounded-full object-cover" />
           <div class="min-w-0">
-            <p class="font-mono text-[0.6rem] uppercase tracking-[0.14em] text-[#b83a0e]">{{ m.papel.es }}</p>
+            <p class="text-[0.6rem] font-semibold uppercase tracking-[0.08em] text-[#b83a0e]">{{ m.papel.es }}</p>
             <p class="font-display font-semibold leading-snug text-[#111111]">{{ m.nombre }}</p>
             <p class="text-surface-800">{{ m.cargo.es }}</p>
           </div>
@@ -88,10 +88,10 @@ const GARANTIAS = [
 
 <style scoped>
 .titulo {
-  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  font-family: var(--fuente-titular);
   font-size: 0.75rem;
-  font-weight: 400;
-  letter-spacing: 0.14em;
+  font-weight: 600;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
   color: #b83a0e;
 }

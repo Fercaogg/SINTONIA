@@ -58,7 +58,7 @@ const resumen = computed<Record<SeccionPuente, string>>(() => {
                 <AppIcon name="back" :size="18" class="text-surface-900 rotate-180 shrink-0" aria-hidden="true" />
               </span>
               <span class="text-sm texto-suave mt-3 flex-1">{{ p.descripcion }}</span>
-              <span v-if="resumen[p.clave]" class="text-xs font-mono uppercase tracking-[0.08em] text-surface-800 mt-3">{{ resumen[p.clave] }}</span>
+              <span v-if="resumen[p.clave]" class="text-sm font-medium text-surface-800 mt-3 tabular-nums">{{ resumen[p.clave] }}</span>
             </RouterLink>
           </li>
         </ul>
